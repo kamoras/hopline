@@ -3,14 +3,17 @@ import type { Line } from "@/domain/line";
 import { createPolyline, type Polyline } from "@/lib/polyline";
 import { providersFor } from "@/providers/registry";
 
-/** Track geometry from every provider that has it. Providers without geometry simply contribute none. */
+/**
+ * Track geometry from every provider that has it. Providers without geometry simply contribute none.
+ * Providers are drawn in reverse registry order, so a first-listed operator's line sits on top where two share track.
+ */
 export async function getLines(board: Board, now = Date.now()): Promise<Line[]> {
   const lists = await Promise.all(
     providersFor(board).map((p) =>
       p.fetchLines?.({ region: board.region, now, diag: {}, signal: AbortSignal.timeout(8_000) }).catch(() => []) ?? [],
     ),
   );
-  return lists.flat();
+  return lists.reverse().flat();
 }
 
 const trackCache = new Map<string, Promise<Polyline[]>>();

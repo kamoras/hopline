@@ -1,6 +1,7 @@
 import { inBounds } from "@/domain/region";
 import type { Trip } from "@/domain/trip";
 import type { FetchContext, TransitProvider } from "../types";
+import { amtrakLines } from "./lines";
 import { AMTRAK_ID, normalizeAmtrakTrip } from "./normalize";
 import { AmtrakStationMetaSchema, AmtrakTrainSchema } from "./schema";
 
@@ -49,6 +50,10 @@ export const amtrakProvider: TransitProvider = {
       diag.positionAgeSecondsOldest = ages.at(-1)!;
     }
     return trips;
+  },
+
+  async fetchLines({ region }) {
+    return amtrakLines(region);
   },
 
   async fetchPlaces({ region, signal }) {
