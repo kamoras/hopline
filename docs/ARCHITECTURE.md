@@ -50,6 +50,7 @@ All state below lives in the URL or in the browser; none of it reaches a server.
 | --- | --- |
 | Daily commuter | **My commutes** (saved "A to B") sit at the top of the board with the next departures; **My trains** pin by number and survive across days. `/` offers "Continue" to the last board. |
 | Knows their train | Type the number. Or open the shareable deep link `/{mode}/{region}/trip/{operator}-{number}`. |
+| Thinks in sentences | Natural language works: `new haven to new york round trip`, `trains leaving stamford to grand central right now`, `nyc`. `src/lib/query.ts` turns text into an intent (legs, round trip, time window) and region `aliases` map city names to station names; anything unrecognized falls back to number/station search. |
 | Knows their station | Type it: autocomplete opens its departures (`/{mode}/{region}/stop/{place}`). Type `A to B` for trains that call at both, then save it as a commute. |
 | Just arrived / unsure | **Near me** (on-device location) suggests the nearest stations; no typing. |
 | Explorer | Map: tap a station for departures, tap a train to follow it. On the home page (when there are several boards) each board is a tappable bubble. |
@@ -68,6 +69,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `inferred` (where time was lost, from stop times). The UI labels the difference.
 - **Estimated positions.** Where an operator provides no GPS (Metro-North often doesn't), the
   position is interpolated between stations from predicted times and marked `source: "estimated"`.
+- **Metro-North trip matching.** The live feed's `trip_id` is opaque and does not match the static
+  schedule; the public train number is in the entity id and vehicle label. Trips are therefore matched
+  on train number + service date (`data/mnr/services.json` records which dates each service runs),
+  with start time and route to disambiguate. `/status` shows how many trips matched which way.
 - **Untrusted upstreams.** Amtraker payloads are parsed per train with zod so one bad record
   doesn't drop the feed; GTFS-RT numeric defaults are checked for presence.
 - **Privacy.** No cookies, analytics or user storage. Pins use `localStorage`; location is read

@@ -7,6 +7,8 @@ export interface Region {
   zoom: number;
   /** IANA zone used to display times to everyone looking at this region. */
   timeZone: string;
+  /** What people call places here, mapped to station-name fragments (normalized). */
+  aliases?: Record<string, string[]>;
 }
 
 export const NORTHEAST: Region = {
@@ -16,6 +18,20 @@ export const NORTHEAST: Region = {
   center: [-73.9, 40.9],
   zoom: 7.2,
   timeZone: "America/New_York",
+  aliases: {
+    "new york": ["grand central", "new york penn"],
+    "new york city": ["grand central", "new york penn"],
+    nyc: ["grand central", "new york penn"],
+    manhattan: ["grand central", "new york penn"],
+    midtown: ["grand central", "new york penn"],
+    gct: ["grand central"],
+    "grand central terminal": ["grand central"],
+    penn: ["new york penn"],
+    "penn station": ["new york penn"],
+    nyp: ["new york penn"],
+    philly: ["philadelphia"],
+    "30th street": ["philadelphia"],
+  },
 };
 
 /** Add new regions here; providers declare which ids they can serve. */

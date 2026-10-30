@@ -6,7 +6,7 @@
  *   npm run data:mnr -- ./gtfs.zip      # use a local copy
  *   npm run data:mnr -- --days 90       # schedule horizon (default 60)
  *
- * Output: data/mnr/{stops,routes,trips,meta}.json
+ * Output: data/mnr/{stops,routes,trips,services,meta}.json
  */
 import AdmZip from "adm-zip";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -85,17 +85,30 @@ async function main() {
   const from = ymd(new Date(today.getTime() - 2 * 86_400_000));
   const to = ymd(new Date(today.getTime() + days * 86_400_000));
 
-  // Which service ids run inside the horizon.
-  const active = new Set<string>();
+  // The dates each service id runs on, inside the horizon. The realtime feed's trip ids are
+  // opaque, so trips are matched on train number + service date; this is what makes that possible.
+  const datesByService = new Map<string, string[]>();
   for (const r of read("calendar_dates.txt")) {
-    if (r.exception_type === "1" && r.date! >= from && r.date! <= to) active.add(r.service_id!);
-  }
-
-  const trips: Record<string, [string, string, string, number, string]> = {};
-  for (const t of read("trips.txt")) {
-    if (active.has(t.service_id!)) {
-      trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), ""];
+    if (r.exception_type === "1" && r.date! >= from && r.date! <= to) {
+      const list = datesByService.get(r.service_id!) ?? [];
+      list.push(r.date!);
+      datesByService.set(r.service_id!, list);
     }
+  }
+  const services: string[] = [];
+  const serviceIndex = new Map<string, number>();
+
+  // trip_id -> [trainNumber, routeId, headsign, direction, stopTimes, serviceIndex]
+  const trips: Record<string, [string, string, string, number, string, number]> = {};
+  for (const t of read("trips.txt")) {
+    const dates = datesByService.get(t.service_id!);
+    if (!dates) continue;
+    let idx = serviceIndex.get(t.service_id!);
+    if (idx === undefined) {
+      idx = services.push(dates.sort().join(",")) - 1;
+      serviceIndex.set(t.service_id!, idx);
+    }
+    trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx];
   }
 
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number }[]>();
@@ -130,6 +143,7 @@ async function main() {
   write("stops.json", stops);
   write("routes.json", routes);
   write("trips.json", trips);
+  write("services.json", services);
   write("meta.json", {
     source: FEED_URL,
     generatedOn: ymd(today),

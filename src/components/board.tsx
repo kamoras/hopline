@@ -19,7 +19,8 @@ import { useNow } from "@/hooks/use-now";
 import { usePinned } from "@/hooks/use-pinned";
 import { useTrips } from "@/hooks/use-trips";
 import { formatAgo } from "@/lib/format";
-import { parseRoute, pinKey, searchTrips, type Filters, type Match, type Route } from "@/lib/search";
+import { describeIntent, describeLeg, parseIntent, type Route } from "@/lib/query";
+import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
 import { Commutes } from "./commutes";
 import { PlaceSheet } from "./place-sheet";
@@ -65,11 +66,25 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
 
   const deferredQuery = useDeferredValue(query);
   const filters: Filters = useMemo(() => ({ query: deferredQuery, operator, delayedOnly }), [deferredQuery, operator, delayedOnly]);
-  const route = useMemo(() => parseRoute(query), [query]);
+  const intent = useMemo(() => parseIntent(query), [query]);
+  const understood = query ? describeIntent(intent) : undefined;
+  const allSaved = intent.legs.length > 0 && intent.legs.every(isSaved);
 
-  const matches = useMemo(() => searchTrips(snapshot.trips, filters), [snapshot.trips, filters]);
+  const matches = useMemo(
+    () => searchTrips(snapshot.trips, filters, { aliases: region.aliases, now }),
+    [snapshot.trips, filters, region.aliases, now],
+  );
   const mine = useMemo(() => (query ? [] : matches.filter((m) => pinned.includes(pinKey(m.trip)))), [matches, pinned, query]);
   const rest = useMemo(() => (query ? matches : matches.filter((m) => !mine.includes(m))), [matches, mine, query]);
+
+  // A round trip shows each direction as its own list; everything else is one list.
+  const groups = useMemo(
+    () =>
+      intent.legs.length > 1
+        ? intent.legs.map((leg, i) => ({ title: describeLeg(leg), items: rest.filter((m) => m.leg === i) }))
+        : [{ title: undefined, items: rest }],
+    [intent.legs, rest],
+  );
 
   const selected = snapshot.trips.find((t) => pinKey(t) === focus.tripKey);
   const selectedPlace = places.find((p) => p.id === focus.placeId);
@@ -213,14 +228,19 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                   </button>
                 </p>
               )}
-              {route && (
+              {understood && (
+                <p className="px-1 text-sm text-muted" role="status">
+                  Showing <span className="font-semibold text-text">{understood}</span>
+                </p>
+              )}
+              {intent.legs.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => toggleCommute(route)}
-                  aria-pressed={isSaved(route)}
-                  className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${isSaved(route) ? "bg-accent text-white" : "border border-line bg-surface hover:bg-surface-2"}`}
+                  onClick={() => toggleCommute(intent.legs)}
+                  aria-pressed={allSaved}
+                  className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${allSaved ? "bg-accent text-white" : "border border-line bg-surface hover:bg-surface-2"}`}
                 >
-                  {isSaved(route) ? "⇄ Saved to My commutes" : "⇄ Save this commute"}
+                  {allSaved ? "⇄ Saved to My commutes" : intent.roundTrip ? "⇄ Save this round trip" : "⇄ Save this commute"}
                 </button>
               )}
             </div>
@@ -231,6 +251,8 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                   commutes={commutes}
                   trips={snapshot.trips}
                   region={region}
+                  aliases={region.aliases}
+                  now={now}
                   onOpenTrip={openTrip}
                   onOpenRoute={showRoute}
                   onRemove={toggleCommute}
@@ -243,12 +265,19 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                 </section>
               )}
               {rest.length > 0 ? (
-                <section aria-label={vocab.label}>
-                  <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">
-                    {query ? `${rest.length} match${rest.length === 1 ? "" : "es"}` : mine.length ? `All ${vocab.nounPlural}` : `${vocab.label} right now`}
-                  </h2>
-                  <ul className="space-y-2.5">{rest.map(card)}</ul>
-                </section>
+                groups.map((g, i) => (
+                  <section key={g.title ?? i} aria-label={g.title ?? vocab.label} className="mb-5">
+                    <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">
+                      {g.title ??
+                        (query ? `${rest.length} match${rest.length === 1 ? "" : "es"}` : mine.length ? `All ${vocab.nounPlural}` : `${vocab.label} right now`)}
+                    </h2>
+                    {g.items.length > 0 ? (
+                      <ul className="space-y-2.5">{g.items.map(card)}</ul>
+                    ) : (
+                      <p className="text-sm text-muted">No {vocab.nounPlural} on this leg right now.</p>
+                    )}
+                  </section>
+                ))
               ) : (
                 mine.length === 0 && <EmptyState vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
               )}

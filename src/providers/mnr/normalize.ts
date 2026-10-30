@@ -6,7 +6,7 @@ import { dateInZone, serviceDayStart } from "@/lib/time";
 import { deriveState, finalizeTrip } from "../finalize";
 import type { AlertIndex } from "./alerts";
 import type { FeedMessage } from "./realtime";
-import type { MnrStaticData, StaticTrip } from "./static";
+import type { MnrStaticData, StaticTrip, StaticTripRef } from "./static";
 
 export const MNR_ID = "mnr";
 export const MNR_TIMEZONE = "America/New_York";
@@ -122,6 +122,67 @@ function estimatePosition(stops: StopCall[], stopsById: MnrStaticData["stops"], 
   return { ...lerpLatLon(prevPos, nextPos, t), heading: bearing(prevPos, nextPos), source: "estimated" };
 }
 
+interface Resolved {
+  /** Schedule trip id (stable, unique). */
+  id: string;
+  trip: StaticTrip;
+  /** Service date (YYYYMMDD) the trip was matched on, if the feed didn't state one. */
+  startDate?: string;
+  via: "tripId" | "trainNumber";
+}
+
+/**
+ * Public train numbers a feed entity might carry. Metro-North puts the number in the entity id
+ * (and vehicle label); its `trip_id` is opaque and does not match the static schedule.
+ */
+function numberCandidates(entity: rt.IFeedEntity, tu: rt.ITripUpdate): string[] {
+  const raw = [entity.id, tu.vehicle?.label, tu.vehicle?.id, tu.trip.tripId];
+  // Numbers can carry letters ("EB1997"); trip ids are far longer and contain "+".
+  return [...new Set(raw.filter((x): x is string => !!x && /^[A-Za-z]{0,3}\d+$/.test(x)))];
+}
+
+const startMinute = (hms: string | null | undefined) => {
+  const [h, m] = (hms ?? "").split(":").map(Number);
+  return h === undefined || m === undefined || Number.isNaN(h + m) ? undefined : h * 60 + m;
+};
+
+/** Of several schedule trips sharing a number and date, pick the one the update is about. */
+function pickCandidate(cands: StaticTripRef[], tu: rt.ITripUpdate, date: string, now: number): StaticTripRef {
+  if (cands.length === 1) return cands[0]!;
+  const wanted = startMinute(tu.trip.startTime);
+  const byTime = wanted === undefined ? undefined : cands.find((c) => c.trip.stopTimes[0]?.departureMin === wanted);
+  if (byTime) return byTime;
+  const byRoute = tu.trip.routeId ? cands.find((c) => c.trip.routeId === tu.trip.routeId) : undefined;
+  if (byRoute) return byRoute;
+  // Otherwise the trip whose scheduled span is closest to now.
+  const start = serviceDayStart(date, MNR_TIMEZONE);
+  const gap = (c: StaticTripRef) => {
+    const mid = (c.trip.stopTimes[0]!.departureMin + c.trip.stopTimes.at(-1)!.arrivalMin) / 2;
+    return Math.abs(start + mid * MIN - now);
+  };
+  return [...cands].sort((a, b) => gap(a) - gap(b))[0]!;
+}
+
+function resolveTrip(entity: rt.IFeedEntity, tu: rt.ITripUpdate, staticData: MnrStaticData, now: number): Resolved | undefined {
+  const tripId = tu.trip.tripId;
+  const exact = tripId ? staticData.trip(tripId) : undefined;
+  if (tripId && exact) return { id: tripId, trip: exact, via: "tripId" };
+
+  const dates = tu.trip.startDate
+    ? [tu.trip.startDate]
+    : [dateInZone(now, MNR_TIMEZONE), dateInZone(now - 24 * 60 * MIN, MNR_TIMEZONE)];
+  for (const number of numberCandidates(entity, tu)) {
+    for (const date of dates) {
+      const cands = staticData.tripsByNumber(number, date);
+      if (cands.length) {
+        const pick = pickCandidate(cands, tu, date, now);
+        return { id: pick.id, trip: pick.trip, startDate: date, via: "trainNumber" };
+      }
+    }
+  }
+  return undefined;
+}
+
 export interface MnrInput {
   staticData: MnrStaticData;
   realtime: FeedMessage;
@@ -137,38 +198,44 @@ const bump = (d: Diagnostics | undefined, key: string) => {
 };
 
 export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag }: MnrInput): Trip[] {
+  // Vehicle positions are keyed by every identifier they carry, since trip ids don't line up.
   const vehicles = new Map<string, rt.IVehiclePosition>();
   for (const e of realtime.entity) {
-    const tripId = e.vehicle?.trip?.tripId;
-    if (tripId && e.vehicle?.position) vehicles.set(tripId, e.vehicle);
+    if (!e.vehicle?.position) continue;
+    for (const key of [e.vehicle.trip?.tripId, e.vehicle.vehicle?.label, e.vehicle.vehicle?.id, e.id]) {
+      if (key) vehicles.set(key, e.vehicle);
+    }
   }
 
   if (diag) {
     diag.feedEntities = realtime.entity.length;
     diag.feedVehicles = vehicles.size;
-    diag.feedTimestamp = realtime.header.timestamp ? new Date(Number(realtime.header.timestamp) * 1000).toISOString() : "none";
+    diag.feedTimestamp = Number(realtime.header.timestamp) > 0 ? new Date(Number(realtime.header.timestamp) * 1000).toISOString() : "none";
   }
 
   const trips: Trip[] = [];
   const unmatched: string[] = [];
   for (const entity of realtime.entity) {
     const tu = entity.tripUpdate;
-    const tripId = tu?.trip?.tripId;
-    if (!tu || !tripId) continue;
+    if (!tu?.trip) continue;
     bump(diag, "tripUpdates");
-    const trip = staticData.trip(tripId);
-    if (!trip || trip.stopTimes.length === 0) {
-      // The most likely failure: feed trip ids don't match the bundled schedule.
+    const resolved = resolveTrip(entity, tu, staticData, now);
+    if (!resolved || resolved.trip.stopTimes.length === 0) {
       bump(diag, "unknownTrip");
-      if (unmatched.length < 3) unmatched.push(tripId);
+      if (unmatched.length < 3) {
+        unmatched.push(`id=${entity.id} trip=${tu.trip.tripId} date=${tu.trip.startDate} time=${tu.trip.startTime}`);
+      }
       continue;
     }
+    bump(diag, resolved.via === "tripId" ? "matchedByTripId" : "matchedByTrainNumber");
+    const { trip } = resolved;
+    const tripId = tu.trip.tripId ?? "";
 
     const canceled = tu.trip.scheduleRelationship === rt.TripDescriptor.ScheduleRelationship.CANCELED;
     const updates = new Map<string, StopUpdate>();
     for (const u of tu.stopTimeUpdate ?? []) if (u.stopId) updates.set(u.stopId, updateFor(u));
 
-    const start = serviceStart(tu.trip.startDate, trip, now);
+    const start = serviceStart(tu.trip.startDate || resolved.startDate, trip, now);
     const stops = buildStops(trip, staticData.stops, start, updates, now);
     const first = stops[0]!;
     const last = stops.at(-1)!;
@@ -177,7 +244,7 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
       continue;
     }
 
-    const vehicle = vehicles.get(tripId);
+    const vehicle = [tripId, entity.id, ...numberCandidates(entity, tu)].map((k) => (k ? vehicles.get(k) : undefined)).find(Boolean);
     const reported = vehicle?.position
       ? ({
           lat: vehicle.position.latitude,
@@ -194,11 +261,11 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
     }
 
     const route = staticData.routes[trip.routeId];
-    const reason = alerts.byTrip.get(tripId) ?? alerts.byRoute.get(trip.routeId);
+    const reason = alerts.byTrip.get(tripId) ?? alerts.byTrip.get(resolved.id) ?? alerts.byRoute.get(trip.routeId);
 
     trips.push(
       finalizeTrip({
-        id: `${MNR_ID}:${tripId}`,
+        id: `${MNR_ID}:${resolved.id}`,
         operatorId: MNR_ID,
         mode: "rail",
         number: trip.number,
@@ -217,7 +284,7 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
   if (diag) {
     diag.kept = trips.length;
     if (unmatched.length) {
-      diag.unmatchedFeedTripIds = unmatched.join(", ");
+      diag.unmatchedFeedSamples = unmatched.join(" ; ");
       diag.exampleScheduleTripId = staticData.tripIds()[0] ?? "none";
     }
   }

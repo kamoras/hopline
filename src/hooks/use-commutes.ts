@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { routeKey, type Route } from "@/lib/search";
+import { routeKey, type Route } from "@/lib/query";
 import { useLocalStore } from "./use-local-store";
 
 const KEY = "hopline:commutes:v1";
@@ -20,13 +20,15 @@ export function useCommutes(boardKey: string) {
 
   const commutes = useMemo(() => all.filter((c) => c.board === boardKey), [all, boardKey]);
   const isSaved = useCallback((r: Route) => commutes.some((c) => routeKey(c) === routeKey(r)), [commutes]);
+  /** Save all given routes, or remove them all if every one is already saved (one write, so round trips can't clobber each other). */
   const toggle = useCallback(
-    (r: Route) =>
-      setRaw(
-        JSON.stringify(
-          isSaved(r) ? all.filter((c) => !(c.board === boardKey && routeKey(c) === routeKey(r))) : [...all, { ...r, board: boardKey }],
-        ),
-      ),
+    (routes: readonly Route[]) => {
+      const keys = new Set(routes.map(routeKey));
+      const next = routes.every(isSaved)
+        ? all.filter((c) => !(c.board === boardKey && keys.has(routeKey(c))))
+        : [...all, ...routes.filter((r) => !isSaved(r)).map((r) => ({ from: r.from, to: r.to, board: boardKey }))];
+      setRaw(JSON.stringify(next));
+    },
     [all, boardKey, isSaved, setRaw],
   );
   return { commutes, isSaved, toggle };
