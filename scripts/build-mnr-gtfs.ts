@@ -86,6 +86,20 @@ function simplify(points: [number, number][], toleranceM: number): [number, numb
   return points.filter((_, i) => keep[i]);
 }
 
+/** Largest gap between consecutive shape points, in meters. Coarse shapes are chords, not track. */
+function maxGapMeters(points: [number, number][]): number {
+  let max = 0;
+  for (let i = 1; i < points.length; i++) {
+    const dy = (points[i]![0] - points[i - 1]![0]) * 110_540;
+    const dx = (points[i]![1] - points[i - 1]![1]) * 111_320 * Math.cos((points[i]![0] * Math.PI) / 180);
+    max = Math.max(max, Math.hypot(dx, dy));
+  }
+  return max;
+}
+
+/** Some schedule shapes have a handful of points over tens of km. Anything with a gap beyond this is not track. */
+const COARSE_GAP_M = 600;
+
 function minutes(hms: string): number {
   const [h = "0", m = "0", s = "0"] = hms.split(":");
   return Math.round((Number(h) * 3600 + Number(m) * 60 + Number(s)) / 60);
@@ -140,9 +154,10 @@ async function main() {
     list.push([Number(s.shape_pt_sequence), Number(s.shape_pt_lat), Number(s.shape_pt_lon)]);
     rawShapes.set(s.shape_id!, list);
   }
-  const shapes: { routeId: string; pts: number[] }[] = [];
+  const shapes: { routeId: string; pts: number[]; coarse?: boolean }[] = [];
   const shapeIndex = new Map<string, number>(); // by simplified geometry, so duplicates share one entry
   const shapeIndexById = new Map<string, number>();
+  const coarse = new Set<number>(); // shapes with no real track geometry
 
   // trip_id -> [trainNumber, routeId, headsign, direction, stopTimes, serviceIndex, shapeIndex]
   const trips: Record<string, [string, string, string, number, string, number, number]> = {};
@@ -156,14 +171,18 @@ async function main() {
     }
     let shape = shapeIndexById.get(t.shape_id!);
     if (shape === undefined) {
-      const pts = simplify(
-        (rawShapes.get(t.shape_id!) ?? []).sort((a, b) => a[0] - b[0]).map(([, la, lo]) => [la, lo] as [number, number]),
-        8,
-      );
-      const flat = pts.flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
-      const key = `${t.route_id}:${flat.join(",")}`;
-      shape = flat.length < 4 ? -1 : (shapeIndex.get(key) ?? shapes.push({ routeId: t.route_id!, pts: flat }) - 1);
-      shapeIndex.set(key, shape);
+      const raw = (rawShapes.get(t.shape_id!) ?? []).sort((a, b) => a[0] - b[0]).map(([, la, lo]) => [la, lo] as [number, number]);
+      if (raw.length >= 2 && maxGapMeters(raw) > COARSE_GAP_M) {
+        // Not real track geometry: build this line from the trip's own station sequence once stop times are read.
+        shape = shapes.push({ routeId: t.route_id!, pts: [], coarse: true }) - 1;
+        coarse.add(shape);
+      } else {
+        const pts = simplify(raw, 8);
+        const flat = pts.flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
+        const key = `${t.route_id}:${flat.join(",")}`;
+        shape = flat.length < 4 ? -1 : (shapeIndex.get(key) ?? shapes.push({ routeId: t.route_id!, pts: flat }) - 1);
+        shapeIndex.set(key, shape);
+      }
       shapeIndexById.set(t.shape_id!, shape);
     }
     trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx, shape];
@@ -190,6 +209,19 @@ async function main() {
 
   const stops: Record<string, [string, number, number]> = {};
   for (const s of read("stops.txt")) stops[s.stop_id!] = [s.stop_name!, Number(s.stop_lat), Number(s.stop_lon)];
+
+  // Coarse shapes become straight segments between the stations of the longest trip that uses them:
+  // crude, but honest about what we know, and it draws the branch instead of a chord across the map.
+  const longest = new Map<number, { stops: number; id: string }>();
+  for (const [id, t] of Object.entries(trips)) {
+    if (!coarse.has(t[6])) continue;
+    const n = t[4].split(";").length;
+    if (n > (longest.get(t[6])?.stops ?? 0)) longest.set(t[6], { stops: n, id });
+  }
+  for (const [idx, { id }] of longest) {
+    const seq = trips[id]![4].split(";").map((p) => p.split("@")[0]!);
+    shapes[idx]!.pts = seq.flatMap((stopId) => (stops[stopId] ? [stops[stopId]![1], stops[stopId]![2]] : []));
+  }
 
   const routes: Record<string, { name: string; color: string }> = {};
   for (const r of read("routes.txt")) {

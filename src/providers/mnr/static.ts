@@ -62,6 +62,8 @@ type RawTrips = Record<string, [string, string, string, number, string, number, 
 export interface RawShape {
   routeId: string;
   pts: number[];
+  /** Built from station positions, not real track geometry. */
+  coarse?: boolean;
 }
 
 export function parseStopTimes(encoded: string): StaticStopTime[] {
@@ -119,13 +121,28 @@ export function createStaticData(raw: {
     routes: raw.routes,
     tripIds: () => Object.keys(raw.trips),
     trip: decode,
-    lines: () =>
-      raw.shapes.map((s, i) => ({
-        id: `mnr-${i}`,
-        name: raw.routes[s.routeId]?.name ? `${raw.routes[s.routeId]!.name} Line` : "Metro-North",
-        color: raw.routes[s.routeId]?.color ?? "#0b5ea8",
-        coords: polylines[i]!.pts.map((p) => [p.lon, p.lat] as [number, number]),
-      })),
+    lines() {
+      // Inbound and outbound often share one geometry; draw each distinct track once.
+      const seen = new Set<string>();
+      // Station-to-station fallbacks are only drawn for a route that has no real track geometry at all.
+      const detailed = new Set(raw.shapes.filter((s) => !s.coarse).map((s) => s.routeId));
+      return raw.shapes.flatMap((s, i) => {
+        if (s.coarse && detailed.has(s.routeId)) return [];
+        const pts = polylines[i]!.pts;
+        const ends = [pts[0], pts.at(-1)].map((p) => `${p?.lat},${p?.lon}`).sort().join("|");
+        const key = `${s.routeId}:${pts.length}:${ends}`;
+        if (pts.length < 2 || seen.has(key)) return [];
+        seen.add(key);
+        return [
+          {
+            id: `mnr-${i}`,
+            name: raw.routes[s.routeId]?.name ? `${raw.routes[s.routeId]!.name} Line` : "Metro-North",
+            color: raw.routes[s.routeId]?.color ?? "#0b5ea8",
+            coords: pts.map((p) => [p.lon, p.lat] as [number, number]),
+          },
+        ];
+      });
+    },
     tripsByNumber(number, date) {
       return (numberIndex().get(number) ?? [])
         .filter((id) => serviceDates[raw.trips[id]![5]]?.has(date))
