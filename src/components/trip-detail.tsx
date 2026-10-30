@@ -6,6 +6,7 @@ import type { Trip } from "@/domain/trip";
 import { isDelayed } from "@/domain/delay";
 import { MODES } from "@/domain/modes";
 import { StatusPill } from "./status-pill";
+import { formatAgo } from "@/lib/format";
 import { StopTimeline } from "./stop-timeline";
 import { OperatorLine } from "./trip-parts";
 
@@ -58,6 +59,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
             {trip.position && (
               <span className="text-sm text-muted">
                 {trip.position.source === "reported" ? "Live GPS" : "Estimated from schedule"}
+                {trip.position.source === "reported" ? ` · updated ${formatAgo(trip.updatedAt, now)}` : ""}
                 {trip.position.speedMph ? ` · ${Math.round(trip.position.speedMph)} mph` : ""}
               </span>
             )}

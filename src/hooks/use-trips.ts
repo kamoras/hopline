@@ -3,7 +3,8 @@
 import useSWR from "swr";
 import type { Mode, Snapshot } from "@/domain/trip";
 
-const REFRESH_MS = 15_000;
+/** How often the browser asks for fresh data. The server caches for about half of this. */
+export const REFRESH_MS = 10_000;
 
 async function fetcher(url: string): Promise<Snapshot> {
   const res = await fetch(url);
@@ -18,7 +19,7 @@ export function useTrips(mode: Mode, regionId: string, initial: Snapshot) {
     refreshInterval: REFRESH_MS,
     revalidateOnFocus: true,
     keepPreviousData: true,
-    dedupingInterval: 5_000,
+    dedupingInterval: 4_000,
   });
   return { snapshot: data ?? initial, error: error as Error | undefined, isValidating, refresh: () => mutate() };
 }

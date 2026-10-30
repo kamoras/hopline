@@ -61,3 +61,26 @@ export function pointAlong(line: Polyline, along: number): LatLon & { heading: n
   const heading = ((Math.atan2((b.lon - a.lon) * line.kx, (b.lat - a.lat) * line.ky) * 180) / Math.PI + 360) % 360;
   return { lat: a.lat + (b.lat - a.lat) * t, lon: a.lon + (b.lon - a.lon) * t, heading };
 }
+
+/**
+ * The part of the line between two distances along it, as a flat [lat, lon, ...] array with
+ * exact (interpolated) ends. Direction is preserved: from > to walks the line backwards.
+ */
+export function slicePolyline(line: Polyline, from: number, to: number): number[] {
+  const lo = Math.max(0, Math.min(from, to));
+  const hi = Math.min(polylineLength(line), Math.max(from, to));
+  const out: number[] = [];
+  const a = pointAlong(line, lo);
+  out.push(a.lat, a.lon);
+  for (let i = 1; i < line.pts.length - 1; i++) {
+    if (line.cum[i]! > lo && line.cum[i]! < hi) out.push(line.pts[i]!.lat, line.pts[i]!.lon);
+  }
+  const b = pointAlong(line, hi);
+  out.push(b.lat, b.lon);
+  if (from > to) {
+    const rev: number[] = [];
+    for (let i = out.length - 2; i >= 0; i -= 2) rev.push(out[i]!, out[i + 1]!);
+    return rev;
+  }
+  return out;
+}

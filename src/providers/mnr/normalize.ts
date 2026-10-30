@@ -2,7 +2,8 @@ import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { inBounds, type Region } from "@/domain/region";
 import type { Diagnostics, Position, StopCall, StopState, Trip } from "@/domain/trip";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
-import { pointAlong, polylineLength, project, type Polyline } from "@/lib/polyline";
+import type { MotionLeg } from "@/lib/motion";
+import { pointAlong, polylineLength, project, slicePolyline, type Polyline } from "@/lib/polyline";
 import { dateInZone, serviceDayStart } from "@/lib/time";
 import { deriveState, finalizeTrip } from "../finalize";
 import type { AlertIndex } from "./alerts";
@@ -109,16 +110,50 @@ function coords(stopsById: MnrStaticData["stops"], id: string): LatLon | undefin
 /** A stop further than this from the track means the geometry isn't for this trip; don't trust it. */
 const MAX_OFF_TRACK_M = 400;
 
+/** Distances along the track of two stops, or nothing if the geometry doesn't fit them. */
+function alongPair(prev: LatLon, next: LatLon, shape: Polyline | undefined): { a: number; b: number } | undefined {
+  if (!shape) return undefined;
+  const a = project(shape, prev);
+  const b = project(shape, next);
+  return a.offMeters <= MAX_OFF_TRACK_M && b.offMeters <= MAX_OFF_TRACK_M && a.along !== b.along ? { a: a.along, b: b.along } : undefined;
+}
+
+/** The route between two stops as a flat [lat, lon, ...] path: along the track if known, else straight. */
+function pathBetween(prev: LatLon, next: LatLon, shape: Polyline | undefined): number[] {
+  const on = alongPair(prev, next, shape);
+  return on && shape ? slicePolyline(shape, on.a, on.b) : [prev.lat, prev.lon, next.lat, next.lon];
+}
+
+/**
+ * Where the train will be over the next few minutes: the stretch it is on and the one after it.
+ * The map moves the train along these continuously, so it keeps rolling between data refreshes.
+ */
+function buildLegs(stops: StopCall[], stopsById: MnrStaticData["stops"], shape: Polyline | undefined): MotionLeg[] | undefined {
+  const nextIdx = stops.findIndex((s) => s.state !== "departed");
+  if (nextIdx === -1) return undefined;
+  const from = stops[nextIdx]!.state === "at" || nextIdx === 0 ? nextIdx : nextIdx - 1;
+  const legs: MotionLeg[] = [];
+  for (let i = from; i < Math.min(stops.length - 1, from + 2); i++) {
+    const a = stops[i]!;
+    const b = stops[i + 1]!;
+    const pa = coords(stopsById, a.id);
+    const pb = coords(stopsById, b.id);
+    if (pa && pb && a.departure !== undefined && b.arrival !== undefined) {
+      legs.push({ t0: a.departure, t1: b.arrival, path: pathBetween(pa, pb, shape) });
+    }
+  }
+  return legs.length ? legs : undefined;
+}
+
 /** Position between two stops, following the track when its geometry is known. */
 function betweenStops(prev: LatLon, next: LatLon, t: number, shape: Polyline | undefined): Omit<Position, "source"> {
   if (shape) {
-    const a = project(shape, prev);
-    const b = project(shape, next);
-    if (a.offMeters <= MAX_OFF_TRACK_M && b.offMeters <= MAX_OFF_TRACK_M && a.along !== b.along) {
-      const along = a.along + (b.along - a.along) * Math.max(0, Math.min(1, t));
+    const on = alongPair(prev, next, shape);
+    if (on) {
+      const along = on.a + (on.b - on.a) * Math.max(0, Math.min(1, t));
       const p = pointAlong(shape, Math.min(polylineLength(shape), along));
       // The polyline has one direction; the train may be travelling the other way along it.
-      const heading = b.along >= a.along ? p.heading : (p.heading + 180) % 360;
+      const heading = on.b >= on.a ? p.heading : (p.heading + 180) % 360;
       return { lat: p.lat, lon: p.lon, heading };
     }
   }
@@ -230,7 +265,10 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
   if (diag) {
     diag.feedEntities = realtime.entity.length;
     diag.feedVehicles = vehicles.size;
-    diag.feedTimestamp = Number(realtime.header.timestamp) > 0 ? new Date(Number(realtime.header.timestamp) * 1000).toISOString() : "none";
+    const ts = Number(realtime.header.timestamp);
+    diag.feedTimestamp = ts > 0 ? new Date(ts * 1000).toISOString() : "none";
+    // How stale the source's own data is: the floor on how real-time anything we show can be.
+    if (ts > 0) diag.feedAgeSeconds = Math.max(0, Math.round(now / 1000 - ts));
   }
 
   const trips: Trip[] = [];
@@ -295,6 +333,7 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
         destination: trip.headsign || last.name,
         state: deriveState(stops, canceled),
         position,
+        motion: buildLegs(stops, staticData.stops, trip.shape),
         stops,
         delayReason: reason,
         updatedAt: toMs(vehicle?.timestamp ?? tu.timestamp ?? realtime.header.timestamp) ?? now,

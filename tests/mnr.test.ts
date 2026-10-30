@@ -207,4 +207,16 @@ describe("track-following positions", () => {
     const mid = at(withShape([35.0, -90.0, 35.1, -90.1]), 510);
     expect(mid.lat).toBeCloseTo(41.0, 2);
   });
+
+  it("sends motion legs that follow the track, for the stretch in progress and the next", () => {
+    const data = withShape([...A, ...apex, ...B]);
+    const now = start + 510 * 60_000;
+    const realtime = feed([{ id: "1", tripUpdate: { trip: { tripId: "S", startDate: DATE }, stopTimeUpdate: [{ stopId: "2", arrival: { delay: 0 } }] } }]);
+    const [trip] = buildMnrTrips({ staticData: data, realtime, alerts: indexAlerts(undefined, now), region: NORTHEAST, now });
+    expect(trip!.motion).toHaveLength(1); // only one stretch remains: A -> B
+    const leg = trip!.motion![0]!;
+    expect([leg.t0, leg.t1]).toEqual([start + 480 * 60_000, start + 540 * 60_000]);
+    expect(leg.path.length).toBeGreaterThanOrEqual(6); // A, the apex, B: not a straight line
+    expect(Math.max(...leg.path.filter((_, i) => i % 2 === 0))).toBeGreaterThan(41.05);
+  });
 });
