@@ -14,7 +14,7 @@ export async function getPlaces(board: Board, now = Date.now()): Promise<Place[]
 
   const lists = await Promise.all(
     providersFor(board).map((p) =>
-      p.fetchPlaces({ region: board.region, now, signal: AbortSignal.timeout(8_000) }).catch(() => []),
+      p.fetchPlaces({ region: board.region, now, diag: {}, signal: AbortSignal.timeout(8_000) }).catch(() => []),
     ),
   );
   const places = mergePlaces(lists.flat());

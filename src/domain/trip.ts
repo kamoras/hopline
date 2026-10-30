@@ -89,6 +89,9 @@ export interface Attribution {
   notice?: string;
 }
 
+/** Counters a provider reports about what it saw and dropped, to make empty boards debuggable. */
+export type Diagnostics = Record<string, number | string>;
+
 export interface ProviderStatus {
   id: string;
   name: string;
@@ -97,6 +100,7 @@ export interface ProviderStatus {
   tripCount: number;
   fetchedAt: number;
   error?: string;
+  diagnostics?: Diagnostics;
 }
 
 export interface Snapshot {

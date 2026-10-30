@@ -76,6 +76,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
   const mapTrips = useMemo(() => matches.map((m) => m.trip), [matches]);
   const delayedCount = useMemo(() => snapshot.trips.filter(isDelayed).length, [snapshot.trips]);
   const down = snapshot.providers.filter((p) => !p.ok);
+  const quiet = snapshot.providers.filter((p) => p.ok && p.tripCount === 0);
   const operators = useMemo(() => [...new Set(snapshot.trips.map((t) => t.operatorId))].sort(), [snapshot.trips]);
   const nearby = useMemo(() => (geo.state.status === "ready" ? nearestPlaces(places, geo.state.at) : []), [geo.state, places]);
 
@@ -194,6 +195,14 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                 <p className="rounded-xl bg-warn-bg px-3 py-2 text-sm text-warn" role="status">
                   {down.map((p) => p.name).join(" and ")} data is temporarily unavailable
                   {down.length < snapshot.providers.length ? "; showing what we have." : "."}
+                </p>
+              )}
+              {quiet.length > 0 && down.length === 0 && (
+                <p className="rounded-xl bg-surface-2 px-3 py-2 text-sm text-muted" role="status">
+                  {quiet.map((p) => p.name).join(" and ")} responded but reported no {vocab.nounPlural} right now.{" "}
+                  <Link href="/status" className="font-semibold text-text underline">
+                    Details
+                  </Link>
                 </p>
               )}
               {focus.tripKey && !selected && (
@@ -338,7 +347,12 @@ function Footer({ providers }: { providers: ProviderStatus[] }) {
         . Delay reasons come from the operator when published; otherwise we only show where time was lost.
       </p>
       {sources.map((a) => a.notice && <p key={a.url}>{a.notice}</p>)}
-      <p>No accounts, no tracking. Saved items and your location never leave this device.</p>
+      <p>
+        No accounts, no tracking. Saved items and your location never leave this device.{" "}
+        <Link href="/status" className="underline hover:text-text">
+          Data status
+        </Link>
+      </p>
     </footer>
   );
 }

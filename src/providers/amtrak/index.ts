@@ -18,24 +18,31 @@ export const amtrakProvider: TransitProvider = {
   mode: "rail",
   regionIds: ["northeast"],
 
-  async fetchTrips({ region, signal }: FetchContext): Promise<Trip[]> {
+  async fetchTrips({ region, signal, diag }: FetchContext): Promise<Trip[]> {
     const base = process.env.AMTRAKER_BASE_URL || DEFAULT_BASE_URL;
-    const res = await fetch(`${base}/trips`, { signal, cache: "no-store" });
+    const res = await fetch(`${base}/trains`, { signal, cache: "no-store" });
     if (!res.ok) throw new Error(`Amtraker responded ${res.status}`);
 
     const body: unknown = await res.json();
     if (!body || typeof body !== "object") throw new Error("Amtraker returned an unexpected payload");
 
     const trips: Trip[] = [];
+    diag.trainsInFeed = 0;
+    diag.invalidRecords = 0;
     for (const group of Object.values(body as Record<string, unknown>)) {
       if (!Array.isArray(group)) continue;
       for (const raw of group) {
+        diag.trainsInFeed = Number(diag.trainsInFeed) + 1;
         const parsed = AmtrakTrainSchema.safeParse(raw);
-        if (!parsed.success) continue;
-        const trip = normalizeAmtrakTrip(parsed.data, region);
+        if (!parsed.success) {
+          diag.invalidRecords = Number(diag.invalidRecords) + 1;
+          continue;
+        }
+        const trip = normalizeAmtrakTrip(parsed.data, region, diag);
         if (trip) trips.push(trip);
       }
     }
+    diag.kept = trips.length;
     return trips;
   },
 

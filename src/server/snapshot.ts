@@ -1,5 +1,5 @@
 import type { Board } from "@/domain/board";
-import type { ProviderStatus, Snapshot, Trip } from "@/domain/trip";
+import type { Diagnostics, ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { providersFor } from "@/providers/registry";
 import type { TransitProvider } from "@/providers/types";
 
@@ -20,14 +20,16 @@ async function runProvider(
   now: number,
 ): Promise<{ status: ProviderStatus; trips: Trip[] }> {
   const key = `${provider.id}:${mode}:${region.id}`;
+  const diag: Diagnostics = {};
   try {
     const trips = await provider.fetchTrips({
       region,
       now,
+      diag,
       signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
     lastGood.set(key, { trips, at: now });
-    return { trips, status: { id: provider.id, name: provider.name, attribution: provider.attribution, ok: true, tripCount: trips.length, fetchedAt: now } };
+    return { trips, status: { id: provider.id, name: provider.name, attribution: provider.attribution, diagnostics: diag, ok: true, tripCount: trips.length, fetchedAt: now } };
   } catch (err) {
     const cached = lastGood.get(key);
     const usable = cached && now - cached.at <= STALE_TOLERANCE_MS ? cached : undefined;
@@ -37,6 +39,7 @@ async function runProvider(
         id: provider.id,
         name: provider.name,
         attribution: provider.attribution,
+        diagnostics: diag,
         ok: false,
         tripCount: usable?.trips.length ?? 0,
         fetchedAt: usable?.at ?? now,
