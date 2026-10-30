@@ -15,7 +15,7 @@ running, who's late, why, and where every train is right now on a map.
   we say plainly where time was lost ("Lost 10 min between Stamford and Greenwich") and
   never guess at a cause.
 - **Live map.** Every train, color-coded by delay, with smooth movement between updates.
-- **Private by design.** No accounts, no analytics, no cookies, no database. "My trains"
+- **Private by design.** No accounts, no cookies, no ad tracking, no database. The only analytics is [Vercel Web Analytics](https://vercel.com/docs/analytics/privacy-policy): anonymous page-view counts, no cookies, no personal data, no cross-site tracking. "My trains"
   and your optional location dot live in your browser only and are never sent anywhere.
 
 ## Quick start
