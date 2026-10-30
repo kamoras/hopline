@@ -52,8 +52,20 @@ so upstream feeds see roughly one request per 10 s regardless of traffic.
 | --- | --- | --- |
 | [MTA GTFS-Realtime](https://www.mta.info/developers) (Metro-North trip updates, vehicles, alerts) | Live Metro-North delays and alert-based reasons | Currently keyless. If MTA requires a key, set `MTA_API_KEY`. |
 | MTA static GTFS | Station names, train numbers, schedules | Converted to JSON at build time, refreshed weekly by a GitHub Action. |
-| [Amtraker v3](https://api-v3.amtraker.com) | Live Amtrak positions and delays | Community API with no key; override with `AMTRAKER_BASE_URL`. |
+| [Amtraker v3](https://amtraker.com) | Live Amtrak positions and delays, stations | Community API, no key. The author asks for credit on the site; Hopline shows it in every board footer. Override the URL with `AMTRAKER_BASE_URL`. |
 | [OpenFreeMap](https://openfreemap.org) + MapLibre GL | Base map | Free, keyless. Override with `NEXT_PUBLIC_MAP_STYLE_URL`. |
+
+## API keys
+
+None are required. Amtraker needs no key. MTA's GTFS-Realtime feeds have been served without
+one, but if they start returning 401/403, get a key from the [MTA developer
+resources](https://www.mta.info/developers) and set `MTA_API_KEY` (it is sent as `x-api-key`).
+
+## Attribution
+
+Each data source credits itself in the footer, as its terms ask: Amtraker for Amtrak data and the MTA
+for Metro-North, plus the trademark and non-affiliation notices. This is part of the provider
+contract (`TransitProvider.attribution`), so every new source must declare one.
 
 ## Architecture
 

@@ -80,9 +80,19 @@ export interface Trip {
   updatedAt: number;
 }
 
+/** Credit a data source asks for, shown wherever its data is shown. */
+export interface Attribution {
+  /** e.g. "Amtraker". */
+  label: string;
+  url: string;
+  /** Optional legal notice, e.g. a trademark line. */
+  notice?: string;
+}
+
 export interface ProviderStatus {
   id: string;
   name: string;
+  attribution: Attribution;
   ok: boolean;
   tripCount: number;
   fetchedAt: number;

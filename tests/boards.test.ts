@@ -6,7 +6,7 @@ import { deriveBoards, findBoard, selectProviders } from "@/providers/registry";
 import type { TransitProvider } from "@/providers/types";
 
 const provider = (id: string, mode: "rail", regionIds: string[]): TransitProvider => ({
-  id, name: id, mode, regionIds, fetchTrips: async () => [], fetchPlaces: async () => [],
+  id, name: id, attribution: { label: id, url: "https://example.com" }, mode, regionIds, fetchTrips: async () => [], fetchPlaces: async () => [],
 });
 
 describe("boards", () => {
