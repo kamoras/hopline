@@ -4,7 +4,7 @@
 Hopline merges live data from multiple operators into one simple view: which trains are
 running, who's late, why, and where every train is right now on a map.
 
-**Coverage:** Metro-North Railroad and Amtrak between New York, Connecticut and Philadelphia, and the NYC subway (live trains on a map, and next trains at every station by line and direction).
+**Coverage:** Metro-North Railroad and Amtrak between New York, Connecticut and Philadelphia, plus Shore Line East and the Hartford Line (timetable only until their schedule data is added, see below), and the NYC subway (live trains on a map, and next trains at every station by line and direction).
 
 - **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see
   the trains due, in arrival order, with live delay.
@@ -39,6 +39,7 @@ HOPLINE_DEMO=1 npm run dev
 | `npm test` | Unit tests (Vitest) |
 | `npm run lint` · `npm run typecheck` | ESLint · TypeScript |
 | `npm run data:mnr` | Regenerate Metro-North schedule data from official GTFS |
+| `npm run data:shoreline-east -- --zip feed.zip` | Build Shore Line East timetable data from a GTFS zip (same for `data:hartford-line`) |
 
 ## Deploying on Vercel
 

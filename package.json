@@ -18,7 +18,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "data:mnr": "tsx scripts/build-mnr-gtfs.ts",
+    "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
+    "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",
+    "data:hartford-line": "tsx scripts/build-rail-gtfs.ts hartford-line",
     "data:subway": "tsx scripts/build-subway-gtfs.ts"
   },
   "dependencies": {
