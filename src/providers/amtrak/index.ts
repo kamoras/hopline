@@ -43,6 +43,11 @@ export const amtrakProvider: TransitProvider = {
       }
     }
     diag.kept = trips.length;
+    if (trips.length) {
+      const ages = trips.map((t) => Math.max(0, Math.round((Date.now() - t.updatedAt) / 1000))).sort((a, b) => a - b);
+      diag.positionAgeSecondsMedian = ages[Math.floor(ages.length / 2)]!;
+      diag.positionAgeSecondsOldest = ages.at(-1)!;
+    }
     return trips;
   },
 

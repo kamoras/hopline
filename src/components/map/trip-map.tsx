@@ -8,10 +8,15 @@ import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
 import type { DelayStatus, Trip } from "@/domain/trip";
 import { lerpLatLon, type LatLon } from "@/lib/geo";
+import { compileLegs, positionAt, type CompiledLeg } from "@/lib/motion";
+import { REFRESH_MS } from "@/hooks/use-trips";
 import { BaseMap } from "./base-map";
 import { useLocate } from "./use-locate";
 
-const TWEEN_MS = 1500;
+/** Frame rate of marker updates (~25 fps keeps it smooth without taxing the map). */
+const FRAME_MS = 40;
+/** Time constant for blending out a correction when fresh data arrives. */
+const CORRECTION_MS = 700;
 
 const STATUS_COLOR: Record<DelayStatus, string> = {
   "on-time": "#138a4b",
@@ -30,6 +35,28 @@ interface Props {
   selectedPlaceId?: string;
   onSelectTrip(id: string): void;
   onSelectPlace(id: string): void;
+}
+
+interface Motion {
+  /** Schedule-based path; when present the train follows it by the clock. */
+  legs?: CompiledLeg[];
+  /** Otherwise: glide from `from` to `to` over `duration` ms starting at `start`. */
+  from: LatLon;
+  to: LatLon;
+  start: number;
+  duration: number;
+  /** Offset between where it was drawn and where the new data says, decaying to zero. */
+  corr: LatLon;
+  corrAt: number;
+}
+
+function motionPosition(m: Motion, now: number): LatLon {
+  if (m.legs) {
+    const base = positionAt(m.legs, now) ?? m.to;
+    const k = Math.exp(-(now - m.corrAt) / CORRECTION_MS);
+    return { lat: base.lat + m.corr.lat * k, lon: base.lon + m.corr.lon * k };
+  }
+  return lerpLatLon(m.from, m.to, m.duration > 0 ? (now - m.start) / m.duration : 1);
 }
 
 const empty: FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -75,6 +102,7 @@ function placeFeatures(places: readonly Place[]): FeatureCollection {
 export default function TripMap({ region, trips, places, lines, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, LatLon>());
+  const motions = useRef(new Map<string, Motion>());
   const raf = useRef(0);
   const fitted = useRef(false);
   const handlers = useRef({ onSelectTrip, onSelectPlace });
@@ -167,35 +195,57 @@ export default function TripMap({ region, trips, places, lines, selectedTripId, 
     (map?.getSource("lines") as GeoJSONSource | undefined)?.setData(lineFeatures(lines));
   }, [map, lines]);
 
-  // Animate markers from where they are now to their newest positions.
+  // Keep every train moving between data refreshes. Trains with a schedule-based path follow it by
+  // the clock; point-only trains (GPS) glide toward their latest report over the refresh interval.
+  // When fresh data disagrees with where a train is drawn, the difference is blended out over a
+  // moment rather than snapped, so nothing visibly jumps.
   useEffect(() => {
     const source = map?.getSource("trips") as GeoJSONSource | undefined;
     if (!map || !source) return;
-    const from = new Map(shown.current);
-    const to = new Map<string, LatLon>();
-    for (const t of trips) if (t.position) to.set(t.id, { lat: t.position.lat, lon: t.position.lon });
+    const t = Date.now();
+    const next = new Map<string, Motion>();
+    for (const trip of trips) {
+      if (!trip.position) continue;
+      const prev = shown.current.get(trip.id);
+      const at: LatLon = { lat: trip.position.lat, lon: trip.position.lon };
+      const legs = trip.motion?.length ? compileLegs(trip.motion) : undefined;
+      if (legs) {
+        const target = positionAt(legs, t) ?? at;
+        next.set(trip.id, { legs, from: at, to: at, start: t, duration: 0, corr: prev ? { lat: prev.lat - target.lat, lon: prev.lon - target.lon } : { lat: 0, lon: 0 }, corrAt: t });
+      } else {
+        next.set(trip.id, { from: prev ?? at, to: at, start: t, duration: REFRESH_MS, corr: { lat: 0, lon: 0 }, corrAt: t });
+      }
+    }
+    motions.current = next;
 
-    if (!fitted.current && to.size > 0) {
+    if (!fitted.current && next.size > 0) {
       // Frame the action once, on first data; after that the user is in control.
       fitted.current = true;
       const b = new LngLatBounds();
-      to.forEach((p) => b.extend([p.lon, p.lat]));
+      next.forEach((m) => b.extend([m.to.lon, m.to.lat]));
       map.fitBounds(b, { padding: 56, maxZoom: 10, duration: 0 });
     }
 
-    cancelAnimationFrame(raf.current);
-    const start = performance.now();
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const step = (now: number) => {
-      const k = reduce ? 1 : Math.min(1, (now - start) / TWEEN_MS);
-      const eased = 1 - (1 - k) ** 3;
+    const draw = () => {
+      const now = Date.now();
       const current = new Map<string, LatLon>();
-      for (const [id, target] of to) current.set(id, lerpLatLon(from.get(id) ?? target, target, eased));
+      for (const [id, m] of motions.current) current.set(id, motionPosition(m, now));
       shown.current = current;
       source.setData(tripFeatures(trips, current));
-      if (k < 1) raf.current = requestAnimationFrame(step);
     };
-    raf.current = requestAnimationFrame(step);
+
+    draw();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let last = 0;
+    const loop = (ts: number) => {
+      if (ts - last >= FRAME_MS) {
+        last = ts;
+        draw();
+      }
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf.current);
   }, [map, trips]);
 
   // Fly to a newly selected trip or station; not on every data refresh.

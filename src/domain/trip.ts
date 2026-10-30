@@ -4,6 +4,7 @@
  * Times are epoch milliseconds (UTC); presentation converts to local time.
  */
 
+import type { MotionLeg } from "@/lib/motion";
 import type { Mode } from "./modes";
 
 export type { Mode };
@@ -69,6 +70,11 @@ export interface Trip {
   destination: string;
   state: TripState;
   position?: Position;
+  /**
+   * Where the train is expected to be over the next minutes, so the map can move it continuously
+   * between data refreshes instead of jumping. Absent when the source gives only a point (GPS).
+   */
+  motion?: MotionLeg[];
   stops: StopCall[];
   /** Delay at the most recent/next stop, in minutes. */
   delayMinutes?: number;
