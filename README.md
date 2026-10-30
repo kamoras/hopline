@@ -1,0 +1,66 @@
+# Hopline
+
+**Where's my train?** A fast, free, open-source single pane of glass for public transit.
+Hopline merges live data from multiple operators into one simple view: which trains are
+running, who's late, why, and where every train is right now on a map.
+
+**Launch coverage:** Metro-North Railroad and Amtrak between New York, Connecticut and Philadelphia.
+
+- **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see
+  the trains due, in arrival order, with live delay.
+- **Few clicks for every kind of rider.** Saved commutes ("Stamford to Grand Central") show the next
+  departures at the top; station autocomplete, "near me", shareable deep links and a tap-through map
+  cover everyone else. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#ways-in-navigation-for-different-people).
+- **Delays explained.** Operator-reported causes when the railroad publishes one; otherwise
+  we say plainly where time was lost ("Lost 10 min between Stamford and Greenwich") and
+  never guess at a cause.
+- **Live map.** Every train, color-coded by delay, with smooth movement between updates.
+- **Private by design.** No accounts, no analytics, no cookies, no database. "My trains"
+  and your optional location dot live in your browser only and are never sent anywhere.
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env.local   # optional: nothing is required
+npm run dev
+```
+
+No API keys are needed. To work offline or without upstream feeds, run with synthetic data
+that flows through the real normalizers:
+
+```bash
+HOPLINE_DEMO=1 npm run dev
+```
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` / `build` / `start` | Next.js dev server / production build / serve |
+| `npm test` | Unit tests (Vitest) |
+| `npm run lint` · `npm run typecheck` | ESLint · TypeScript |
+| `npm run data:mnr` | Regenerate Metro-North schedule data from official GTFS |
+
+## Deploying on Vercel
+
+Import the repo into Vercel; no configuration is required. Optional environment variables
+are listed in [`.env.example`](.env.example). `/api/trips` is cached at the edge for 10 s,
+so upstream feeds see roughly one request per 10 s regardless of traffic.
+
+## Data sources
+
+| Source | Used for | Notes |
+| --- | --- | --- |
+| [MTA GTFS-Realtime](https://www.mta.info/developers) (Metro-North trip updates, vehicles, alerts) | Live Metro-North delays and alert-based reasons | Currently keyless. If MTA requires a key, set `MTA_API_KEY`. |
+| MTA static GTFS | Station names, train numbers, schedules | Converted to JSON at build time, refreshed weekly by a GitHub Action. |
+| [Amtraker v3](https://api-v3.amtraker.com) | Live Amtrak positions and delays | Community API with no key; override with `AMTRAKER_BASE_URL`. |
+| [OpenFreeMap](https://openfreemap.org) + MapLibre GL | Base map | Free, keyless. Override with `NEXT_PUBLIC_MAP_STYLE_URL`. |
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design details and for how to add a new
+operator, mode or region. In short: every source is a `TransitProvider` that returns the
+common `Train` model; a fault-isolated aggregator merges them; the UI only knows the model.
+
+## License
+
+[AGPL-3.0](LICENSE). Contributions welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
