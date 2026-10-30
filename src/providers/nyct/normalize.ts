@@ -1,4 +1,5 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
+import type { Arrival } from "@/domain/arrival";
 import type { Region } from "@/domain/region";
 import type { Diagnostics, Position, StopCall, Trip } from "@/domain/trip";
 import type { MotionLeg } from "@/lib/motion";
@@ -136,4 +137,45 @@ export function buildNyctTrips({ staticData, feeds, now, diag }: NyctInput): Tri
   }
   if (diag) diag.feedsUsed = feeds.length;
   return trips;
+}
+
+/** How far ahead arrivals are listed. Beyond this a station board is just noise. */
+const ARRIVALS_HORIZON_MS = 45 * 60_000;
+const ARRIVALS_MAX = 60;
+
+/**
+ * Trains due at a station (any of its platforms) from the realtime feeds: when each arrives and
+ * where it is going, taken from the last stop in its own list of upcoming stops.
+ */
+export function buildNyctArrivals({
+  staticData,
+  feeds,
+  platforms,
+  now,
+}: {
+  staticData: NyctStatic;
+  feeds: readonly FeedMessage[];
+  platforms: readonly string[];
+  now: number;
+}): Arrival[] {
+  const wanted = new Set(platforms);
+  const out: Arrival[] = [];
+  for (const feed of feeds) {
+    for (const entity of feed.entity) {
+      const tu = entity.tripUpdate;
+      const tripId = tu?.trip?.tripId;
+      const route = tu?.trip?.routeId ? staticData.routes[tu.trip.routeId] : undefined;
+      if (!tu || !tripId || !route) continue;
+      const updates = tu.stopTimeUpdate ?? [];
+      const lastStop = [...updates].reverse().find((u) => u.stopId && staticData.stationOfPlatform(u.stopId));
+      const headsign = (lastStop?.stopId && staticData.stationOfPlatform(lastStop.stopId)?.name) || route.long;
+      for (const u of updates) {
+        const at = timeMs(u.arrival) ?? timeMs(u.departure);
+        if (!u.stopId || !wanted.has(u.stopId) || at === undefined) continue;
+        if (at < now - PASSED_GRACE_MS || at > now + ARRIVALS_HORIZON_MS) continue;
+        out.push({ tripId, route: route.short, color: route.color, textColor: route.text, headsign, at, platform: u.stopId });
+      }
+    }
+  }
+  return out.sort((a, b) => a.at - b.at).slice(0, ARRIVALS_MAX);
 }

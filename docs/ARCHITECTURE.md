@@ -75,7 +75,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   feeds in parallel (a failed feed is skipped and reported on `/status`), gets stations, line colors and track from
   bundled data (`npm run data:subway`; stations in the same complex are merged), and estimates each train's position
   as its next stop's place on the track minus the distance it still has to cover. Station ids are supplied by the
-  provider because subway names repeat ("86 St").
+  provider because subway names repeat ("86 St"). Station boards are served by `fetchArrivals` (optional on a
+  provider): trains due at a station's platforms in the next 45 min, grouped by line and destination
+  (`lib/arrivals.ts`), refreshed while the sheet is open (`/api/arrivals`), with a warning when the next train is
+  15+ min away or a gap is much bigger than the usual spacing.
 - **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
   that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
   from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches

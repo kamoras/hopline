@@ -2,7 +2,7 @@ import type { Place } from "@/domain/place";
 import { placeSlug } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
 import type { FetchContext, TransitProvider } from "../types";
-import { buildNyctTrips, NYCT_ID } from "./normalize";
+import { buildNyctArrivals, buildNyctTrips, NYCT_ID } from "./normalize";
 import { fetchSubwayFeeds } from "./realtime";
 import { loadNyctStatic } from "./static";
 
@@ -33,6 +33,11 @@ export const nyctProvider: TransitProvider = {
       const slug = placeSlug(s.name);
       return { id: (counts.get(slug) ?? 0) > 1 ? `${slug}-${s.id.toLowerCase()}` : slug, name: s.name, lat: s.lat, lon: s.lon, mode: "subway", regionId: region.id, codes: s.platforms };
     });
+  },
+
+  async fetchArrivals({ signal, now }, place) {
+    const { feeds } = await fetchSubwayFeeds(signal, now);
+    return buildNyctArrivals({ staticData: loadNyctStatic(), feeds, platforms: place.codes ?? [], now });
   },
 
   async fetchLines() {

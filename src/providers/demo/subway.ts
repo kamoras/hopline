@@ -1,7 +1,7 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { NYC } from "@/domain/region";
 import { project } from "@/lib/polyline";
-import { buildNyctTrips } from "../nyct/normalize";
+import { buildNyctArrivals, buildNyctTrips } from "../nyct/normalize";
 import { loadNyctStatic } from "../nyct/static";
 import type { TransitProvider } from "../types";
 import { nyctProvider } from "../nyct";
@@ -50,10 +50,14 @@ function syntheticFeed(now: number): rt.FeedMessage {
   return rt.FeedMessage.decode(rt.FeedMessage.encode(rt.FeedMessage.create({ header: { gtfsRealtimeVersion: "2.0", timestamp: Math.floor(now / 1000) }, entity: entities })).finish());
 }
 
+/** Same synthetic feed, so arrivals in demo mode agree with the trains on the map. */
 export const demoSubwayProvider: TransitProvider = {
   ...nyctProvider,
   id: "nyct",
   async fetchTrips({ now, region, diag }) {
     return buildNyctTrips({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], region: region ?? NYC, now, diag });
+  },
+  async fetchArrivals({ now }, place) {
+    return buildNyctArrivals({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], platforms: place.codes ?? [], now });
   },
 };
