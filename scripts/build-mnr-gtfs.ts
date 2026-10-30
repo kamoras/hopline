@@ -6,7 +6,7 @@
  *   npm run data:mnr -- ./gtfs.zip      # use a local copy
  *   npm run data:mnr -- --days 90       # schedule horizon (default 60)
  *
- * Output: data/mnr/{stops,routes,trips,services,meta}.json
+ * Output: data/mnr/{stops,routes,trips,services,shapes,meta}.json
  */
 import AdmZip from "adm-zip";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -50,6 +50,40 @@ function parseCsv(text: string): Row[] {
   }
   const header = rows.shift()?.map((h) => h.replace(/^﻿/, "")) ?? [];
   return rows.map((r) => Object.fromEntries(header.map((h, i) => [h, r[i] ?? ""])));
+}
+
+/** Douglas-Peucker on [lat, lon] points, tolerance in meters (local flat-earth projection). */
+function simplify(points: [number, number][], toleranceM: number): [number, number][] {
+  if (points.length < 3) return points;
+  const lat0 = points[0]![0];
+  const kx = 111_320 * Math.cos((lat0 * Math.PI) / 180);
+  const ky = 110_540;
+  const xy = points.map(([la, lo]) => [lo * kx, la * ky] as const);
+  const keep = new Uint8Array(points.length);
+  keep[0] = keep[points.length - 1] = 1;
+  const stack: [number, number][] = [[0, points.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop()!;
+    const [ax, ay] = xy[a]!;
+    const [bx, by] = xy[b]!;
+    const len2 = (bx - ax) ** 2 + (by - ay) ** 2;
+    let worst = -1;
+    let worstD = toleranceM;
+    for (let i = a + 1; i < b; i++) {
+      const [px, py] = xy[i]!;
+      const t = len2 ? Math.max(0, Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / len2)) : 0;
+      const d = Math.hypot(px - (ax + t * (bx - ax)), py - (ay + t * (by - ay)));
+      if (d > worstD) {
+        worstD = d;
+        worst = i;
+      }
+    }
+    if (worst >= 0) {
+      keep[worst] = 1;
+      stack.push([a, worst], [worst, b]);
+    }
+  }
+  return points.filter((_, i) => keep[i]);
 }
 
 function minutes(hms: string): number {
@@ -98,8 +132,20 @@ async function main() {
   const services: string[] = [];
   const serviceIndex = new Map<string, number>();
 
-  // trip_id -> [trainNumber, routeId, headsign, direction, stopTimes, serviceIndex]
-  const trips: Record<string, [string, string, string, number, string, number]> = {};
+  // Track geometry, simplified to ~8 m. Trips point at a shape by index so estimated positions
+  // can follow the rails instead of cutting straight between stations.
+  const rawShapes = new Map<string, [number, number, number][]>();
+  for (const s of read("shapes.txt")) {
+    const list = rawShapes.get(s.shape_id!) ?? [];
+    list.push([Number(s.shape_pt_sequence), Number(s.shape_pt_lat), Number(s.shape_pt_lon)]);
+    rawShapes.set(s.shape_id!, list);
+  }
+  const shapes: { routeId: string; pts: number[] }[] = [];
+  const shapeIndex = new Map<string, number>(); // by simplified geometry, so duplicates share one entry
+  const shapeIndexById = new Map<string, number>();
+
+  // trip_id -> [trainNumber, routeId, headsign, direction, stopTimes, serviceIndex, shapeIndex]
+  const trips: Record<string, [string, string, string, number, string, number, number]> = {};
   for (const t of read("trips.txt")) {
     const dates = datesByService.get(t.service_id!);
     if (!dates) continue;
@@ -108,7 +154,19 @@ async function main() {
       idx = services.push(dates.sort().join(",")) - 1;
       serviceIndex.set(t.service_id!, idx);
     }
-    trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx];
+    let shape = shapeIndexById.get(t.shape_id!);
+    if (shape === undefined) {
+      const pts = simplify(
+        (rawShapes.get(t.shape_id!) ?? []).sort((a, b) => a[0] - b[0]).map(([, la, lo]) => [la, lo] as [number, number]),
+        8,
+      );
+      const flat = pts.flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
+      const key = `${t.route_id}:${flat.join(",")}`;
+      shape = flat.length < 4 ? -1 : (shapeIndex.get(key) ?? shapes.push({ routeId: t.route_id!, pts: flat }) - 1);
+      shapeIndex.set(key, shape);
+      shapeIndexById.set(t.shape_id!, shape);
+    }
+    trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx, shape];
   }
 
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number }[]>();
@@ -144,6 +202,7 @@ async function main() {
   write("routes.json", routes);
   write("trips.json", trips);
   write("services.json", services);
+  write("shapes.json", shapes);
   write("meta.json", {
     source: FEED_URL,
     generatedOn: ymd(today),

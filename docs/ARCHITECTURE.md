@@ -73,6 +73,15 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   schedule; the public train number is in the entity id and vehicle label. Trips are therefore matched
   on train number + service date (`data/mnr/services.json` records which dates each service runs),
   with start time and route to disambiguate. `/status` shows how many trips matched which way.
+- **Map accuracy.**
+  - *Trains:* where an operator gives no GPS, a position is estimated between stations from predicted
+    times and then snapped to the track, using the schedule's own geometry (`data/mnr/shapes.json`,
+    simplified to ~8 m). On the real Metro-North schedule this moved the average estimate from 527 m
+    off the track (up to 5 km) to on it. Estimates are labeled `source: "estimated"`. The same
+    geometry is drawn on the map via `/api/lines` (providers opt in with `fetchLines`).
+  - *Stations:* provider coordinates are sometimes rough. `data/places/overrides.json` holds
+    hand-verified positions (each names its source) that win over a feed, matched by place id or operator
+    code. To correct a station, add an entry there; prefer an official source such as an agency's GTFS `stops.txt`.
 - **Untrusted upstreams.** Amtraker payloads are parsed per train with zod so one bad record
   doesn't drop the feed; GTFS-RT numeric defaults are checked for presence.
 - **Privacy.** No cookies, analytics or user storage. Pins use `localStorage`; location is read

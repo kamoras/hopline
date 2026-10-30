@@ -1,0 +1,9 @@
+[
+  {
+    "ids": ["new-york-penn", "penn", "new-york-penn-station"],
+    "codes": ["NYP"],
+    "lat": 40.75058844,
+    "lon": -73.99358408,
+    "source": "MTA LIRR GTFS stops.txt, stop NYK \"Penn Station\""
+  }
+]

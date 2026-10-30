@@ -56,7 +56,8 @@ export const amtrakProvider: TransitProvider = {
     return Object.values(body as Record<string, unknown>).flatMap((raw) => {
       const s = AmtrakStationMetaSchema.safeParse(raw);
       if (!s.success || !inBounds(region, s.data.lat, s.data.lon)) return [];
-      return [{ name: s.data.name, lat: s.data.lat, lon: s.data.lon, mode: "rail" as const, regionId: region.id }];
+      const codes = s.data.code ? [s.data.code] : undefined;
+      return [{ name: s.data.name, lat: s.data.lat, lon: s.data.lon, mode: "rail" as const, regionId: region.id, codes }];
     });
   },
 };

@@ -9,6 +9,21 @@ export interface Place {
   lon: number;
   mode: Mode;
   regionId: string;
+  /** Operator station codes that map to this place (e.g. Amtrak "NYP"). */
+  codes?: string[];
+}
+
+/**
+ * A hand-verified position that beats whatever an operator's feed says. Providers' own
+ * coordinates are often rough (a city centroid, a ticket office); each entry here names its source.
+ */
+export interface PlaceOverride {
+  /** Match by place id (slug), by operator code, or both. */
+  ids?: string[];
+  codes?: string[];
+  lat: number;
+  lon: number;
+  source: string;
 }
 
 /** Lowercase alphanumerics, so "St. Louis" and "st louis" compare equal. */
@@ -26,13 +41,24 @@ export const placeSlug = (name: string) => normalizeName(name).replace(/ /g, "-"
  * Operators name the same station differently ("Stamford" vs "Stamford Station"),
  * so places are merged by normalized name. The first one wins.
  */
-export function mergePlaces(places: readonly Omit<Place, "id">[]): Place[] {
+export function mergePlaces(places: readonly Omit<Place, "id">[], overrides: readonly PlaceOverride[] = []): Place[] {
   const byId = new Map<string, Place>();
   for (const p of places) {
     const id = placeSlug(p.name.replace(/\s+(station|terminal)$/i, ""));
-    if (id && !byId.has(id)) byId.set(id, { ...p, id });
+    if (!id) continue;
+    const existing = byId.get(id);
+    if (existing) {
+      // Same station from another operator: keep the first position, but remember its codes.
+      existing.codes = [...new Set([...(existing.codes ?? []), ...(p.codes ?? [])])];
+    } else {
+      byId.set(id, { ...p, id });
+    }
   }
-  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  const merged = [...byId.values()].map((place) => {
+    const fix = overrides.find((o) => o.ids?.includes(place.id) || o.codes?.some((c) => place.codes?.includes(c)));
+    return fix ? { ...place, lat: fix.lat, lon: fix.lon } : place;
+  });
+  return merged.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export interface NearbyPlace {

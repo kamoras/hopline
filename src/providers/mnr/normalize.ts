@@ -2,6 +2,7 @@ import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { inBounds, type Region } from "@/domain/region";
 import type { Diagnostics, Position, StopCall, StopState, Trip } from "@/domain/trip";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
+import { pointAlong, polylineLength, project, type Polyline } from "@/lib/polyline";
 import { dateInZone, serviceDayStart } from "@/lib/time";
 import { deriveState, finalizeTrip } from "../finalize";
 import type { AlertIndex } from "./alerts";
@@ -105,7 +106,26 @@ function coords(stopsById: MnrStaticData["stops"], id: string): LatLon | undefin
 }
 
 /** Place the trip along the straight line between the stops it is travelling between. */
-function estimatePosition(stops: StopCall[], stopsById: MnrStaticData["stops"], now: number): Position | undefined {
+/** A stop further than this from the track means the geometry isn't for this trip; don't trust it. */
+const MAX_OFF_TRACK_M = 400;
+
+/** Position between two stops, following the track when its geometry is known. */
+function betweenStops(prev: LatLon, next: LatLon, t: number, shape: Polyline | undefined): Omit<Position, "source"> {
+  if (shape) {
+    const a = project(shape, prev);
+    const b = project(shape, next);
+    if (a.offMeters <= MAX_OFF_TRACK_M && b.offMeters <= MAX_OFF_TRACK_M && a.along !== b.along) {
+      const along = a.along + (b.along - a.along) * Math.max(0, Math.min(1, t));
+      const p = pointAlong(shape, Math.min(polylineLength(shape), along));
+      // The polyline has one direction; the train may be travelling the other way along it.
+      const heading = b.along >= a.along ? p.heading : (p.heading + 180) % 360;
+      return { lat: p.lat, lon: p.lon, heading };
+    }
+  }
+  return { ...lerpLatLon(prev, next, t), heading: bearing(prev, next) };
+}
+
+function estimatePosition(stops: StopCall[], stopsById: MnrStaticData["stops"], now: number, shape?: Polyline): Position | undefined {
   const nextIdx = stops.findIndex((s) => s.state !== "departed");
   if (nextIdx === -1) return undefined;
   const next = stops[nextIdx]!;
@@ -119,7 +139,7 @@ function estimatePosition(stops: StopCall[], stopsById: MnrStaticData["stops"], 
   if (!prevPos) return { ...nextPos, source: "estimated" };
   const span = next.arrival! - prev.departure!;
   const t = span > 0 ? (now - prev.departure!) / span : 1;
-  return { ...lerpLatLon(prevPos, nextPos, t), heading: bearing(prevPos, nextPos), source: "estimated" };
+  return { ...betweenStops(prevPos, nextPos, t, shape), source: "estimated" };
 }
 
 interface Resolved {
@@ -254,7 +274,7 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag 
           source: "reported",
         } satisfies Position)
       : undefined;
-    const position = reported ?? estimatePosition(stops, staticData.stops, now);
+    const position = reported ?? estimatePosition(stops, staticData.stops, now, trip.shape);
     if (position && !inBounds(region, position.lat, position.lon)) {
       bump(diag, "outsideRegion");
       continue;

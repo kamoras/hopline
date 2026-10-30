@@ -13,6 +13,7 @@ import type { ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { useCommutes } from "@/hooks/use-commutes";
 import { useFocus } from "@/hooks/use-focus";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { useLines } from "@/hooks/use-lines";
 import { useRememberBoard } from "@/hooks/use-last-board";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useNow } from "@/hooks/use-now";
@@ -107,6 +108,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
   }, []);
 
   const showMap = isDesktop || view === "map";
+  const lines = useLines(mode, region.id, showMap);
   const showList = isDesktop || view === "list";
 
   const card = (m: Match) => (
@@ -292,6 +294,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               region={region}
               trips={mapTrips}
               places={places}
+              lines={lines}
               selectedTripId={selected?.id}
               selectedPlaceId={selectedPlace?.id}
               onSelectTrip={openTripById}
