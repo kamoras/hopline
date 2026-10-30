@@ -1,0 +1,24 @@
+name: Delete merged branch
+
+# Backstop for the "Automatically delete head branches" repo setting
+# (see docs/REPO_SETUP.md): removes a PR's branch once it is merged.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref != github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete head branch
+        run: gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${HEAD_REF}" || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}

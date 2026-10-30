@@ -1,0 +1,28 @@
+name: Dependabot auto-merge
+
+# Enables auto-merge on Dependabot PRs. GitHub then merges only after every
+# required check (CI) passes, so a failing update is never merged.
+#
+# Policy: patch and minor updates, and any update that fixes a security
+# advisory (including majors). Other major bumps are left for a human.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enable auto-merge
+        if: steps.meta.outputs.update-type != 'version-update:semver-major' || steps.meta.outputs.ghsa-id != ''
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

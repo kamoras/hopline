@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --line: #e2e5eb;
+  --text: #11151c;
+  --muted: #5d6676;
+  --accent: #1f6feb;
+  --ok: #138a4b;
+  --ok-bg: #e3f5eb;
+  --warn: #a35a00;
+  --warn-bg: #fff1d6;
+  --bad: #c0261f;
+  --bad-bg: #fde6e4;
+  --idle: #5d6676;
+  --idle-bg: #e9ecf1;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0f14;
+    --surface: #151a22;
+    --surface-2: #1d232d;
+    --line: #272e3a;
+    --text: #eef1f6;
+    --muted: #9aa4b5;
+    --accent: #5b9bff;
+    --ok: #4cd08a;
+    --ok-bg: #11291d;
+    --warn: #ffb547;
+    --warn-bg: #33250a;
+    --bad: #ff7b72;
+    --bad-bg: #3a1614;
+    --idle: #9aa4b5;
+    --idle-bg: #232a35;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-idle: var(--idle);
+  --color-idle-bg: var(--idle-bg);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skip layout/paint work for off-screen cards in long lists. */
+.card-cv {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 112px;
+}
+
+/* Dim the light basemap in dark mode instead of shipping a second style. */
+@media (prefers-color-scheme: dark) {
+  .map-dark .maplibregl-canvas {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.95);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.sheet-in {
+  animation: sheet-in 0.18s ease-out;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in,
+  .live-dot {
+    animation: none;
+  }
+}

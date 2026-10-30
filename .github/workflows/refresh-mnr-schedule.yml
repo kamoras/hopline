@@ -1,0 +1,43 @@
+name: Refresh Metro-North schedule
+
+# Metro-North publishes new timetables every few weeks. This regenerates
+# data/mnr/*.json from the official GTFS feed and opens a PR if anything changed.
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run data:mnr
+      # Fail before opening a PR if the new data breaks anything.
+      - run: npm test
+      - id: pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # PRs opened with the default GITHUB_TOKEN don't trigger CI, so required
+          # checks would never report and auto-merge would stall. Set AUTOMERGE_TOKEN
+          # (a fine-grained PAT with contents + pull-requests write) to fix that.
+          token: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+          branch: chore/refresh-mnr-schedule
+          delete-branch: true
+          commit-message: "chore: refresh Metro-North schedule data"
+          title: "chore: refresh Metro-North schedule data"
+          body: "Automated regeneration of `data/mnr/*.json` from the MTA GTFS feed (`npm run data:mnr`)."
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-number
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
