@@ -4,8 +4,14 @@ Auto-merge only works if GitHub is configured to hold PRs until CI passes. These
 repo settings, so they can't live in code. Do them once:
 
 1. **Settings → General → Pull Requests:** enable **Allow auto-merge** (and allow squash merging).
-2. **Settings → Branches → add a rule for `main`:** require a pull request, and require the
-   status check **`verify`** (the CI job) to pass. Without this, `--auto` merges immediately.
+2. **Branch protection:** Settings → Rules → Rulesets → New ruleset → **Import a ruleset**, and
+   choose [`.github/rulesets/main.json`](../.github/rulesets/main.json). It protects the default
+   branch:
+   - changes only via pull request, squash merge only (one commit per PR, linear history);
+   - the `verify` CI check must pass, so `--auto` waits for CI instead of merging immediately;
+   - no force-pushes or deletion of `main`;
+   - 0 required approvals (solo-friendly); repository admins can bypass on a PR, never by direct push.
+   Raise `required_approving_review_count` in the file if you add collaborators.
 3. **Settings → Advanced Security:** enable **Dependabot alerts** and **Dependabot security
    updates** (security PRs are raised by Dependabot and covered by the auto-merge workflow).
 4. **Secret `AUTOMERGE_TOKEN`** (Settings → Secrets → Actions): a fine-grained personal access
