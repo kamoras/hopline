@@ -4,12 +4,17 @@ import type { FetchContext, TransitProvider } from "../types";
 import { AMTRAK_ID, normalizeAmtrakTrip } from "./normalize";
 import { AmtrakStationMetaSchema, AmtrakTrainSchema } from "./schema";
 
-const DEFAULT_BASE_URL = "https://api-v3.amtraker.com/v3";
+const DEFAULT_BASE_URL = "https://api.amtraker.com/v3";
 
 /** Amtrak via the community-run Amtraker v3 API (no key required). */
 export const amtrakProvider: TransitProvider = {
   id: AMTRAK_ID,
   name: "Amtrak",
+  attribution: {
+    label: "Amtraker",
+    url: "https://amtraker.com",
+    notice: "Amtrak and the Amtrak logo are trademarks of the National Railroad Passenger Corporation. Hopline is not affiliated with Amtrak.",
+  },
   mode: "rail",
   regionIds: ["northeast"],
 

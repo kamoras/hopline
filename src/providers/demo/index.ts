@@ -91,6 +91,7 @@ function syntheticAmtrak(now: number, region: FetchContext["region"]): Trip[] {
 export const demoProvider: TransitProvider = {
   id: "demo",
   name: "Demo",
+  attribution: { label: "Demo data", url: "https://github.com/kamoras/hopline" },
   mode: "rail",
   regionIds: ["northeast"],
   async fetchTrips({ now, region }) {

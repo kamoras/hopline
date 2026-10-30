@@ -9,7 +9,7 @@ import { MODES, type Mode, type ModeInfo } from "@/domain/modes";
 import { operatorName } from "@/domain/operators";
 import { nearestPlaces, type Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
-import type { Snapshot, Trip } from "@/domain/trip";
+import type { ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { useCommutes } from "@/hooks/use-commutes";
 import { useFocus } from "@/hooks/use-focus";
 import { useGeolocation } from "@/hooks/use-geolocation";
@@ -243,7 +243,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               ) : (
                 mine.length === 0 && <EmptyState vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
               )}
-              <Footer sources={snapshot.providers.map((p) => p.name)} />
+              <Footer providers={snapshot.providers} />
             </div>
           </main>
         )}
@@ -321,10 +321,23 @@ function EmptyState({ vocab, hasQuery, allDown }: { vocab: ModeInfo; hasQuery: b
   );
 }
 
-function Footer({ sources }: { sources: string[] }) {
+function Footer({ providers }: { providers: ProviderStatus[] }) {
+  const sources = providers.map((p) => p.attribution);
   return (
-    <footer className="mt-8 space-y-1 text-xs text-muted">
-      <p>Data: {sources.join(", ")}. Delay reasons come from the operator when published; otherwise we only show where time was lost.</p>
+    <footer className="mt-8 space-y-1.5 text-xs text-muted">
+      <p>
+        Data from{" "}
+        {sources.map((a, i) => (
+          <span key={a.url}>
+            {i > 0 && ", "}
+            <a href={a.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-text">
+              {a.label}
+            </a>
+          </span>
+        ))}
+        . Delay reasons come from the operator when published; otherwise we only show where time was lost.
+      </p>
+      {sources.map((a) => a.notice && <p key={a.url}>{a.notice}</p>)}
       <p>No accounts, no tracking. Saved items and your location never leave this device.</p>
     </footer>
   );

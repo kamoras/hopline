@@ -10,6 +10,11 @@ import { loadStaticData } from "./static";
 export const mnrProvider: TransitProvider = {
   id: MNR_ID,
   name: "Metro-North",
+  attribution: {
+    label: "MTA",
+    url: "https://www.mta.info/developers",
+    notice: "Metro-North schedule and real-time data provided by the MTA. Hopline is not affiliated with or endorsed by the MTA.",
+  },
   mode: "rail",
   regionIds: ["northeast"],
 

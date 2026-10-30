@@ -27,7 +27,7 @@ async function runProvider(
       signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
     lastGood.set(key, { trips, at: now });
-    return { trips, status: { id: provider.id, name: provider.name, ok: true, tripCount: trips.length, fetchedAt: now } };
+    return { trips, status: { id: provider.id, name: provider.name, attribution: provider.attribution, ok: true, tripCount: trips.length, fetchedAt: now } };
   } catch (err) {
     const cached = lastGood.get(key);
     const usable = cached && now - cached.at <= STALE_TOLERANCE_MS ? cached : undefined;
@@ -36,6 +36,7 @@ async function runProvider(
       status: {
         id: provider.id,
         name: provider.name,
+        attribution: provider.attribution,
         ok: false,
         tripCount: usable?.trips.length ?? 0,
         fetchedAt: usable?.at ?? now,

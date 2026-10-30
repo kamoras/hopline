@@ -76,8 +76,9 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
 ## Extending Hopline
 
 ### Add an operator (e.g. NJ Transit, SEPTA)
-1. Create `src/providers/<id>/index.ts` exporting a `TransitProvider` (`id`, `name`, `mode`,
-   `regionIds`, `fetchTrips`). Map raw data to `Trip`; call `finalizeTrip` for derived fields.
+1. Create `src/providers/<id>/index.ts` exporting a `TransitProvider` (`id`, `name`, `attribution`,
+   `mode`, `regionIds`, `fetchTrips`, `fetchPlaces`). `attribution` is required: read the source's terms
+   and credit it as asked; the footer renders it automatically. Map raw data to `Trip`; call `finalizeTrip` for derived fields.
 2. Register it in `src/providers/registry.ts` and add its display name in `src/domain/operators.ts`.
 3. Add fixture-based tests in `tests/`.
 
