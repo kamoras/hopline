@@ -6,8 +6,9 @@
    server and UI must stay operator-agnostic.
 4. Add tests with a fixture for any normalization change. Upstream feeds are messy; tests
    are how we keep them honest.
-5. Privacy is a feature: do not add analytics, trackers, or server-side storage of anything
-   about a user. Location and saved trains stay in the browser.
+5. Privacy is a feature: no accounts, cookies, ad trackers, or server-side storage of anything about
+   a user. The only analytics is Vercel Web Analytics (anonymous, cookieless page views); do not add
+   others. Location and saved trains stay in the browser.
 
 ## Adding a provider (operator, mode or region)
 

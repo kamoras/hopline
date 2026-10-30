@@ -396,7 +396,7 @@ function Footer({ providers, reportsDelay }: { providers: ProviderStatus[]; repo
       </p>
       {sources.map((a) => a.notice && <p key={a.url}>{a.notice}</p>)}
       <p>
-        No accounts, no tracking. Saved items and your location never leave this device.{" "}
+        No accounts or cookies. Page views are counted anonymously (Vercel Analytics); saved items and your location never leave this device.{" "}
         <Link href="/status" className="underline hover:text-text">
           Data status
         </Link>

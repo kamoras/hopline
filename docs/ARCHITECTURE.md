@@ -111,8 +111,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
     code. To correct a station, add an entry there; prefer an official source such as an agency's GTFS `stops.txt`.
 - **Untrusted upstreams.** Amtraker payloads are parsed per train with zod so one bad record
   doesn't drop the feed; GTFS-RT numeric defaults are checked for presence.
-- **Privacy.** No cookies, analytics or user storage. Pins use `localStorage`; location is read
-  by the map in-browser and drawn locally.
+- **Privacy.** No accounts, cookies or server-side user storage. Pins and commutes use `localStorage`; location is read
+  by the map in-browser and drawn locally. The one exception is Vercel Web Analytics (`<Analytics />` in
+  `app/layout.tsx`): anonymous, cookieless page-view counts. Note that paths such as `/stop/...` and
+  `/trip/...` are recorded as page views, so aggregate station popularity is visible, never who looked.
 
 ## Extending Hopline
 

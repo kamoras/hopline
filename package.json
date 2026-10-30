@@ -22,6 +22,7 @@
     "data:subway": "tsx scripts/build-subway-gtfs.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "gtfs-realtime-bindings": "^2.2.0",
     "maplibre-gl": "^6.16.0",
     "next": "^16.4.3",
