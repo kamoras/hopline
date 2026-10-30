@@ -67,6 +67,7 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   it would be added behind a storage interface and remain optional.
 - **Honest delay reasons.** `DelayReason.kind` is `operator-reported` (alerts, cause codes) or
   `inferred` (where time was lost, from stop times). The UI labels the difference.
+- **Stop timeline.** The trip sheet shows the journey, not just a list: passed stops are filled with a check and a solid line in the route's color, the train's current or next stop is highlighted with a countdown, and track ahead is dashed. Phases come from `stopPhases` (unit tested).
 - **Estimated positions.** Where an operator provides no GPS (Metro-North often doesn't), the
   position is interpolated between stations from predicted times and marked `source: "estimated"`.
 - **Metro-North trip matching.** The live feed's `trip_id` is opaque and does not match the static
