@@ -27,8 +27,8 @@ export const MODES = {
     nounPlural: "trains",
     numberLabel: "Train",
     stopNoun: "station",
-    searchPlaceholder: "Train number or station…",
-    searchHint: "Try a train number like 2150, or a station like Stamford.",
+    searchPlaceholder: "Station, train #, or “A to B”…",
+    searchHint: "Try a train number like 2150, a station like Stamford, or a trip like “New Haven to New York round trip”.",
   },
 } as const satisfies Record<string, ModeInfo>;
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { normalizeName, type Place } from "@/domain/place";
-import { parseRoute } from "@/lib/search";
+import { parseIntent } from "@/lib/query";
 
 interface Props {
   value: string;
@@ -21,7 +21,7 @@ export function SearchBox({ value, onChange, placeholder, label, places, onPickP
   const [focused, setFocused] = useState(false);
   const q = normalizeName(value);
   const suggestions =
-    focused && q.length >= 2 && !/^\d+$/.test(q) && !parseRoute(value)
+    focused && q.length >= 2 && !/^\d+$/.test(q) && parseIntent(value).legs.length === 0
       ? places
           .filter((p) => normalizeName(p.name).includes(q))
           .sort((a, b) => Number(!normalizeName(a.name).startsWith(q)) - Number(!normalizeName(b.name).startsWith(q)))
