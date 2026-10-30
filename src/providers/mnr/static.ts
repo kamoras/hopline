@@ -18,6 +18,8 @@ export interface StaticStopTime {
   /** Minutes after the start of the service day (may exceed 1440). */
   arrivalMin: number;
   departureMin: number;
+  /** Scheduled track, when the schedule names one. */
+  track?: string;
 }
 
 export interface StaticTrip {
@@ -68,9 +70,10 @@ export interface RawShape {
 
 export function parseStopTimes(encoded: string): StaticStopTime[] {
   return encoded.split(";").map((part) => {
-    const [stopId = "", times = ""] = part.split("@");
+    const [stopId = "", rest = ""] = part.split("@");
+    const [times = "", track] = rest.split("#");
     const [arr = "0", dep = arr] = times.split("-");
-    return { stopId, arrivalMin: Number(arr), departureMin: Number(dep) };
+    return { stopId, arrivalMin: Number(arr), departureMin: Number(dep), ...(track ? { track } : {}) };
   });
 }
 

@@ -15,6 +15,11 @@ export function OperatorLine({ trip }: { trip: Pick<Trip, "operatorId" | "routeN
   );
 }
 
+/** "Track 17" where the stop's platform is known, nothing otherwise. */
+export function PlatformTag({ stop, noun }: { stop: Pick<StopCall, "platform">; noun: string }) {
+  return stop.platform ? <span className="font-semibold text-accent">{noun} {stop.platform}</span> : null;
+}
+
 export function stopTimes(stop: StopCall) {
   const actual = stop.arrival ?? stop.departure;
   const scheduled = stop.scheduledArrival ?? stop.scheduledDeparture;

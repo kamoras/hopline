@@ -14,6 +14,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPolyline, project, slicePolyline, type Polyline } from "../src/lib/polyline";
 
+/** The schedule's track number; "BUS" marks a replacement bus, which has no track. */
+function trackOf(raw: string | undefined): string {
+  const t = (raw ?? "").trim();
+  return t.toUpperCase() === "BUS" ? "" : t;
+}
+
 const FEED_URL = process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip";
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "data", "mnr");
 
@@ -189,7 +195,7 @@ async function main() {
     trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx, shape];
   }
 
-  const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number }[]>();
+  const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
   for (const st of read("stop_times.txt")) {
     if (!trips[st.trip_id!]) continue;
     const list = byTrip.get(st.trip_id!) ?? [];
@@ -198,13 +204,16 @@ async function main() {
       stop: st.stop_id!,
       arr: minutes(st.arrival_time!),
       dep: minutes(st.departure_time!),
+      track: trackOf(st.track),
     });
     byTrip.set(st.trip_id!, list);
   }
   for (const [id, list] of byTrip) {
     list.sort((a, b) => a.seq - b.seq);
-    // "stopId@arrivalMin" or "stopId@arrivalMin-departureMin" when the train dwells.
-    trips[id]![4] = list.map((s) => `${s.stop}@${s.arr}${s.dep !== s.arr ? `-${s.dep}` : ""}`).join(";");
+    // "stopId@arrivalMin[-departureMin][#track]": the departure when the train dwells, the scheduled track if known.
+    trips[id]![4] = list
+      .map((s) => `${s.stop}@${s.arr}${s.dep !== s.arr ? `-${s.dep}` : ""}${s.track ? `#${s.track}` : ""}`)
+      .join(";");
   }
   for (const id of Object.keys(trips)) if (!trips[id]![4]) delete trips[id];
 

@@ -96,6 +96,7 @@ function buildStops(
       arrival,
       departure,
       delayMinutes: delay === undefined ? undefined : Math.round(delay),
+      platform: st.track,
     });
   }
   return calls;

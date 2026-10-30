@@ -7,7 +7,7 @@ import { formatRelative } from "@/lib/format";
 import { isDelayed } from "@/domain/delay";
 import { MODES } from "@/domain/modes";
 import { StatusPill } from "./status-pill";
-import { OperatorLine, StopTime, stopTimes } from "./trip-parts";
+import { OperatorLine, PlatformTag, StopTime, stopTimes } from "./trip-parts";
 
 interface Props {
   trip: Trip;
@@ -53,6 +53,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
               <span className="font-semibold">
                 <StopTime stop={focus} region={region} emphasize={false} />
               </span>
+              <PlatformTag stop={focus} noun={mode.platformNoun} />
               {to && (
                 <span className="font-semibold">
                   → {to.name} <StopTime stop={to} region={region} emphasize={false} />

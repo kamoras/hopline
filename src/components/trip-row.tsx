@@ -1,6 +1,7 @@
 import type { Region } from "@/domain/region";
 import { StatusPill } from "./status-pill";
-import { StopTime } from "./trip-parts";
+import { MODES } from "@/domain/modes";
+import { PlatformTag, StopTime } from "./trip-parts";
 import { pinKey, type Match } from "@/lib/search";
 
 /** Compact one-line departure: number, destination, time here (and at the destination for A-to-B). */
@@ -20,6 +21,12 @@ export function TripRow({ match, region, onOpen }: { match: Match; region: Regio
           <span className="font-medium">{trip.destination}</span>
           <span className="tabular block text-sm text-muted">
             {here && <StopTime stop={here} region={region} emphasize={false} showScheduled={false} />}
+            {here?.platform && (
+              <>
+                {" · "}
+                <PlatformTag stop={here} noun={MODES[trip.mode].platformNoun} />
+              </>
+            )}
             {to && (
               <>
                 {" → "}

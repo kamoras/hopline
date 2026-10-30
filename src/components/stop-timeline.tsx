@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useRef } from "react";
 import type { Region } from "@/domain/region";
 import type { StopCall } from "@/domain/trip";
 import { formatRelative } from "@/lib/format";
-import { StopTime } from "./trip-parts";
+import { PlatformTag, StopTime } from "./trip-parts";
 
 type Phase = "visited" | "here" | "next" | "upcoming";
 
@@ -18,6 +18,7 @@ interface Props {
   stops: readonly StopCall[];
   routeColor: string;
   region: Region;
+  platformNoun: string;
   now: number;
 }
 
@@ -25,7 +26,7 @@ interface Props {
  * The stop list as a journey: passed stops are filled and muted, the train's current stop or the next
  * one is highlighted with a countdown, and the track ahead is dashed. Scrolls to the train's stop if it's below the fold.
  */
-export function StopTimeline({ stops, routeColor, region, now }: Props) {
+export function StopTimeline({ stops, routeColor, region, platformNoun, now }: Props) {
   const phases = stopPhases(stops);
   const focusRef = useRef<HTMLLIElement>(null);
 
@@ -70,6 +71,7 @@ export function StopTimeline({ stops, routeColor, region, now }: Props) {
             isLast={i === stops.length - 1}
             routeColor={routeColor}
             region={region}
+            platformNoun={platformNoun}
             now={now}
           />
         ))}
@@ -86,6 +88,7 @@ interface ItemProps {
   isLast: boolean;
   routeColor: string;
   region: Region;
+  platformNoun: string;
   now: number;
 }
 
@@ -93,7 +96,7 @@ const DOT = { visited: 18, here: 24, next: 22, upcoming: 14 } as const;
 const CENTER_Y = 22; // px from the top of a row to the middle of its dot
 
 const StopItem = forwardRef<HTMLLIElement, ItemProps>(function StopItem(
-  { stop, phase, nextPhase, isLast, routeColor, region, now },
+  { stop, phase, nextPhase, isLast, routeColor, region, platformNoun, now },
   ref,
 ) {
   const size = DOT[phase];
@@ -150,10 +153,17 @@ const StopItem = forwardRef<HTMLLIElement, ItemProps>(function StopItem(
             <StopTime stop={stop} region={region} emphasize={phase !== "visited"} showScheduled={phase !== "visited"} />
           </span>
         </div>
+        {!focus && phase !== "visited" && stop.platform && (
+          <div className="text-xs">
+            <PlatformTag stop={stop} noun={platformNoun} />
+          </div>
+        )}
         {focus && (
           <div className="mt-0.5 flex flex-wrap items-center gap-x-3 text-xs font-semibold tracking-wide text-accent uppercase">
             <span>{phase === "here" ? "Here now" : when !== undefined ? `Next · ${formatRelative(when, now)}` : "Next"}</span>
-            {stop.platform && <span className="text-muted normal-case">Platform {stop.platform}</span>}
+            <span className="normal-case">
+              <PlatformTag stop={stop} noun={platformNoun} />
+            </span>
           </div>
         )}
       </div>
