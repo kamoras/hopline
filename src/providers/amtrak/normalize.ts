@@ -1,5 +1,5 @@
 import { inBounds, type Region } from "@/domain/region";
-import type { Position, StopCall, StopState, Trip } from "@/domain/trip";
+import type { Diagnostics, Position, StopCall, StopState, Trip } from "@/domain/trip";
 import { minutesBetween } from "@/lib/time";
 import { deriveState, finalizeTrip } from "../finalize";
 import type { AmtrakStation, AmtrakTrain } from "./schema";
@@ -75,13 +75,23 @@ function inRegion(t: AmtrakTrain, region: Region): boolean {
   return t.stations.some((s) => codes.has(s.code));
 }
 
-export function normalizeAmtrakTrip(t: AmtrakTrain, region: Region): Trip | undefined {
-  if (!inRegion(t, region) || t.stations.length === 0) return undefined;
+const bump = (d: Diagnostics | undefined, key: string) => {
+  if (d) d[key] = Number(d[key] ?? 0) + 1;
+};
+
+export function normalizeAmtrakTrip(t: AmtrakTrain, region: Region, diag?: Diagnostics): Trip | undefined {
+  if (!inRegion(t, region) || t.stations.length === 0) {
+    bump(diag, "outsideRegion");
+    return undefined;
+  }
 
   const stops = t.stations.filter((s) => s.code).map(normalizeStop);
   const canceled = /cancel/i.test(t.statusMsg);
   const completed = stops.length > 0 && stops.every((s) => s.state === "departed");
-  if (completed) return undefined;
+  if (completed) {
+    bump(diag, "completed");
+    return undefined;
+  }
 
   let state = deriveState(stops, canceled);
   if (t.trainState === "Predeparture" && state !== "canceled") state = "scheduled";

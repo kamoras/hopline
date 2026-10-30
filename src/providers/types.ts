@@ -1,12 +1,14 @@
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
-import type { Attribution, Mode, Trip } from "@/domain/trip";
+import type { Attribution, Diagnostics, Mode, Trip } from "@/domain/trip";
 
 export interface FetchContext {
   region: Region;
   signal: AbortSignal;
   /** Injectable clock (epoch ms) so providers are deterministic under test. */
   now: number;
+  /** Providers record what they saw and dropped here; surfaced on /status and in the API. */
+  diag: Diagnostics;
 }
 
 /**

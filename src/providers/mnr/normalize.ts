@@ -1,6 +1,6 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { inBounds, type Region } from "@/domain/region";
-import type { Position, StopCall, StopState, Trip } from "@/domain/trip";
+import type { Diagnostics, Position, StopCall, StopState, Trip } from "@/domain/trip";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
 import { dateInZone, serviceDayStart } from "@/lib/time";
 import { deriveState, finalizeTrip } from "../finalize";
@@ -128,22 +128,41 @@ export interface MnrInput {
   alerts: AlertIndex;
   region: Region;
   now: number;
+  /** Optional counters describing what was kept and why the rest was dropped. */
+  diag?: Diagnostics;
 }
 
-export function buildMnrTrips({ staticData, realtime, alerts, region, now }: MnrInput): Trip[] {
+const bump = (d: Diagnostics | undefined, key: string) => {
+  if (d) d[key] = Number(d[key] ?? 0) + 1;
+};
+
+export function buildMnrTrips({ staticData, realtime, alerts, region, now, diag }: MnrInput): Trip[] {
   const vehicles = new Map<string, rt.IVehiclePosition>();
   for (const e of realtime.entity) {
     const tripId = e.vehicle?.trip?.tripId;
     if (tripId && e.vehicle?.position) vehicles.set(tripId, e.vehicle);
   }
 
+  if (diag) {
+    diag.feedEntities = realtime.entity.length;
+    diag.feedVehicles = vehicles.size;
+    diag.feedTimestamp = realtime.header.timestamp ? new Date(Number(realtime.header.timestamp) * 1000).toISOString() : "none";
+  }
+
   const trips: Trip[] = [];
+  const unmatched: string[] = [];
   for (const entity of realtime.entity) {
     const tu = entity.tripUpdate;
     const tripId = tu?.trip?.tripId;
     if (!tu || !tripId) continue;
+    bump(diag, "tripUpdates");
     const trip = staticData.trip(tripId);
-    if (!trip || trip.stopTimes.length === 0) continue;
+    if (!trip || trip.stopTimes.length === 0) {
+      // The most likely failure: feed trip ids don't match the bundled schedule.
+      bump(diag, "unknownTrip");
+      if (unmatched.length < 3) unmatched.push(tripId);
+      continue;
+    }
 
     const canceled = tu.trip.scheduleRelationship === rt.TripDescriptor.ScheduleRelationship.CANCELED;
     const updates = new Map<string, StopUpdate>();
@@ -153,8 +172,10 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now }: Mnr
     const stops = buildStops(trip, staticData.stops, start, updates, now);
     const first = stops[0]!;
     const last = stops.at(-1)!;
-    if (first.departure! - now > LOOKAHEAD_MS) continue;
-    if (now - last.arrival! > LINGER_MS) continue;
+    if (first.departure! - now > LOOKAHEAD_MS || now - last.arrival! > LINGER_MS) {
+      bump(diag, "outsideTimeWindow");
+      continue;
+    }
 
     const vehicle = vehicles.get(tripId);
     const reported = vehicle?.position
@@ -167,7 +188,10 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now }: Mnr
         } satisfies Position)
       : undefined;
     const position = reported ?? estimatePosition(stops, staticData.stops, now);
-    if (position && !inBounds(region, position.lat, position.lon)) continue;
+    if (position && !inBounds(region, position.lat, position.lon)) {
+      bump(diag, "outsideRegion");
+      continue;
+    }
 
     const route = staticData.routes[trip.routeId];
     const reason = alerts.byTrip.get(tripId) ?? alerts.byRoute.get(trip.routeId);
@@ -189,6 +213,13 @@ export function buildMnrTrips({ staticData, realtime, alerts, region, now }: Mnr
         updatedAt: toMs(vehicle?.timestamp ?? tu.timestamp ?? realtime.header.timestamp) ?? now,
       }),
     );
+  }
+  if (diag) {
+    diag.kept = trips.length;
+    if (unmatched.length) {
+      diag.unmatchedFeedTripIds = unmatched.join(", ");
+      diag.exampleScheduleTripId = staticData.tripIds()[0] ?? "none";
+    }
   }
   return trips;
 }
