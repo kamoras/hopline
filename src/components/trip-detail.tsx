@@ -95,7 +95,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
             )}
           </div>
 
-          <StopTimeline stops={trip.stops} routeColor={trip.routeColor} region={region} now={now} />
+          <StopTimeline stops={trip.stops} routeColor={trip.routeColor} region={region} platformNoun={mode.platformNoun} now={now} />
         </div>
       </div>
     </div>
