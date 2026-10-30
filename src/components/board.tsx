@@ -308,6 +308,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
         <TripDetail
           trip={selected}
           region={region}
+          now={now}
           pinned={pinned.includes(pinKey(selected))}
           showMapButton={!isDesktop && view === "list"}
           onClose={close}
