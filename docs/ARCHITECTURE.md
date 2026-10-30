@@ -79,6 +79,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   provider): trains due at a station's platforms in the next 45 min, grouped by line and destination
   (`lib/arrivals.ts`), refreshed while the sheet is open (`/api/arrivals`), with a warning when the next train is
   15+ min away or a gap is much bigger than the usual spacing.
+- **Line status.** `fetchLineStatus` (optional on a provider) turns the MTA service-alerts feed into one
+  `LineStatus` per line (`good | planned | change | delays | suspended`, `src/providers/nyct/alerts.ts`, unit
+  tested). The board shows a strip of lines with problems, a line sheet with the alerts, and station arrivals
+  carry a banner for troubled lines serving that station. Served by `/api/line-status`.
 - **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
   that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
   from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches

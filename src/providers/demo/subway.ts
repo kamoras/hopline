@@ -1,6 +1,7 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { NYC } from "@/domain/region";
 import { project } from "@/lib/polyline";
+import { buildLineStatus } from "../nyct/alerts";
 import { buildNyctArrivals, buildNyctTrips } from "../nyct/normalize";
 import { loadNyctStatic } from "../nyct/static";
 import type { TransitProvider } from "../types";
@@ -50,12 +51,42 @@ function syntheticFeed(now: number): rt.FeedMessage {
   return rt.FeedMessage.decode(rt.FeedMessage.encode(rt.FeedMessage.create({ header: { gtfsRealtimeVersion: "2.0", timestamp: Math.floor(now / 1000) }, entity: entities })).finish());
 }
 
+/** A handful of realistic alerts, so the status UI can be developed and checked offline. */
+function syntheticAlerts(now: number): rt.FeedMessage {
+  const alert = (id: string, routes: string[], effect: rt.Alert.Effect, headline: string, description?: string): rt.IFeedEntity => ({
+    id,
+    alert: {
+      effect,
+      headerText: { translation: [{ text: headline, language: "en" }] },
+      descriptionText: description ? { translation: [{ text: description, language: "en" }] } : undefined,
+      informedEntity: routes.map((routeId) => ({ routeId })),
+    },
+  });
+  const E = rt.Alert.Effect;
+  return rt.FeedMessage.decode(
+    rt.FeedMessage.encode(
+      rt.FeedMessage.create({
+        header: { gtfsRealtimeVersion: "2.0", timestamp: Math.floor(now / 1000) },
+        entity: [
+          alert("a", ["A", "C"], E.SIGNIFICANT_DELAYS, "Some northbound A and C trains are running with delays", "Delays are due to a signal problem at 59 St-Columbus Circle. Allow extra travel time."),
+          alert("b", ["L"], E.MODIFIED_SERVICE, "Planned work: late nights, L trains run every 20 minutes", "Overnight track work between Bedford Av and Lorimer St."),
+          alert("c", ["7"], E.NO_SERVICE, "No 7 trains between Queensboro Plaza and Flushing-Main St", "Use the Q66 or Q44 bus as an alternative."),
+          alert("d", ["4"], E.DETOUR, "4 trains are running local in Brooklyn"),
+        ],
+      }),
+    ).finish(),
+  );
+}
+
 /** Same synthetic feed, so arrivals in demo mode agree with the trains on the map. */
 export const demoSubwayProvider: TransitProvider = {
   ...nyctProvider,
   id: "nyct",
   async fetchTrips({ now, region, diag }) {
     return buildNyctTrips({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], region: region ?? NYC, now, diag });
+  },
+  async fetchLineStatus({ now }) {
+    return buildLineStatus({ staticData: loadNyctStatic(), feed: syntheticAlerts(now), now });
   },
   async fetchArrivals({ now }, place) {
     return buildNyctArrivals({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], platforms: place.codes ?? [], now });

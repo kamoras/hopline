@@ -13,6 +13,7 @@ import type { ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { useCommutes } from "@/hooks/use-commutes";
 import { useFocus } from "@/hooks/use-focus";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { useLineStatus } from "@/hooks/use-line-status";
 import { useLines } from "@/hooks/use-lines";
 import { useRememberBoard } from "@/hooks/use-last-board";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -25,6 +26,8 @@ import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
 import { Commutes } from "./commutes";
 import { ArrivalsSheet } from "./arrivals-sheet";
+import { LineStatusSheet } from "./line-status-sheet";
+import { LineStatusStrip } from "./line-status-strip";
 import { PlaceSheet } from "./place-sheet";
 import { SearchBox } from "./search-box";
 import { StationList } from "./station-list";
@@ -53,6 +56,8 @@ interface Props {
 export function Board({ mode, region, href, boards, places, initialFocus, initial }: Props) {
   const vocab = MODES[mode];
   const stationsFirst = vocab.browse === "stations";
+  const status = useLineStatus(mode, region.id, stationsFirst);
+  const [statusRoute, setStatusRoute] = useState<string>();
   const boardKey = href.slice(1);
   const { snapshot, error, isValidating, refresh } = useTrips(mode, region.id, initial);
   const now = useNow(initial.generatedAt);
@@ -257,6 +262,11 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
+              {stationsFirst && !query && (
+                <div className="mb-4">
+                  <LineStatusStrip lines={status.lines} unavailable={status.unavailable} loading={status.isLoading} onOpen={setStatusRoute} />
+                </div>
+              )}
               {stationsFirst ? (
                 <StationList places={places} query={query} vocab={vocab} onPick={openPlace} />
               ) : (
@@ -334,7 +344,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
       ) : (
         selectedPlace &&
         (stationsFirst ? (
-          <ArrivalsSheet mode={mode} regionId={region.id} place={selectedPlace} now={now} onClose={close} />
+          <ArrivalsSheet mode={mode} regionId={region.id} place={selectedPlace} now={now} lineStatus={status.lines} onClose={close} />
         ) : (
           <PlaceSheet
             place={selectedPlace}
@@ -349,6 +359,9 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
             }}
           />
         ))
+      )}
+      {statusRoute && !selected && !selectedPlace && status.lines.find((l) => l.route === statusRoute) && (
+        <LineStatusSheet line={status.lines.find((l) => l.route === statusRoute)!} onClose={() => setStatusRoute(undefined)} />
       )}
     </div>
   );

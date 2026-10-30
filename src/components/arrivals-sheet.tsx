@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import type { Mode } from "@/domain/modes";
 import { MODES } from "@/domain/modes";
 import type { Place } from "@/domain/place";
+import { LINE_STATE_LABEL, type LineStatus } from "@/domain/line-status";
 import { useArrivals } from "@/hooks/use-arrivals";
 import { groupArrivals, minutesUntil } from "@/lib/arrivals";
 import { LineBadge } from "./line-badge";
@@ -13,6 +14,8 @@ interface Props {
   regionId: string;
   place: Place;
   now: number;
+  /** How each line is running, to flag trouble on the lines serving this station. */
+  lineStatus: readonly LineStatus[];
   onClose(): void;
 }
 
@@ -25,11 +28,12 @@ const when = (at: number, now: number) => {
  * What a rider at a station wants to know: the next trains, by line and direction. Live, so it
  * refreshes while open; groups warn about unusually long waits.
  */
-export function ArrivalsSheet({ mode, regionId, place, now, onClose }: Props) {
+export function ArrivalsSheet({ mode, regionId, place, now, lineStatus, onClose }: Props) {
   const { arrivals, error, isLoading } = useArrivals(mode, regionId, place.id);
   const groups = groupArrivals(arrivals, now);
   const lines = [...new Map(groups.map((g) => [g.route, g])).values()];
   const vocab = MODES[mode];
+  const troubled = lineStatus.filter((l) => l.state !== "good" && lines.some((g) => g.route === l.route));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -59,6 +63,14 @@ export function ArrivalsSheet({ mode, regionId, place, now, onClose }: Props) {
         </div>
 
         <div className="space-y-2 overflow-y-auto px-3 pb-5">
+          {troubled.map((l) => (
+            <div key={l.route} className="flex items-start gap-2.5 rounded-2xl bg-warn-bg px-3 py-2.5 text-sm text-warn" role="status">
+              <LineBadge route={l.route} color={l.color} textColor={l.textColor} size={20} />
+              <span>
+                <span className="font-semibold">{LINE_STATE_LABEL[l.state]}:</span> {l.alerts[0]?.headline}
+              </span>
+            </div>
+          ))}
           {isLoading && groups.length === 0 && (
             <div className="space-y-2" aria-hidden>
               {[0, 1, 2].map((i) => (

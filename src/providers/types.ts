@@ -1,5 +1,6 @@
 import type { Arrival } from "@/domain/arrival";
 import type { Line } from "@/domain/line";
+import type { LineStatus } from "@/domain/line-status";
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
 import type { Attribution, Diagnostics, Mode, Trip } from "@/domain/trip";
@@ -33,6 +34,8 @@ export interface TransitProvider {
   fetchPlaces(ctx: FetchContext): Promise<(Omit<Place, "id"> & { id?: string })[]>;
   /** Optional: trains due at a place, for station-first boards. */
   fetchArrivals?(ctx: FetchContext, place: Place): Promise<Arrival[]>;
+  /** Optional: how each line is running (from service alerts). A failure means status is unknown, not good. */
+  fetchLineStatus?(ctx: FetchContext): Promise<LineStatus[]>;
   /** Optional: track/route geometry to draw on the map. */
   fetchLines?(ctx: FetchContext): Promise<Line[]>;
 }
