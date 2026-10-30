@@ -19,7 +19,9 @@ repo settings, so they can't live in code. Do them once:
 ## Merge policy
 | PR | Auto-merges when |
 | --- | --- |
-| Dependabot patch/minor (grouped weekly) | CI passes |
-| Dependabot security update (any version bump) | CI passes |
-| Dependabot major, not security | Never; review manually |
-| Metro-North schedule refresh | Its own test run and CI pass |
+| Any Dependabot PR (patch, minor, major, security) | The `verify` job passes (the merge job runs after it in `ci.yml`) |
+| Metro-North schedule refresh | Its own test run passes |
+
+A major bump that breaks lint, types, tests or the build fails `verify` and stays open for a
+human; it is never merged. Because the merge step is chained after `verify`, this holds even
+without the branch rule in step 2, but keep the rule so humans can't merge a red PR either.

@@ -16,5 +16,4 @@ See "Extending Hopline" in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 ## Automated PRs
 
 Dependabot (weekly) and the Metro-North schedule refresh open PRs that auto-merge once CI
-passes. Patch/minor updates and security fixes merge automatically; other major bumps wait
-for a human. One-time repo setup is in [docs/REPO_SETUP.md](docs/REPO_SETUP.md).
+passes. That includes major bumps: if one breaks CI it stays open for a human. One-time repo setup is in [docs/REPO_SETUP.md](docs/REPO_SETUP.md).
