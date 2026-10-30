@@ -83,6 +83,13 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `LineStatus` per line (`good | planned | change | delays | suspended`, `src/providers/nyct/alerts.ts`, unit
   tested). The board shows a strip of lines with problems, a line sheet with the alerts, and station arrivals
   carry a banner for troubled lines serving that station. Served by `/api/line-status`.
+- **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
+  `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
+  now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
+  position code (`providers/gtfs/`) with Metro-North, and `scripts/build-rail-gtfs.ts` builds each agency's data
+  (`calendar.txt` and `calendar_dates.txt` both supported). Their `data/<agency>/` files ship empty; download
+  the agency's GTFS zip and run `npm run data:shoreline-east -- --zip feed.zip` to fill them. Adding real-time
+  later means swapping that provider's `fetchTrips`.
 - **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
   that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
   from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches

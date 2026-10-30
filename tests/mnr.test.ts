@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { NORTHEAST } from "@/domain/region";
 import { indexAlerts } from "@/providers/mnr/alerts";
 import { buildMnrTrips } from "@/providers/mnr/normalize";
-import { createStaticData, parseStopTimes } from "@/providers/mnr/static";
+import { createStaticData as create, parseStopTimes } from "@/providers/gtfs/static";
 import { serviceDayStart } from "@/lib/time";
+
+const createStaticData = (raw: Parameters<typeof create>[0]) => create(raw, { id: "mnr", name: "Metro-North", routeLabel: (n) => `${n} Line` });
 
 const staticData = createStaticData({
   stops: {

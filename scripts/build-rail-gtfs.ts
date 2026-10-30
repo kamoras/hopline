@@ -1,12 +1,13 @@
 /**
- * Converts the Metro-North static GTFS feed into compact JSON the API reads at
+ * Converts a commuter-rail static GTFS feed into compact JSON the API reads at
  * runtime (so there is no database and no parsing on cold start).
  *
- *   npm run data:mnr                    # download the current feed
- *   npm run data:mnr -- ./gtfs.zip      # use a local copy
- *   npm run data:mnr -- --days 90       # schedule horizon (default 60)
+ *   npm run data:mnr                                  # download the current feed
+ *   npm run data:shoreline-east -- --zip ./gtfs.zip   # use a local copy
+ *   npm run data:mnr -- --days 90                     # schedule horizon (default 60)
  *
- * Output: data/mnr/{stops,routes,trips,services,shapes,meta}.json
+ * Output: data/<agency>/{stops,routes,trips,services,shapes,meta}.json
+ * To add an agency: add it to AGENCIES below, add an npm script, and register a provider.
  */
 import AdmZip from "adm-zip";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -20,8 +21,13 @@ function trackOf(raw: string | undefined): string {
   return t.toUpperCase() === "BUS" ? "" : t;
 }
 
-const FEED_URL = process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip";
-const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "data", "mnr");
+/** `url` is where the feed is downloaded from; agencies without one need `--zip`. */
+const AGENCIES: Record<string, { url?: string }> = {
+  mnr: { url: process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip" },
+  "shoreline-east": { url: process.env.SHORELINE_EAST_GTFS_URL },
+  "hartford-line": { url: process.env.HARTFORD_LINE_GTFS_URL },
+};
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 type Row = Record<string, string>;
 
@@ -116,24 +122,47 @@ function ymd(d: Date): string {
   return d.toISOString().slice(0, 10).replaceAll("-", "");
 }
 
-async function loadZip(arg: string | undefined): Promise<AdmZip> {
-  if (arg) return new AdmZip(readFileSync(arg));
-  const res = await fetch(FEED_URL);
-  if (!res.ok) throw new Error(`Failed to download ${FEED_URL}: ${res.status}`);
+async function loadZip(url: string | undefined, local: string | undefined): Promise<AdmZip> {
+  if (local) return new AdmZip(readFileSync(local));
+  if (!url) throw new Error("No download URL for this agency; pass --zip <file> (or set its *_GTFS_URL variable)");
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to download ${url}: ${res.status}`);
   return new AdmZip(Buffer.from(await res.arrayBuffer()));
 }
 
+const arg = (args: string[], flag: string) => {
+  const i = args.indexOf(flag);
+  return i >= 0 ? args[i + 1] : undefined;
+};
+
+/** Every date from `a` to `b` (YYYYMMDD, inclusive) on one of the given weekdays (0 = Sunday). */
+function datesBetween(a: string, b: string, weekdays: Set<number>): string[] {
+  const parse = (d: string) => Date.UTC(Number(d.slice(0, 4)), Number(d.slice(4, 6)) - 1, Number(d.slice(6, 8)));
+  const out: string[] = [];
+  for (let t = parse(a); t <= parse(b); t += 86_400_000) {
+    if (weekdays.has(new Date(t).getUTCDay())) out.push(ymd(new Date(t)));
+  }
+  return out;
+}
+
+const WEEKDAY_COLUMNS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
 async function main() {
   const args = process.argv.slice(2);
-  const daysIdx = args.indexOf("--days");
-  const days = daysIdx >= 0 ? Number(args[daysIdx + 1]) : 60;
-  const local = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--days");
+  const agencyId = args[0] ?? "";
+  const agency = AGENCIES[agencyId];
+  if (!agency) throw new Error(`Usage: build-rail-gtfs <${Object.keys(AGENCIES).join("|")}> [--zip file] [--days n]`);
+  const days = Number(arg(args, "--days") ?? 60);
+  const OUT_DIR = join(ROOT, "data", agencyId);
 
-  const zip = await loadZip(local);
-  const read = (name: string) => {
+  const zip = await loadZip(agency.url, arg(args, "--zip"));
+  const optional = (name: string) => {
     const entry = zip.getEntry(name);
-    if (!entry) throw new Error(`${name} missing from GTFS feed`);
-    return parseCsv(entry.getData().toString("utf8"));
+    return entry ? parseCsv(entry.getData().toString("utf8")) : [];
+  };
+  const read = (name: string) => {
+    if (!zip.getEntry(name)) throw new Error(`${name} missing from GTFS feed`);
+    return optional(name);
   };
 
   const today = new Date();
@@ -142,13 +171,19 @@ async function main() {
 
   // The dates each service id runs on, inside the horizon. The realtime feed's trip ids are
   // opaque, so trips are matched on train number + service date; this is what makes that possible.
-  const datesByService = new Map<string, string[]>();
-  for (const r of read("calendar_dates.txt")) {
-    if (r.exception_type === "1" && r.date! >= from && r.date! <= to) {
-      const list = datesByService.get(r.service_id!) ?? [];
-      list.push(r.date!);
-      datesByService.set(r.service_id!, list);
-    }
+  // Feeds list dates in calendar_dates.txt, in calendar.txt weekly patterns, or both (with exceptions).
+  const datesByService = new Map<string, Set<string>>();
+  for (const r of optional("calendar.txt")) {
+    const weekdays = new Set(WEEKDAY_COLUMNS.flatMap((col, day) => (r[col] === "1" ? [day] : [])));
+    const dates = datesBetween(r.start_date! > from ? r.start_date! : from, r.end_date! < to ? r.end_date! : to, weekdays);
+    datesByService.set(r.service_id!, new Set(dates));
+  }
+  for (const r of optional("calendar_dates.txt")) {
+    if (r.date! < from || r.date! > to) continue;
+    const set = datesByService.get(r.service_id!) ?? new Set<string>();
+    if (r.exception_type === "1") set.add(r.date!);
+    else if (r.exception_type === "2") set.delete(r.date!);
+    datesByService.set(r.service_id!, set);
   }
   const services: string[] = [];
   const serviceIndex = new Map<string, number>();
@@ -156,7 +191,7 @@ async function main() {
   // Track geometry, simplified to ~8 m. Trips point at a shape by index so estimated positions
   // can follow the rails instead of cutting straight between stations.
   const rawShapes = new Map<string, [number, number, number][]>();
-  for (const s of read("shapes.txt")) {
+  for (const s of optional("shapes.txt")) {
     const list = rawShapes.get(s.shape_id!) ?? [];
     list.push([Number(s.shape_pt_sequence), Number(s.shape_pt_lat), Number(s.shape_pt_lon)]);
     rawShapes.set(s.shape_id!, list);
@@ -170,10 +205,10 @@ async function main() {
   const trips: Record<string, [string, string, string, number, string, number, number]> = {};
   for (const t of read("trips.txt")) {
     const dates = datesByService.get(t.service_id!);
-    if (!dates) continue;
+    if (!dates?.size) continue;
     let idx = serviceIndex.get(t.service_id!);
     if (idx === undefined) {
-      idx = services.push(dates.sort().join(",")) - 1;
+      idx = services.push([...dates].sort().join(",")) - 1;
       serviceIndex.set(t.service_id!, idx);
     }
     let shape = shapeIndexById.get(t.shape_id!);
@@ -275,7 +310,7 @@ async function main() {
   write("services.json", services);
   write("shapes.json", shapes);
   write("meta.json", {
-    source: FEED_URL,
+    source: agency.url ?? arg(args, "--zip") ?? "local file",
     generatedOn: ymd(today),
     horizon: { from, to },
     tripCount: Object.keys(trips).length,
