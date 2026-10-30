@@ -68,6 +68,20 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
 - **Honest delay reasons.** `DelayReason.kind` is `operator-reported` (alerts, cause codes) or
   `inferred` (where time was lost, from stop times). The UI labels the difference.
 - **Stop timeline.** The trip sheet shows the journey, not just a list: passed stops are filled with a check and a solid line in the route's color, the train's current or next stop is highlighted with a countdown, and track ahead is dashed. Phases come from `stopPhases` (unit tested).
+- **Subway (a station-first mode).** The subway is `mode: "subway"` with `browse: "stations"` and
+  `reportsDelay: false` (`src/domain/modes.ts`): riders think in stations and lines, so the board lists
+  stations (not hundreds of trains), trains live on the map, and no delay status is shown, because the feeds
+  give arrival times but nothing to be late against. The provider (`src/providers/nyct`) reads the eight MTA
+  feeds in parallel (a failed feed is skipped and reported on `/status`), gets stations, line colors and track from
+  bundled data (`npm run data:subway`; stations in the same complex are merged), and estimates each train's position
+  as its next stop's place on the track minus the distance it still has to cover. Station ids are supplied by the
+  provider because subway names repeat ("86 St").
+- **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
+  that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
+  from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches
+  with no geometry at all are straight. GPS-reported positions (Amtrak) are snapped onto known track when within
+  120 m (`server/snap.ts`). On the map, easing toward corrected data happens *along* the track, never by sliding
+  across the landscape; a train drawn nowhere near its new path snaps instead.
 - **Map as a transit diagram.** A muted basemap with the network on top: thick colored lines with white
   casings, white station rings, and small train glyphs rotated to the direction of travel. Trains that are
   fine are quiet (white body, line-colored outline); problems are solid status colors with a pulsing glow,

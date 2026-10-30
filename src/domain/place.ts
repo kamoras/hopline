@@ -41,10 +41,11 @@ export const placeSlug = (name: string) => normalizeName(name).replace(/ /g, "-"
  * Operators name the same station differently ("Stamford" vs "Stamford Station"),
  * so places are merged by normalized name. The first one wins.
  */
-export function mergePlaces(places: readonly Omit<Place, "id">[], overrides: readonly PlaceOverride[] = []): Place[] {
+export function mergePlaces(places: readonly (Omit<Place, "id"> & { id?: string })[], overrides: readonly PlaceOverride[] = []): Place[] {
   const byId = new Map<string, Place>();
   for (const p of places) {
-    const id = placeSlug(p.name.replace(/\s+(station|terminal)$/i, ""));
+    // A provider that knows its stations are distinct (the subway has many "86 St") supplies the id itself.
+    const id = p.id ?? placeSlug(p.name.replace(/\s+(station|terminal)$/i, ""));
     if (!id) continue;
     const existing = byId.get(id);
     if (existing) {

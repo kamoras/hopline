@@ -55,3 +55,15 @@ describe("slicePolyline", () => {
     expect(all.slice(0, 2)).toEqual([41.3, -72.9]);
   });
 });
+
+describe("positionAt with a shift", () => {
+  it("moves along the same track, never off it", () => {
+    const shifted = positionAt(legs, 1500, 300)!; // 300 m ahead of the clock position
+    expect(shifted.lat).toBeCloseTo(41.0, 6); // still on the track's latitude
+    expect(shifted.lon).toBeGreaterThan(positionAt(legs, 1500)!.lon);
+  });
+  it("clamps at the ends of the leg", () => {
+    expect(positionAt(legs, 1500, 1e6)!.lon).toBeCloseTo(-72.99, 5);
+    expect(positionAt(legs, 1500, -1e6)!.lon).toBeCloseTo(-73.0, 5);
+  });
+});

@@ -46,7 +46,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
             <h2 className="mt-1 text-2xl font-bold tracking-tight">
               <span className="tabular">{trip.number}</span> to {trip.destination}
             </h2>
-            <p className="text-sm text-muted">from {trip.origin}</p>
+            {trip.origin && <p className="text-sm text-muted">from {trip.origin}</p>}
           </div>
           <button type="button" onClick={onClose} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xl text-muted hover:bg-surface-2" aria-label="Close">
             ×
@@ -55,7 +55,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
 
         <div className="space-y-4 overflow-y-auto px-5 pb-5">
           <div className="flex flex-wrap items-center gap-3">
-            <StatusPill status={trip.delayStatus} minutes={trip.delayMinutes} size="lg" />
+            {mode.reportsDelay && <StatusPill status={trip.delayStatus} minutes={trip.delayMinutes} size="lg" />}
             {trip.position && (
               <span className="text-sm text-muted">
                 {trip.position.source === "reported" ? "Live GPS" : "Estimated from schedule"}

@@ -26,6 +26,7 @@ import { BoardSwitcher } from "./board-switcher";
 import { Commutes } from "./commutes";
 import { PlaceSheet } from "./place-sheet";
 import { SearchBox } from "./search-box";
+import { StationList } from "./station-list";
 import { TripCard } from "./trip-card";
 import { TripDetail } from "./trip-detail";
 
@@ -50,6 +51,7 @@ interface Props {
 
 export function Board({ mode, region, href, boards, places, initialFocus, initial }: Props) {
   const vocab = MODES[mode];
+  const stationsFirst = vocab.browse === "stations";
   const boardKey = href.slice(1);
   const { snapshot, error, isValidating, refresh } = useTrips(mode, region.id, initial);
   const now = useNow(initial.generatedAt);
@@ -178,17 +180,23 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                 onPickPlace={openPlace}
               />
               <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm whitespace-nowrap [scrollbar-width:none]">
-                <Chip active={operator === "all"} onClick={() => setOperator("all")}>
-                  All
-                </Chip>
-                {operators.map((id) => (
-                  <Chip key={id} active={operator === id} onClick={() => setOperator(id)}>
-                    {operatorName(id)}
+                {!stationsFirst && (
+                  <>
+                    <Chip active={operator === "all"} onClick={() => setOperator("all")}>
+                      All
+                    </Chip>
+                    {operators.map((id) => (
+                      <Chip key={id} active={operator === id} onClick={() => setOperator(id)}>
+                        {operatorName(id)}
+                      </Chip>
+                    ))}
+                  </>
+                )}
+                {vocab.reportsDelay && (
+                  <Chip active={delayedOnly} onClick={() => setDelayedOnly((v) => !v)}>
+                    Delayed{delayedCount ? ` · ${delayedCount}` : ""}
                   </Chip>
-                ))}
-                <Chip active={delayedOnly} onClick={() => setDelayedOnly((v) => !v)}>
-                  Delayed{delayedCount ? ` · ${delayedCount}` : ""}
-                </Chip>
+                )}
                 <Chip active={geo.state.status === "ready"} onClick={geo.request}>
                   {geo.state.status === "asking" ? "Locating…" : geo.state.status === "denied" ? "Location unavailable" : `◎ Near me`}
                 </Chip>
@@ -248,42 +256,48 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
-              {!query && (
-                <Commutes
-                  commutes={commutes}
-                  trips={snapshot.trips}
-                  region={region}
-                  aliases={region.aliases}
-                  now={now}
-                  onOpenTrip={openTrip}
-                  onOpenRoute={showRoute}
-                  onRemove={toggleCommute}
-                />
-              )}
-              {mine.length > 0 && (
-                <section aria-label={`My ${vocab.nounPlural}`} className="mb-5">
-                  <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">★ My {vocab.nounPlural}</h2>
-                  <ul className="space-y-2.5">{mine.map(card)}</ul>
-                </section>
-              )}
-              {rest.length > 0 ? (
-                groups.map((g, i) => (
-                  <section key={g.title ?? i} aria-label={g.title ?? vocab.label} className="mb-5">
-                    <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">
-                      {g.title ??
-                        (query ? `${rest.length} match${rest.length === 1 ? "" : "es"}` : mine.length ? `All ${vocab.nounPlural}` : `${vocab.label} right now`)}
-                    </h2>
-                    {g.items.length > 0 ? (
-                      <ul className="space-y-2.5">{g.items.map(card)}</ul>
-                    ) : (
-                      <p className="text-sm text-muted">No {vocab.nounPlural} on this leg right now.</p>
-                    )}
-                  </section>
-                ))
+              {stationsFirst ? (
+                <StationList places={places} query={query} vocab={vocab} onPick={openPlace} />
               ) : (
-                mine.length === 0 && <EmptyState vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
+                <>
+                {!query && (
+                  <Commutes
+                    commutes={commutes}
+                    trips={snapshot.trips}
+                    region={region}
+                    aliases={region.aliases}
+                    now={now}
+                    onOpenTrip={openTrip}
+                    onOpenRoute={showRoute}
+                    onRemove={toggleCommute}
+                  />
+                )}
+                {mine.length > 0 && (
+                  <section aria-label={`My ${vocab.nounPlural}`} className="mb-5">
+                    <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">★ My {vocab.nounPlural}</h2>
+                    <ul className="space-y-2.5">{mine.map(card)}</ul>
+                  </section>
+                )}
+                {rest.length > 0 ? (
+                  groups.map((g, i) => (
+                    <section key={g.title ?? i} aria-label={g.title ?? vocab.label} className="mb-5">
+                      <h2 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">
+                        {g.title ??
+                          (query ? `${rest.length} match${rest.length === 1 ? "" : "es"}` : mine.length ? `All ${vocab.nounPlural}` : `${vocab.label} right now`)}
+                      </h2>
+                      {g.items.length > 0 ? (
+                        <ul className="space-y-2.5">{g.items.map(card)}</ul>
+                      ) : (
+                        <p className="text-sm text-muted">No {vocab.nounPlural} on this leg right now.</p>
+                      )}
+                    </section>
+                  ))
+                ) : (
+                  mine.length === 0 && <EmptyState vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
+                )}
+                </>
               )}
-              <Footer providers={snapshot.providers} />
+              <Footer providers={snapshot.providers} reportsDelay={vocab.reportsDelay} />
             </div>
           </main>
         )}
@@ -295,6 +309,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               trips={mapTrips}
               places={places}
               lines={lines}
+              showDelays={vocab.reportsDelay}
               selectedTripId={selected?.id}
               selectedPlaceId={selectedPlace?.id}
               onSelectTrip={openTripById}
@@ -363,7 +378,7 @@ function EmptyState({ vocab, hasQuery, allDown }: { vocab: ModeInfo; hasQuery: b
   );
 }
 
-function Footer({ providers }: { providers: ProviderStatus[] }) {
+function Footer({ providers, reportsDelay }: { providers: ProviderStatus[]; reportsDelay: boolean }) {
   const sources = providers.map((p) => p.attribution);
   return (
     <footer className="mt-8 space-y-1.5 text-xs text-muted">
@@ -377,7 +392,7 @@ function Footer({ providers }: { providers: ProviderStatus[] }) {
             </a>
           </span>
         ))}
-        . Delay reasons come from the operator when published; otherwise we only show where time was lost.
+        .{reportsDelay && " Delay reasons come from the operator when published; otherwise we only show where time was lost."}
       </p>
       {sources.map((a) => a.notice && <p key={a.url}>{a.notice}</p>)}
       <p>

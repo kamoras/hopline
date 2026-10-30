@@ -12,6 +12,7 @@ import AdmZip from "adm-zip";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPolyline, project, slicePolyline, type Polyline } from "../src/lib/polyline";
 
 const FEED_URL = process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip";
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "data", "mnr");
@@ -210,8 +211,25 @@ async function main() {
   const stops: Record<string, [string, number, number]> = {};
   for (const s of read("stops.txt")) stops[s.stop_id!] = [s.stop_name!, Number(s.stop_lat), Number(s.stop_lon)];
 
-  // Coarse shapes become straight segments between the stations of the longest trip that uses them:
-  // crude, but honest about what we know, and it draws the branch instead of a chord across the map.
+  // Coarse shapes have no real geometry. Rebuild them from the stations the longest trip on them serves,
+  // but follow real track wherever it exists: a branch shares its trunk's rails (Waterbury trains leave
+  // Bridgeport on the New Haven Line), so each hop between two stations is cut from a detailed shape that
+  // passes through both. Only stretches no detailed shape covers fall back to a straight segment.
+  const detailed: Polyline[] = shapes.filter((s) => !s.coarse && s.pts.length >= 4).map((s) => createPolyline(s.pts));
+  const SNAP_M = 150;
+  const hop = (a: { lat: number; lon: number }, b: { lat: number; lon: number }): number[] => {
+    let best: { cost: number; piece: number[] } | undefined;
+    for (const line of detailed) {
+      const pa = project(line, a);
+      const pb = project(line, b);
+      const cost = pa.offMeters + pb.offMeters;
+      if (pa.offMeters <= SNAP_M && pb.offMeters <= SNAP_M && Math.abs(pa.along - pb.along) > 50 && (!best || cost < best.cost)) {
+        best = { cost, piece: slicePolyline(line, pa.along, pb.along) };
+      }
+    }
+    return best?.piece ?? [a.lat, a.lon, b.lat, b.lon];
+  };
+
   const longest = new Map<number, { stops: number; id: string }>();
   for (const [id, t] of Object.entries(trips)) {
     if (!coarse.has(t[6])) continue;
@@ -219,8 +237,20 @@ async function main() {
     if (n > (longest.get(t[6])?.stops ?? 0)) longest.set(t[6], { stops: n, id });
   }
   for (const [idx, { id }] of longest) {
-    const seq = trips[id]![4].split(";").map((p) => p.split("@")[0]!);
-    shapes[idx]!.pts = seq.flatMap((stopId) => (stops[stopId] ? [stops[stopId]![1], stops[stopId]![2]] : []));
+    const seq = trips[id]![4]
+      .split(";")
+      .map((p) => stops[p.split("@")[0]!])
+      .filter((s): s is [string, number, number] => !!s)
+      .map(([, lat, lon]) => ({ lat, lon }));
+    const flat: number[] = [];
+    for (let i = 0; i + 1 < seq.length; i++) {
+      const piece = hop(seq[i]!, seq[i + 1]!);
+      // Pieces share their end points; drop the repeated one.
+      flat.push(...(flat.length >= 2 && flat[flat.length - 2] === piece[0] && flat[flat.length - 1] === piece[1] ? piece.slice(2) : piece));
+    }
+    const pts: [number, number][] = [];
+    for (let i = 0; i + 1 < flat.length; i += 2) pts.push([flat[i]!, flat[i + 1]!]);
+    shapes[idx]!.pts = simplify(pts, 8).flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
   }
 
   const routes: Record<string, { name: string; color: string }> = {};

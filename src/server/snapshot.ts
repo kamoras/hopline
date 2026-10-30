@@ -1,6 +1,8 @@
 import type { Board } from "@/domain/board";
 import type { Diagnostics, ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { providersFor } from "@/providers/registry";
+import { getTrack } from "./lines";
+import { snapToTrack } from "./snap";
 import type { TransitProvider } from "@/providers/types";
 
 const PROVIDER_TIMEOUT_MS = 8_000;
@@ -51,12 +53,15 @@ async function runProvider(
 
 /** Fan out to every provider for the board; one failing source never blocks the others. */
 export async function getSnapshot(board: Board, now = Date.now()): Promise<Snapshot> {
-  const results = await Promise.all(providersFor(board).map((p) => runProvider(p, board, now)));
+  const [results, track] = await Promise.all([
+    Promise.all(providersFor(board).map((p) => runProvider(p, board, now))),
+    getTrack(board).catch(() => []), // no track data just means nothing to snap to
+  ]);
   return {
     mode: board.mode,
     regionId: board.region.id,
     generatedAt: now,
-    trips: results.flatMap((r) => r.trips),
+    trips: snapToTrack(results.flatMap((r) => r.trips), track),
     providers: results.map((r) => r.status),
   };
 }

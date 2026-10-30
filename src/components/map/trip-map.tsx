@@ -9,7 +9,8 @@ import type { Region } from "@/domain/region";
 import type { DelayStatus, Trip } from "@/domain/trip";
 import { REFRESH_MS } from "@/hooks/use-trips";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
-import { compileLegs, positionAt, type CompiledLeg } from "@/lib/motion";
+import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from "@/lib/motion";
+import { project } from "@/lib/polyline";
 import { BaseMap } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
 import { installTrainIcons, trainIconId } from "./train-icon";
@@ -19,6 +20,8 @@ import { useLocate } from "./use-locate";
 const FRAME_MS = 40;
 /** Time constant for blending out a correction when fresh data arrives. */
 const CORRECTION_MS = 700;
+/** A drawn train further than this from the new path is snapped to it instead of slid along it. */
+const SLIDE_MAX_OFF_M = 120;
 /** Below this zoom, crowds of on-time trains collapse into counted stacks. */
 const STACK_MAX_ZOOM = 11.5;
 const STACK_RADIUS_PX = 16;
@@ -36,14 +39,18 @@ const PROBLEM_COLOR: Record<Exclude<DelayStatus, "on-time">, string> = {
   canceled: "#7a1f1a",
   unknown: "#6b7482",
 };
-const tripColor = (t: Trip) => (t.delayStatus === "on-time" ? t.routeColor : PROBLEM_COLOR[t.delayStatus]);
-const isProblem = (t: Trip) => t.delayStatus !== "on-time" && t.delayStatus !== "unknown";
+/** On time, or no delay information at all: nothing to flag, so the train stays quiet in its line color. */
+const isQuiet = (t: Trip) => t.delayStatus === "on-time" || t.delayStatus === "unknown";
+const tripColor = (t: Trip) => (isQuiet(t) ? t.routeColor : PROBLEM_COLOR[t.delayStatus as keyof typeof PROBLEM_COLOR]);
+const isProblem = (t: Trip) => !isQuiet(t);
 
 interface Props {
   region: Region;
   trips: readonly Trip[];
   places: readonly Place[];
   lines: readonly Line[];
+  /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
+  showDelays?: boolean;
   selectedTripId?: string;
   selectedPlaceId?: string;
   onSelectTrip(id: string): void;
@@ -60,19 +67,21 @@ interface Motion {
   to: LatLon;
   start: number;
   duration: number;
-  /** Offset between where it was drawn and where the new data says, decaying to zero. */
-  corr: LatLon;
-  corrAt: number;
+  /**
+   * How far (meters) along its track the train was drawn from where the new data says it is, decaying to
+   * zero. Measured along the track so easing toward corrected data never leaves the rails.
+   */
+  shift: number;
+  /** When the correction started, for decay. */
+  shiftAt: number;
   /** Heading to use when the path gives none. */
   heading: number;
 }
 
 function motionPosition(m: Motion, now: number): Placed {
   if (m.legs) {
-    const base = positionAt(m.legs, now);
-    const k = Math.exp(-(now - m.corrAt) / CORRECTION_MS);
-    const at = base ?? { ...m.to, heading: m.heading };
-    return { lat: at.lat + m.corr.lat * k, lon: at.lon + m.corr.lon * k, heading: at.heading };
+    const k = Math.exp(-(now - m.shiftAt) / CORRECTION_MS);
+    return positionAt(m.legs, now, m.shift * k) ?? { ...m.to, heading: m.heading };
   }
   const p = lerpLatLon(m.from, m.to, m.duration > 0 ? (now - m.start) / m.duration : 1);
   const moved = Math.hypot(m.to.lat - m.from.lat, m.to.lon - m.from.lon) > 1e-4; // ~10 m
@@ -157,7 +166,7 @@ function mutedBasemap(map: MapLibreMap) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -336,11 +345,17 @@ export default function TripMap({ region, trips, places, lines, selectedTripId, 
       const heading = trip.position.heading ?? prev?.heading ?? 0;
       const legs = trip.motion?.length ? compileLegs(trip.motion) : undefined;
       if (legs) {
-        const target = positionAt(legs, t) ?? at;
-        const corr = prev ? { lat: prev.lat - target.lat, lon: prev.lon - target.lon } : { lat: 0, lon: 0 };
-        next.set(trip.id, { legs, from: at, to: at, start: t, duration: 0, corr, corrAt: t, heading });
+        // Ease from where the train was drawn to where the new data puts it, along the track. If it was
+        // drawn nowhere near the new path (a different trip, a big revision), snap rather than slide across land.
+        const target = locateOnLeg(legs, t);
+        let shift = 0;
+        if (prev && target) {
+          const onPath = project(target.leg.line, prev);
+          if (onPath.offMeters <= SLIDE_MAX_OFF_M) shift = onPath.along - target.along;
+        }
+        next.set(trip.id, { legs, from: at, to: at, start: t, duration: 0, shift, shiftAt: t, heading });
       } else {
-        next.set(trip.id, { from: prev ?? at, to: at, start: t, duration: REFRESH_MS, corr: { lat: 0, lon: 0 }, corrAt: t, heading });
+        next.set(trip.id, { from: prev ?? at, to: at, start: t, duration: REFRESH_MS, shift: 0, shiftAt: t, heading });
       }
     }
     motions.current = next;
@@ -425,7 +440,7 @@ export default function TripMap({ region, trips, places, lines, selectedTripId, 
       >
         {locate.label}
       </button>
-      <Legend />
+      {showDelays && <Legend />}
     </BaseMap>
   );
 }
