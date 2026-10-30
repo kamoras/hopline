@@ -24,6 +24,7 @@ import { describeIntent, describeLeg, parseIntent, type Route } from "@/lib/quer
 import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
 import { Commutes } from "./commutes";
+import { ArrivalsSheet } from "./arrivals-sheet";
 import { PlaceSheet } from "./place-sheet";
 import { SearchBox } from "./search-box";
 import { StationList } from "./station-list";
@@ -331,7 +332,10 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
           onShowOnMap={openTripOnMap}
         />
       ) : (
-        selectedPlace && (
+        selectedPlace &&
+        (stationsFirst ? (
+          <ArrivalsSheet mode={mode} regionId={region.id} place={selectedPlace} now={now} onClose={close} />
+        ) : (
           <PlaceSheet
             place={selectedPlace}
             trips={snapshot.trips}
@@ -344,7 +348,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               showRoute({ from: from.name.toLowerCase(), to: to.name.toLowerCase() });
             }}
           />
-        )
+        ))
       )}
     </div>
   );

@@ -1,3 +1,4 @@
+import type { Arrival } from "@/domain/arrival";
 import type { Line } from "@/domain/line";
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
@@ -30,6 +31,8 @@ export interface TransitProvider {
   fetchTrips(ctx: FetchContext): Promise<Trip[]>;
   /** Stations/airports in the region, used for search, "near me" and the map. */
   fetchPlaces(ctx: FetchContext): Promise<(Omit<Place, "id"> & { id?: string })[]>;
+  /** Optional: trains due at a place, for station-first boards. */
+  fetchArrivals?(ctx: FetchContext, place: Place): Promise<Arrival[]>;
   /** Optional: track/route geometry to draw on the map. */
   fetchLines?(ctx: FetchContext): Promise<Line[]>;
 }

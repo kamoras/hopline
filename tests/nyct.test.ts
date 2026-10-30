@@ -1,7 +1,7 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { describe, expect, it } from "vitest";
 import { NYC } from "@/domain/region";
-import { buildNyctTrips } from "@/providers/nyct/normalize";
+import { buildNyctArrivals, buildNyctTrips } from "@/providers/nyct/normalize";
 import { createNyctStatic, loadNyctStatic, type RawSubway } from "@/providers/nyct/static";
 
 const NOW = 1_800_000_000_000;
@@ -73,6 +73,30 @@ describe("buildNyctTrips", () => {
     const f = feed([{ id: "u", tripUpdate: { trip: { tripId: "1_Q..N", routeId: "Q" }, stopTimeUpdate: [{ stopId: "B1N", arrival: { time: sec(NOW + 1000) } }] } }]);
     expect(buildNyctTrips({ staticData: data, feeds: [f], region: NYC, now: NOW, diag })).toEqual([]);
     expect(diag).toMatchObject({ tripUpdates: 1, unknownRoute: 1 });
+  });
+});
+
+describe("buildNyctArrivals", () => {
+  const at = (stops: [string, number][], id = "t") => ({
+    id,
+    tripUpdate: { trip: { tripId: `${id}_X..N`, routeId: "X" }, stopTimeUpdate: stops.map(([stopId, t]) => ({ stopId, arrival: { time: sec(t) } })) },
+  });
+  const arrivals = (entities: rt.IFeedEntity[], platforms = ["B1N", "B1S"]) => buildNyctArrivals({ staticData: data, feeds: [feed(entities)], platforms, now: NOW });
+
+  it("lists trains due at a station's platforms, soonest first, going to their last stop", () => {
+    const list = arrivals([at([["B1N", NOW + 300_000], ["C1N", NOW + 420_000]], "later"), at([["B1N", NOW + 60_000], ["C1N", NOW + 180_000]], "sooner")]);
+    expect(list.map((a) => a.tripId)).toEqual(["sooner_X..N", "later_X..N"]);
+    expect(list[0]).toMatchObject({ route: "X", color: "#00aa00", headsign: "Gamma St", platform: "B1N" });
+  });
+
+  it("ignores other stations, trains that have left, and trains far in the future", () => {
+    const list = arrivals([at([["A1N", NOW + 60_000], ["C1N", NOW + 200_000]], "elsewhere"), at([["B1N", NOW - 200_000]], "gone"), at([["B1N", NOW + 3 * 3_600_000]], "far")]);
+    expect(list).toEqual([]);
+  });
+
+  it("includes both directions", () => {
+    const list = arrivals([at([["B1N", NOW + 60_000]], "n"), at([["B1S", NOW + 120_000]], "s")]);
+    expect(list.map((a) => a.platform).sort()).toEqual(["B1N", "B1S"]);
   });
 });
 

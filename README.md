@@ -4,7 +4,7 @@
 Hopline merges live data from multiple operators into one simple view: which trains are
 running, who's late, why, and where every train is right now on a map.
 
-**Coverage:** Metro-North Railroad and Amtrak between New York, Connecticut and Philadelphia, and the NYC subway (live trains on a map, with station arrivals coming next).
+**Coverage:** Metro-North Railroad and Amtrak between New York, Connecticut and Philadelphia, and the NYC subway (live trains on a map, and next trains at every station by line and direction).
 
 - **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see
   the trains due, in arrival order, with live delay.
