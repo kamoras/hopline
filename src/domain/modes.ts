@@ -14,6 +14,12 @@ export interface ModeInfo {
   numberLabel: string;
   /** What a stop is called for this mode. */
   stopNoun: string;
+  /** Whether the operator reports lateness against a timetable. If not, the UI shows no delay status. */
+  reportsDelay: boolean;
+  /** "trips": the board lists individual trips. "stations": riders think in stations, so it lists stations. */
+  browse: "trips" | "stations";
+  /** What a boarding position is called: "Track 12", "Platform 3". */
+  platformNoun: string;
   searchPlaceholder: string;
   /** Shown when a search finds nothing. */
   searchHint: string;
@@ -27,8 +33,24 @@ export const MODES = {
     nounPlural: "trains",
     numberLabel: "Train",
     stopNoun: "station",
+    reportsDelay: true,
+    browse: "trips",
+    platformNoun: "Track",
     searchPlaceholder: "Station, train #, or “A to B”…",
     searchHint: "Try a train number like 2150, a station like Stamford, or a trip like “New Haven to New York round trip”.",
+  },
+  subway: {
+    slug: "subway",
+    label: "Subway",
+    noun: "train",
+    nounPlural: "trains",
+    numberLabel: "Line",
+    stopNoun: "station",
+    reportsDelay: false,
+    browse: "stations",
+    platformNoun: "Platform",
+    searchPlaceholder: "Station or line (A, 7, L)…",
+    searchHint: "Try a station like Times Sq, or a line like L.",
   },
 } as const satisfies Record<string, ModeInfo>;
 

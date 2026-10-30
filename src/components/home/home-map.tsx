@@ -14,7 +14,8 @@ export default function HomeMap({ pins }: { pins: RegionPin[] }) {
   const bounds = useMemo<[number, number, number, number]>(() => {
     const lons = pins.map((p) => p.lon);
     const lats = pins.map((p) => p.lat);
-    const pad = 3;
+    // Frame the boards with room around them, but stay close when they are near each other.
+    const pad = Math.max(0.35, (Math.max(...lons) - Math.min(...lons)) * 0.6);
     return pins.length
       ? [Math.min(...lons) - pad, Math.min(...lats) - pad, Math.max(...lons) + pad, Math.max(...lats) + pad]
       : NORTHEAST.bounds;

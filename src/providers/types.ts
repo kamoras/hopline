@@ -29,7 +29,7 @@ export interface TransitProvider {
   readonly regionIds: readonly string[];
   fetchTrips(ctx: FetchContext): Promise<Trip[]>;
   /** Stations/airports in the region, used for search, "near me" and the map. */
-  fetchPlaces(ctx: FetchContext): Promise<Omit<Place, "id">[]>;
+  fetchPlaces(ctx: FetchContext): Promise<(Omit<Place, "id"> & { id?: string })[]>;
   /** Optional: track/route geometry to draw on the map. */
   fetchLines?(ctx: FetchContext): Promise<Line[]>;
 }

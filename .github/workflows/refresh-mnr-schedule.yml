@@ -22,6 +22,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run data:mnr
+      - run: npm run data:subway
       # Fail before opening a PR if the new data breaks anything.
       - run: npm test
       - id: pr

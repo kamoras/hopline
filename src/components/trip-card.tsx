@@ -39,7 +39,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
         >
           <div className="flex items-center justify-between gap-3">
             <OperatorLine trip={trip} />
-            <StatusPill status={trip.delayStatus} minutes={trip.delayMinutes} />
+            {mode.reportsDelay && <StatusPill status={trip.delayStatus} minutes={trip.delayMinutes} />}
           </div>
           <div className="flex items-baseline gap-2">
             <span className="tabular text-2xl font-bold tracking-tight">{trip.number}</span>

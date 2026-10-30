@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "data:mnr": "tsx scripts/build-mnr-gtfs.ts"
+    "data:mnr": "tsx scripts/build-mnr-gtfs.ts",
+    "data:subway": "tsx scripts/build-subway-gtfs.ts"
   },
   "dependencies": {
     "gtfs-realtime-bindings": "^2.2.0",
