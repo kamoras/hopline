@@ -15,8 +15,8 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -25,7 +25,7 @@ jobs:
       # Fail before opening a PR if the new data breaks anything.
       - run: npm test
       - id: pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           # PRs opened with the default GITHUB_TOKEN don't trigger CI, so required
           # checks would never report and auto-merge would stall. Set AUTOMERGE_TOKEN
