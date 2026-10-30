@@ -125,15 +125,19 @@ function pathBetween(prev: LatLon, next: LatLon, shape: Polyline | undefined): n
 }
 
 /**
- * Where the train will be over the next few minutes: the stretch it is on and the one after it.
- * The map moves the train along these continuously, so it keeps rolling between data refreshes.
+ * Where the train will be until the next data refresh: the stretch it is on, ending at the stop it is
+ * heading for. The map moves the train along it continuously, so it keeps rolling between refreshes.
+ *
+ * Deliberately only ONE stretch: the train must never be drawn past the stop it is heading for. If the
+ * real train is running behind our prediction it waits at that stop until fresh data says it has left,
+ * instead of gliding on through the station.
  */
 function buildLegs(stops: StopCall[], stopsById: MnrStaticData["stops"], shape: Polyline | undefined): MotionLeg[] | undefined {
   const nextIdx = stops.findIndex((s) => s.state !== "departed");
   if (nextIdx === -1) return undefined;
   const from = stops[nextIdx]!.state === "at" || nextIdx === 0 ? nextIdx : nextIdx - 1;
   const legs: MotionLeg[] = [];
-  for (let i = from; i < Math.min(stops.length - 1, from + 2); i++) {
+  for (let i = from; i < Math.min(stops.length - 1, from + 1); i++) {
     const a = stops[i]!;
     const b = stops[i + 1]!;
     const pa = coords(stopsById, a.id);

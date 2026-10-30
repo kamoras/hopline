@@ -208,7 +208,7 @@ describe("track-following positions", () => {
     expect(mid.lat).toBeCloseTo(41.0, 2);
   });
 
-  it("sends motion legs that follow the track, for the stretch in progress and the next", () => {
+  it("sends motion legs that follow the track, for the stretch in progress", () => {
     const data = withShape([...A, ...apex, ...B]);
     const now = start + 510 * 60_000;
     const realtime = feed([{ id: "1", tripUpdate: { trip: { tripId: "S", startDate: DATE }, stopTimeUpdate: [{ stopId: "2", arrival: { delay: 0 } }] } }]);
@@ -218,5 +218,23 @@ describe("track-following positions", () => {
     expect([leg.t0, leg.t1]).toEqual([start + 480 * 60_000, start + 540 * 60_000]);
     expect(leg.path.length).toBeGreaterThanOrEqual(6); // A, the apex, B: not a straight line
     expect(Math.max(...leg.path.filter((_, i) => i % 2 === 0))).toBeGreaterThan(41.05);
+  });
+
+  it("never lets a train move past the stop it is heading for", () => {
+    // Three stops; the train is between the first and second. Only the stretch ending at the second
+    // stop may be sent, so the map holds it there until fresh data says it has left.
+    const data = createStaticData({
+      stops: { "1": ["A", 41.0, -73.0], "2": ["B", 41.0, -72.95], "3": ["C", 41.0, -72.9] },
+      routes: { "3": { name: "New Haven", color: "#EE0034" } },
+      trips: { S: ["1", "3", "C", 0, "1@480;2@510;3@540", 0, -1] },
+      services: [DATE],
+      shapes: [],
+    });
+    const now = start + 495 * 60_000;
+    const realtime = feed([{ id: "1", tripUpdate: { trip: { tripId: "S", startDate: DATE }, stopTimeUpdate: [{ stopId: "2", arrival: { delay: 0 } }, { stopId: "3", arrival: { delay: 0 } }] } }]);
+    const [trip] = buildMnrTrips({ staticData: data, realtime, alerts: indexAlerts(undefined, now), region: NORTHEAST, now });
+    expect(trip!.motion).toHaveLength(1);
+    expect(trip!.motion![0]!.t1).toBe(start + 510 * 60_000); // arrives at B...
+    expect(trip!.motion![0]!.path.slice(-2)).toEqual([41.0, -72.95]); // ...and the path ends at B, never beyond
   });
 });

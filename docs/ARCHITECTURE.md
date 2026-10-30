@@ -68,10 +68,17 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
 - **Honest delay reasons.** `DelayReason.kind` is `operator-reported` (alerts, cause codes) or
   `inferred` (where time was lost, from stop times). The UI labels the difference.
 - **Stop timeline.** The trip sheet shows the journey, not just a list: passed stops are filled with a check and a solid line in the route's color, the train's current or next stop is highlighted with a countdown, and track ahead is dashed. Phases come from `stopPhases` (unit tested).
+- **Map as a transit diagram.** A muted basemap with the network on top: thick colored lines with white
+  casings, white station rings, and small train glyphs rotated to the direction of travel. Trains that are
+  fine are quiet (white body, line-colored outline); problems are solid status colors with a pulsing glow,
+  so trouble stands out. Levels of detail keep it readable: tiny dots zoomed out, glyphs closer, numbers
+  closest, and crowds of on-time trains collapse into counted stacks (`stacking.ts`) until you zoom in.
+  Schedule shapes that are really chords (a handful of points over tens of km) are detected at build time and
+  replaced by the trip's station sequence.
 - **Real-time and smooth movement.** The sources set the floor (`/status` shows each feed's own age). On top of
   that, the browser refreshes every 10 s against a 5 s edge cache. Between refreshes the map keeps trains
-  moving: each trip carries `motion` legs (where it will be over the next stretches, following the track) and
-  the map moves it by the clock; point-only trips (GPS) glide toward their latest report. When fresh data
+  moving: each trip carries a `motion` leg (the stretch to the stop it is heading for, following the track, and never
+  beyond it, so a train waits at its stop until fresh data confirms it left) and the map moves it by the clock; point-only trips (GPS) glide toward their latest report. When fresh data
   disagrees with where a train is drawn, the difference is blended out over ~0.7 s instead of snapped.
 - **Estimated positions.** Where an operator provides no GPS (Metro-North often doesn't), the
   position is interpolated between stations from predicted times and marked `source: "estimated"`.
