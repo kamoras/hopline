@@ -1,6 +1,7 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { GTFS_CAUSE_TEXT } from "@/domain/delay";
 import type { DelayReason } from "@/domain/trip";
+import { englishText, isActive } from "../mta/alert-utils";
 import type { FeedMessage } from "./realtime";
 
 export interface AlertIndex {
@@ -15,12 +16,6 @@ const IMPACTFUL = new Set([
   rt.Alert.Effect.NO_SERVICE,
 ]);
 
-function englishText(ts: rt.ITranslatedString | null | undefined): string | undefined {
-  const tr = ts?.translation ?? [];
-  const pick = tr.find((t) => !t.language || t.language.startsWith("en")) ?? tr[0];
-  return pick?.text?.trim() || undefined;
-}
-
 function reasonFor(alert: rt.IAlert): DelayReason | undefined {
   const cause = alert.cause != null ? rt.Alert.Cause[alert.cause] : undefined;
   const causeText = cause ? GTFS_CAUSE_TEXT[cause] : undefined;
@@ -28,12 +23,6 @@ function reasonFor(alert: rt.IAlert): DelayReason | undefined {
   const shortHeader = header && header.length <= 140 ? header : undefined;
   const text = shortHeader ?? causeText ?? (header ? `${header.slice(0, 137)}…` : undefined);
   return text ? { kind: "operator-reported", text } : undefined;
-}
-
-function isActive(alert: rt.IAlert, nowSec: number): boolean {
-  const periods = alert.activePeriod ?? [];
-  if (periods.length === 0) return true;
-  return periods.some((p) => (!p.start || Number(p.start) <= nowSec) && (!p.end || Number(p.end) >= nowSec));
 }
 
 /** Indexes active alerts so each trip can look up an operator-reported reason. */

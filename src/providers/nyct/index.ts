@@ -2,8 +2,9 @@ import type { Place } from "@/domain/place";
 import { placeSlug } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
 import type { FetchContext, TransitProvider } from "../types";
+import { buildLineStatus } from "./alerts";
 import { buildNyctArrivals, buildNyctTrips, NYCT_ID } from "./normalize";
-import { fetchSubwayFeeds } from "./realtime";
+import { fetchSubwayAlerts, fetchSubwayFeeds } from "./realtime";
 import { loadNyctStatic } from "./static";
 
 /** NYC Subway via the MTA's eight GTFS-Realtime feeds plus bundled static data. */
@@ -38,6 +39,10 @@ export const nyctProvider: TransitProvider = {
   async fetchArrivals({ signal, now }, place) {
     const { feeds } = await fetchSubwayFeeds(signal, now);
     return buildNyctArrivals({ staticData: loadNyctStatic(), feeds, platforms: place.codes ?? [], now });
+  },
+
+  async fetchLineStatus({ signal, now }) {
+    return buildLineStatus({ staticData: loadNyctStatic(), feed: await fetchSubwayAlerts(signal, now), now });
   },
 
   async fetchLines() {
