@@ -1,6 +1,9 @@
+import type { Line } from "@/domain/line";
+import { createPolyline, type Polyline } from "@/lib/polyline";
 import routes from "../../../data/mnr/routes.json";
 import services from "../../../data/mnr/services.json";
 import stops from "../../../data/mnr/stops.json";
+import shapes from "../../../data/mnr/shapes.json";
 import trips from "../../../data/mnr/trips.json";
 
 /** Schedule data produced by `npm run data:mnr` (scripts/build-mnr-gtfs.ts). */
@@ -23,6 +26,8 @@ export interface StaticTrip {
   headsign: string;
   direction: number;
   stopTimes: StaticStopTime[];
+  /** The track this trip runs on, if the schedule has geometry for it. */
+  shape?: Polyline;
 }
 
 /** A schedule trip together with its schedule id. */
@@ -46,10 +51,18 @@ export interface MnrStaticData {
    * trip ids don't match the schedule's, but train number + service date identifies a trip.
    */
   tripsByNumber(number: string, date: string): StaticTripRef[];
+  /** Every distinct track, for drawing on the map. */
+  lines(): Line[];
 }
 
-/** [trainNumber, routeId, headsign, direction, encodedStopTimes, serviceIndex] */
-type RawTrips = Record<string, [string, string, string, number, string, number]>;
+/** [trainNumber, routeId, headsign, direction, encodedStopTimes, serviceIndex, shapeIndex (-1 = none)] */
+type RawTrips = Record<string, [string, string, string, number, string, number, number]>;
+
+/** Simplified track geometry: flat [lat, lon, ...] per shape. */
+export interface RawShape {
+  routeId: string;
+  pts: number[];
+}
 
 export function parseStopTimes(encoded: string): StaticStopTime[] {
   return encoded.split(";").map((part) => {
@@ -65,19 +78,28 @@ export function createStaticData(raw: {
   trips: RawTrips;
   /** Per service index, the comma-separated dates (YYYYMMDD) it runs on. */
   services: string[];
+  shapes: RawShape[];
 }): MnrStaticData {
   const stopsById: Record<string, StaticStop> = {};
   for (const [id, [name, lat, lon]] of Object.entries(raw.stops)) stopsById[id] = { name, lat, lon };
 
   const serviceDates = raw.services.map((d) => new Set(d.split(",")));
   const cache = new Map<string, StaticTrip>();
+  const polylines = raw.shapes.map((s) => createPolyline(s.pts));
 
   const decode = (id: string): StaticTrip | undefined => {
     const hit = cache.get(id);
     if (hit) return hit;
     const t = raw.trips[id];
     if (!t) return undefined;
-    const trip: StaticTrip = { number: t[0], routeId: t[1], headsign: t[2], direction: t[3], stopTimes: parseStopTimes(t[4]) };
+    const trip: StaticTrip = {
+      number: t[0],
+      routeId: t[1],
+      headsign: t[2],
+      direction: t[3],
+      stopTimes: parseStopTimes(t[4]),
+      shape: polylines[t[6]],
+    };
     cache.set(id, trip);
     return trip;
   };
@@ -97,6 +119,13 @@ export function createStaticData(raw: {
     routes: raw.routes,
     tripIds: () => Object.keys(raw.trips),
     trip: decode,
+    lines: () =>
+      raw.shapes.map((s, i) => ({
+        id: `mnr-${i}`,
+        name: raw.routes[s.routeId]?.name ? `${raw.routes[s.routeId]!.name} Line` : "Metro-North",
+        color: raw.routes[s.routeId]?.color ?? "#0b5ea8",
+        coords: polylines[i]!.pts.map((p) => [p.lon, p.lat] as [number, number]),
+      })),
     tripsByNumber(number, date) {
       return (numberIndex().get(number) ?? [])
         .filter((id) => serviceDates[raw.trips[id]![5]]?.has(date))
@@ -120,6 +149,7 @@ export function loadStaticData(): MnrStaticData {
     routes,
     trips: trips as unknown as RawTrips,
     services,
+    shapes,
   });
   return loaded;
 }

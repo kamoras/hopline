@@ -14,13 +14,14 @@ const staticData = createStaticData({
   },
   routes: { "3": { name: "New Haven", color: "#EE0034" } },
   trips: {
-    T1: ["1302", "3", "New Haven", 0, "1@480;2@540-541;3@600", 0],
+    T1: ["1302", "3", "New Haven", 0, "1@480;2@540-541;3@600", 0, -1],
     // Same train number twice on one day (an AM and a PM run), plus one that runs another day.
-    AM: ["1500", "3", "New Haven", 0, "1@300;3@400", 0],
-    PM: ["1500", "3", "New Haven", 0, "1@900;3@1000", 0],
-    OTHERDAY: ["1600", "3", "New Haven", 0, "1@480;3@600", 1],
+    AM: ["1500", "3", "New Haven", 0, "1@300;3@400", 0, -1],
+    PM: ["1500", "3", "New Haven", 0, "1@900;3@1000", 0, -1],
+    OTHERDAY: ["1600", "3", "New Haven", 0, "1@480;3@600", 1, -1],
   },
   services: ["20261029", "20261030"],
+  shapes: [],
 });
 
 const DATE = "20261029";
@@ -123,8 +124,9 @@ describe("buildMnrTrips", () => {
     const withPrefix = createStaticData({
       stops: { "1": ["A", 40.75, -73.97], "2": ["B", 41.0, -73.5] },
       routes: { "3": { name: "New Haven", color: "#EE0034" } },
-      trips: { P: ["EB1997", "3", "B", 0, "1@480;2@540", 0] },
+      trips: { P: ["EB1997", "3", "B", 0, "1@480;2@540", 0, -1] },
       services: [DATE],
+      shapes: [],
     });
     const rt2 = feed([{ id: "EB1997", tripUpdate: { trip: { tripId: "opaque", startDate: DATE } } }]);
     expect(buildMnrTrips({ staticData: withPrefix, realtime: rt2, alerts: indexAlerts(undefined, now), region: NORTHEAST, now })[0]?.number).toBe("EB1997");
@@ -172,5 +174,37 @@ describe("buildMnrTrips", () => {
     const now = at(700);
     const realtime = feed([tripUpdate([]), { id: "x", tripUpdate: { trip: { tripId: "nope", startDate: DATE } } }]);
     expect(buildMnrTrips({ staticData, realtime, alerts: indexAlerts(undefined, now), region: NORTHEAST, now })).toEqual([]);
+  });
+});
+
+describe("track-following positions", () => {
+  // Stop A and stop B are 0.1 deg of longitude apart on the same latitude, but the track
+  // detours north through an apex, like a rail line around a bay.
+  const A = [41.0, -73.0] as const;
+  const B = [41.0, -72.9] as const;
+  const apex = [41.06, -72.95] as const;
+  const withShape = (pts: number[]) =>
+    createStaticData({
+      stops: { "1": ["A", ...A], "2": ["B", ...B] },
+      routes: { "3": { name: "New Haven", color: "#EE0034" } },
+      trips: { S: ["1", "3", "B", 0, "1@480;2@540", 0, 0] },
+      services: [DATE],
+      shapes: [{ routeId: "3", pts }],
+    });
+  const at = (data: ReturnType<typeof withShape>, min: number) => {
+    const now = start + min * 60_000;
+    const realtime = feed([{ id: "1", tripUpdate: { trip: { tripId: "S", startDate: DATE }, stopTimeUpdate: [{ stopId: "2", arrival: { delay: 0 } }] } }]);
+    return buildMnrTrips({ staticData: data, realtime, alerts: indexAlerts(undefined, now), region: NORTHEAST, now })[0]!.position!;
+  };
+
+  it("follows the track instead of cutting straight between stations", () => {
+    const mid = at(withShape([...A, ...apex, ...B]), 510); // halfway in time
+    expect(mid.source).toBe("estimated");
+    expect(mid.lat).toBeGreaterThan(41.04); // up at the apex, not on the 41.0 straight line
+  });
+
+  it("falls back to a straight line when the geometry is nowhere near the stops", () => {
+    const mid = at(withShape([35.0, -90.0, 35.1, -90.1]), 510);
+    expect(mid.lat).toBeCloseTo(41.0, 2);
   });
 });

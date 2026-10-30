@@ -98,4 +98,5 @@ export const demoProvider: TransitProvider = {
     return [...syntheticMnr(now), ...syntheticAmtrak(now, region)];
   },
   fetchPlaces: (ctx) => mnrProvider.fetchPlaces(ctx),
+  fetchLines: (ctx) => mnrProvider.fetchLines!(ctx),
 };

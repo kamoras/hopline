@@ -30,6 +30,10 @@ export const mnrProvider: TransitProvider = {
     });
   },
 
+  async fetchLines() {
+    return loadStaticData().lines();
+  },
+
   async fetchPlaces({ region }) {
     return Object.values(loadStaticData().stops)
       .filter((s) => inBounds(region, s.lat, s.lon))

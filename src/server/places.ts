@@ -1,6 +1,7 @@
 import type { Board } from "@/domain/board";
-import { mergePlaces, type Place } from "@/domain/place";
+import { mergePlaces, type Place, type PlaceOverride } from "@/domain/place";
 import { providersFor } from "@/providers/registry";
+import overrides from "../../data/places/overrides.json";
 
 /** Stations barely change, so cache generously per server instance. */
 const TTL_MS = 6 * 60 * 60_000;
@@ -17,7 +18,7 @@ export async function getPlaces(board: Board, now = Date.now()): Promise<Place[]
       p.fetchPlaces({ region: board.region, now, diag: {}, signal: AbortSignal.timeout(8_000) }).catch(() => []),
     ),
   );
-  const places = mergePlaces(lists.flat());
+  const places = mergePlaces(lists.flat(), overrides as PlaceOverride[]);
   // Don't pin an empty result (probably a transient failure) for hours.
   if (places.length) cache.set(key, { places, at: now });
   return places;

@@ -3,6 +3,7 @@
 import { LngLatBounds, type ExpressionSpecification, type GeoJSONSource, type Map as MapLibreMap } from "maplibre-gl";
 import type { Feature, FeatureCollection } from "geojson";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Line } from "@/domain/line";
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
 import type { DelayStatus, Trip } from "@/domain/trip";
@@ -24,6 +25,7 @@ interface Props {
   region: Region;
   trips: readonly Trip[];
   places: readonly Place[];
+  lines: readonly Line[];
   selectedTripId?: string;
   selectedPlaceId?: string;
   onSelectTrip(id: string): void;
@@ -48,6 +50,17 @@ function tripFeatures(trips: readonly Trip[], at: Map<string, LatLon>): FeatureC
   return { type: "FeatureCollection", features };
 }
 
+function lineFeatures(lines: readonly Line[]): FeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: lines.map((l) => ({
+      type: "Feature",
+      geometry: { type: "LineString", coordinates: l.coords },
+      properties: { name: l.name, color: l.color },
+    })),
+  };
+}
+
 function placeFeatures(places: readonly Place[]): FeatureCollection {
   return {
     type: "FeatureCollection",
@@ -59,7 +72,7 @@ function placeFeatures(places: readonly Place[]): FeatureCollection {
   };
 }
 
-export default function TripMap({ region, trips, places, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, LatLon>());
   const raf = useRef(0);
@@ -72,8 +85,17 @@ export default function TripMap({ region, trips, places, selectedTripId, selecte
   }, [onSelectTrip, onSelectPlace]);
 
   const setup = useCallback((m: MapLibreMap) => {
+    m.addSource("lines", { type: "geojson", data: empty });
     m.addSource("places", { type: "geojson", data: empty });
     m.addSource("trips", { type: "geojson", data: empty });
+    // Track geometry sits underneath everything, in each line's own color.
+    m.addLayer({
+      id: "rail-lines",
+      type: "line",
+      source: "lines",
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: { "line-color": ["get", "color"], "line-width": byZoom(1.5, 3, 5), "line-opacity": 0.7 },
+    });
     m.addLayer({
       id: "place-dots",
       type: "circle",
@@ -140,6 +162,10 @@ export default function TripMap({ region, trips, places, selectedTripId, selecte
   useEffect(() => {
     (map?.getSource("places") as GeoJSONSource | undefined)?.setData(placeFeatures(places));
   }, [map, places]);
+
+  useEffect(() => {
+    (map?.getSource("lines") as GeoJSONSource | undefined)?.setData(lineFeatures(lines));
+  }, [map, lines]);
 
   // Animate markers from where they are now to their newest positions.
   useEffect(() => {

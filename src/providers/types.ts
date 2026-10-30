@@ -1,3 +1,4 @@
+import type { Line } from "@/domain/line";
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
 import type { Attribution, Diagnostics, Mode, Trip } from "@/domain/trip";
@@ -29,4 +30,6 @@ export interface TransitProvider {
   fetchTrips(ctx: FetchContext): Promise<Trip[]>;
   /** Stations/airports in the region, used for search, "near me" and the map. */
   fetchPlaces(ctx: FetchContext): Promise<Omit<Place, "id">[]>;
+  /** Optional: track/route geometry to draw on the map. */
+  fetchLines?(ctx: FetchContext): Promise<Line[]>;
 }
