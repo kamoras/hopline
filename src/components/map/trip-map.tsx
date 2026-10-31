@@ -51,6 +51,8 @@ interface Props {
   trips: readonly Trip[];
   places: readonly Place[];
   lines: readonly Line[];
+  /** Reports where the map is looking (after each pan or zoom), so other modes can open the same place. */
+  onViewChange?(center: LatLon): void;
   /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
   showDelays?: boolean;
   selectedTripId?: string;
@@ -168,7 +170,7 @@ function mutedBasemap(map: MapLibreMap) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, onViewChange, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -432,6 +434,16 @@ export default function TripMap({ region, trips, places, lines, showDelays = tru
     raf.current = requestAnimationFrame(loop);
     return stop;
   }, [map, trips]);
+
+  useEffect(() => {
+    if (!map || !onViewChange) return;
+    const report = () => onViewChange({ lat: map.getCenter().lat, lon: map.getCenter().lng });
+    report();
+    map.on("moveend", report);
+    return () => {
+      map.off("moveend", report);
+    };
+  }, [map, onViewChange]);
 
   // Fly to a newly selected trip or station; not on every data refresh.
   useEffect(() => {

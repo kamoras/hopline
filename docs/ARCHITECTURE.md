@@ -37,7 +37,17 @@ shows everything in a region. The unit of navigation is a **board**: one **mode*
   only where a provider serves that (mode, region), so the UI cannot offer an empty one.
 - **URLs:** `/` is a chooser grouped by mode (it redirects straight to the board when only one
   exists, keeping "where's my train" one step away); each board is `/{mode}/{region}`, e.g.
-  `/rail/northeast`. A header menu switches boards, grouped by mode.
+  `/rail/northeast`.
+- **Moving between modes** needs no menu. Tabs for every mode available sit in the header (`ModeTabs`); the
+  area carries over: a tab opens the board of that mode for wherever the map is looking
+  (`nearestBoard` in `domain/board.ts`: the board whose area contains the point, else the closest), so Trains
+  at New York then Subway is the New York subway, not Boston's. They are real links (open in a new tab, work
+  without JavaScript). The title menu only chooses another *area* of the same mode.
+- **Interchanges.** A station sheet lists the other modes' stations beside it ("Also here: Subway Grand
+  Central-42 St"), each opening that station on its board. `server/connections.ts` finds them by distance
+  (about a three-minute walk) and only consults boards whose area contains the station, so it never loads a
+  faraway board's data; `/api/connections` is cached for an hour. A new mode gets its tab and its interchanges
+  for free once it has a board and places.
 - **Isolation:** the API, aggregation and cache are all keyed by (mode, region), so an Atlanta
   flight board never loads, or even fetches, New York train data.
 
@@ -53,6 +63,7 @@ All state below lives in the URL or in the browser; none of it reaches a server.
 | Thinks in sentences | Natural language works: `new haven to new york round trip`, `trains leaving stamford to grand central right now`, `nyc`. `src/lib/query.ts` turns text into an intent (legs, round trip, time window) and region `aliases` map city names to station names; anything unrecognized falls back to number/station search. |
 | Knows their station | Type it: autocomplete opens its departures (`/{mode}/{region}/stop/{place}`). Type `A to B` for trains that call at both, then save it as a commute. |
 | Just arrived / unsure | **Near me** (on-device location) suggests the nearest stations; no typing. |
+| Changing from train to subway (or flights, later) | Tap the mode tab in the header; it opens the same area. Or tap "Also here" in a station sheet to jump to that interchange's other board. |
 | Explorer | Map: tap a station for departures, tap a train to follow it. On the home page (when there are several boards) each board is a tappable bubble. |
 | Visitor from a link | Deep links open straight to the trip or station; Back closes the sheet. |
 

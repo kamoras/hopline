@@ -6,6 +6,7 @@ import type { Region } from "@/domain/region";
 import type { Trip } from "@/domain/trip";
 import { MODES } from "@/domain/modes";
 import { searchTrips } from "@/lib/search";
+import { Connections } from "./connections";
 import { TripRow } from "./trip-row";
 
 interface Props {
@@ -45,6 +46,7 @@ export function PlaceSheet({ place, trips, places, region, onClose, onOpenTrip, 
         </div>
 
         <div className="space-y-4 overflow-y-auto px-2 pb-5">
+          <Connections mode={place.mode} regionId={region.id} placeId={place.id} className="px-3" />
           <label className="block px-3">
             <span className="text-xs font-semibold tracking-wide text-muted uppercase">Going to</span>
             <select

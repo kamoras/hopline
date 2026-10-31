@@ -7,6 +7,7 @@ import type { Place } from "@/domain/place";
 import { LINE_STATE_LABEL, type LineStatus } from "@/domain/line-status";
 import { useArrivals } from "@/hooks/use-arrivals";
 import { groupArrivals, minutesUntil } from "@/lib/arrivals";
+import { Connections } from "./connections";
 import { LineBadge } from "./line-badge";
 
 interface Props {
@@ -63,6 +64,7 @@ export function ArrivalsSheet({ mode, regionId, place, now, lineStatus, onClose 
         </div>
 
         <div className="space-y-2 overflow-y-auto px-3 pb-5">
+          <Connections mode={mode} regionId={regionId} placeId={place.id} />
           {troubled.map((l) => (
             <div key={l.route} className="flex items-start gap-2.5 rounded-2xl bg-warn-bg px-3 py-2.5 text-sm text-warn" role="status">
               <LineBadge route={l.route} color={l.color} textColor={l.textColor} size={20} />
