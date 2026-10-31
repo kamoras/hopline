@@ -12,6 +12,8 @@ export const REGION_STATION_CODES: Record<string, ReadonlySet<string>> = {
     // New York → Connecticut (Shore Line East corridor, Hartford Line, Empire/Vermonter)
     "NRO", "STM", "BRP", "NHV", "OSB", "NLC", "MYS", "WLY", "KIN", "PVD",
     "WFD", "MDN", "BER", "HFD", "WNL", "SPG", "YNY", "CRT", "POU",
+    // Providence → Boston (Northeast Corridor), and the Downeaster / Lake Shore into Boston
+    "RTE", "BBY", "BOS", "BON", "FRA", "WOR", "HHL", "WOB",
   ]),
 };
 

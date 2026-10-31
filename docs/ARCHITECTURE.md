@@ -83,6 +83,12 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `LineStatus` per line (`good | planned | change | delays | suspended`, `src/providers/nyct/alerts.ts`, unit
   tested). The board shows a strip of lines with problems, a line sheet with the alerts, and station arrivals
   carry a banner for troubled lines serving that station. Served by `/api/line-status`.
+- **Railroads with a GTFS-Realtime feed share one builder.** `providers/gtfs/realtime.ts` turns a schedule plus a
+  GTFS-RT feed into trips (matching by trip id, or by train number and service date for feeds like Metro-North's whose
+  ids are opaque); a railroad supplies a `RealtimeConfig` and its feeds. Metro-North and MBTA Commuter Rail are
+  both just that. The MBTA publishes trip updates and vehicle positions as separate feeds for every mode, so its
+  provider merges them and keeps commuter rail; its stops are per-track platforms, which the build script
+  (`platformStops`) names after the parent station and reads the track from.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and

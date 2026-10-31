@@ -1,7 +1,7 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { describe, expect, it } from "vitest";
 import { NORTHEAST } from "@/domain/region";
-import { indexAlerts } from "@/providers/mnr/alerts";
+import { indexAlerts } from "@/providers/gtfs/alerts";
 import { buildMnrTrips } from "@/providers/mnr/normalize";
 import { createStaticData as create, parseStopTimes } from "@/providers/gtfs/static";
 import { serviceDayStart } from "@/lib/time";

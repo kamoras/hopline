@@ -13,10 +13,10 @@ export interface Region {
 
 export const NORTHEAST: Region = {
   id: "northeast",
-  name: "NYC · Connecticut · Philadelphia",
-  bounds: [-75.9, 39.7, -71.6, 42.2],
-  center: [-73.9, 40.9],
-  zoom: 7.2,
+  name: "Philadelphia · NYC · Boston",
+  bounds: [-75.9, 39.7, -70.5, 42.9],
+  center: [-73.0, 41.3],
+  zoom: 6.6,
   timeZone: "America/New_York",
   aliases: {
     "new york": ["grand central", "new york penn"],
@@ -31,6 +31,10 @@ export const NORTHEAST: Region = {
     nyp: ["new york penn"],
     philly: ["philadelphia"],
     "30th street": ["philadelphia"],
+    boston: ["boston south", "boston north", "boston back bay"],
+    "south station": ["boston south"],
+    "north station": ["boston north"],
+    "back bay": ["boston back bay"],
   },
 };
 

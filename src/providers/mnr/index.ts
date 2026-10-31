@@ -1,7 +1,7 @@
-import { inBounds } from "@/domain/region";
 import type { Trip } from "@/domain/trip";
+import { indexAlerts } from "../gtfs/alerts";
+import { staticLinesAndPlaces } from "../gtfs/scheduled";
 import type { FetchContext, TransitProvider } from "../types";
-import { indexAlerts } from "./alerts";
 import { buildMnrTrips, MNR_ID } from "./normalize";
 import { fetchAlerts, fetchRealtime } from "./realtime";
 import { loadStaticData } from "./static";
@@ -30,13 +30,5 @@ export const mnrProvider: TransitProvider = {
     });
   },
 
-  async fetchLines() {
-    return loadStaticData().lines();
-  },
-
-  async fetchPlaces({ region }) {
-    return Object.values(loadStaticData().stops)
-      .filter((s) => inBounds(region, s.lat, s.lon))
-      .map((s) => ({ name: s.name, lat: s.lat, lon: s.lon, mode: "rail" as const, regionId: region.id }));
-  },
+  ...staticLinesAndPlaces(loadStaticData),
 };

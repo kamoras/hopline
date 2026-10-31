@@ -1,6 +1,6 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { LINE_STATE_RANK, type LineAlert, type LineState, type LineStatus } from "@/domain/line-status";
-import { englishText, isActive } from "../mta/alert-utils";
+import { englishText, isActive } from "../gtfs/alert-utils";
 import type { FeedMessage } from "../mta/feed";
 import type { NyctStatic } from "./static";
 
