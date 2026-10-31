@@ -11,11 +11,14 @@ import { REFRESH_MS } from "@/hooks/use-trips";
 import { assignDetailZoom, DETAIL_MAX_ZOOM, DETAIL_MIN_ZOOM } from "@/lib/declutter";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
 import { placeImportance } from "@/lib/importance";
+import { newArrivals, type Arrival } from "@/lib/ripples";
+import { nightFactor, sunAltitudeDeg } from "@/lib/sun";
 import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from "@/lib/motion";
 import { project } from "@/lib/polyline";
-import { BaseMap } from "./base-map";
+import { BaseMap, prefersDark } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
 import { installTrainIcons, vehicleIconId } from "./train-icon";
+import { extendTrail, TRAIL_STEP_MS, trailSegments, type Sample } from "@/lib/trail";
 import { useLocate } from "./use-locate";
 
 /** Station names appear from this zoom, and only where they fit. */
@@ -66,6 +69,11 @@ interface Props {
   onViewChange?(view: MapView): void;
   /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
   showDelays?: boolean;
+  /**
+   * A living model: the basemap dims at night by the real sun at the map's center, a ring ripples out where a vehicle
+   * pulls into a station, and the basemap is calmer so the network is what you see.
+   */
+  living?: boolean;
   /** Where the late/on-time legend sits (default top left). */
   legendClassName?: string;
   /** Where the zoom buttons sit (default top right). */
@@ -115,6 +123,9 @@ export interface MapView {
   zoom: number;
 }
 
+/** Aircraft are drawn larger than trains: they are few, fast and easy to lose against the map. */
+const PLANE_SCALE = 1.5;
+
 const empty: FeatureCollection = { type: "FeatureCollection", features: [] };
 const byZoom = (a: number, b: number, c: number, z = [6, 9, 12]): ExpressionSpecification => ["interpolate", ["linear"], ["zoom"], z[0]!, a, z[1]!, b, z[2]!, c];
 
@@ -131,11 +142,12 @@ function tripFeatures(trips: readonly Trip[], at: Map<string, Placed>, stacked: 
       properties: {
         id: t.id,
         number: t.number,
+        mode: t.mode,
         status: t.delayStatus,
         color,
         icon: vehicleIconId(t.mode, color, problem),
         heading: p.heading,
-        scale: problem ? 1.25 : 0.95,
+        scale: (problem ? 1.25 : 0.95) * (t.mode === "flights" ? PLANE_SCALE : 1),
         pulse: problem ? pulse : 0,
       },
     });
@@ -166,6 +178,26 @@ function lineFeatures(lines: readonly Line[]): FeatureCollection {
   };
 }
 
+/** How dark the basemap goes at full night (0 to 1): enough to feel like evening, never so much the map is hard to read. */
+const NIGHT_DIM = 0.42;
+
+/** How long a ring takes to spread and fade, and how far (px) it grows. */
+const RIPPLE_MS = 2_600;
+const RIPPLE_PX = 36;
+
+/** Updates the rings on the map for this frame; sends nothing when there are none (and once more when the last one ends). */
+function drawRipples(map: MapLibreMap, rings: { current: (Arrival & { start: number })[] }, hadRings: { current: boolean }, now: number) {
+  rings.current = rings.current.filter((r) => now - r.start < RIPPLE_MS);
+  if (rings.current.length === 0 && !hadRings.current) return;
+  hadRings.current = rings.current.length > 0;
+  const features: Feature[] = rings.current.map((r) => {
+    const t = (now - r.start) / RIPPLE_MS;
+    const eased = 1 - (1 - t) ** 3;
+    return { type: "Feature", geometry: { type: "Point", coordinates: [r.lon, r.lat] }, properties: { color: r.color, r: 5 + eased * RIPPLE_PX, a: 0.85 * (1 - t) } };
+  });
+  (map.getSource("ripples") as GeoJSONSource | undefined)?.setData({ type: "FeatureCollection", features });
+}
+
 /** `dz` is the zoom a station first appears at (see `assignDetailZoom`): crowded stations thin out when zoomed out. */
 function placeFeatures(places: readonly Place[], detail: ReadonlyMap<string, number>): FeatureCollection {
   return {
@@ -179,14 +211,14 @@ function placeFeatures(places: readonly Place[], detail: ReadonlyMap<string, num
 }
 
 /** Quiet the basemap so the network is the focus, like a transit diagram. Runs before our layers are added. */
-function mutedBasemap(map: MapLibreMap) {
+function mutedBasemap(map: MapLibreMap, calm: boolean) {
   for (const layer of map.getStyle().layers) {
     try {
-      if (layer.type === "fill") map.setPaintProperty(layer.id, "fill-opacity", 0.55);
-      else if (layer.type === "line") map.setPaintProperty(layer.id, "line-opacity", 0.45);
+      if (layer.type === "fill") map.setPaintProperty(layer.id, "fill-opacity", calm ? 0.45 : 0.55);
+      else if (layer.type === "line") map.setPaintProperty(layer.id, "line-opacity", calm ? 0.3 : 0.45);
       else if (layer.type === "symbol") {
-        map.setPaintProperty(layer.id, "text-opacity", 0.7);
-        map.setPaintProperty(layer.id, "icon-opacity", 0.55);
+        map.setPaintProperty(layer.id, "text-opacity", calm ? 0.5 : 0.7);
+        map.setPaintProperty(layer.id, "icon-opacity", calm ? 0.4 : 0.55);
       }
     } catch {
       // A layer whose paint can't be changed is simply left as it is.
@@ -194,7 +226,7 @@ function mutedBasemap(map: MapLibreMap) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -203,6 +235,18 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
   const selectedRef = useRef(selectedTripId);
   const raf = useRef(0);
   const fitted = useRef(false);
+  /** Rings spreading from stations, and who was at a station at the last refresh. */
+  const ripples = useRef<(Arrival & { start: number })[]>([]);
+  const atStation = useRef<Set<string> | undefined>(undefined);
+  const hadRipples = useRef(false);
+  /** Where each aircraft has been (kept in memory only), for its trail. */
+  const history = useRef(new Map<string, Sample[]>());
+  const lastTrail = useRef(0);
+  const airport = useMemo(() => {
+    const byCode = new Map<string, LatLon>();
+    for (const p of places) for (const c of [p.id, ...(p.codes ?? [])]) byCode.set(c, p);
+    return byCode;
+  }, [places]);
   const handlers = useRef({ onSelectTrip, onSelectPlace });
   const locate = useLocate(map);
 
@@ -212,9 +256,17 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
   }, [onSelectTrip, onSelectPlace, selectedTripId]);
 
   const setup = useCallback((m: MapLibreMap) => {
-    mutedBasemap(m);
+    const dark = prefersDark();
+    const ink = dark ? "#f2f5fa" : "#1b2a41"; // labels on the map: light on the dark basemap
+    const halo = dark ? "#0f1620" : "#ffffff";
+    mutedBasemap(m, living);
     installTrainIcons(m);
-    for (const id of ["lines", "places", "trips", "stacks"]) m.addSource(id, { type: "geojson", data: empty });
+    for (const id of ["lines", "places", "trips", "stacks", "trails", "leads"]) m.addSource(id, { type: "geojson", data: empty });
+    if (living) {
+      m.addSource("ripples", { type: "geojson", data: empty });
+      // Night is a navy sheet over the basemap only (it sits under the network, so lines and trains stay bright).
+      m.addLayer({ id: "night", type: "background", paint: { "background-color": "#0a1830", "background-opacity": 0 } });
+    }
 
     // The network: a white casing under a thick colored line, like a transit diagram.
     m.addLayer({
@@ -257,7 +309,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
         minzoom: Math.max(z, LABEL_PLACE_MIN_ZOOM),
         filter: ["==", ["get", "dz"], z],
         layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 11, "text-offset": [0, 1.2], "text-anchor": "top" },
-        paint: { "text-color": "#1b2a41", "text-halo-color": "#ffffff", "text-halo-width": 1.6 },
+        paint: { "text-color": ink, "text-halo-color": halo, "text-halo-width": 1.6 },
       });
     }
     // A chosen station always shows, however crowded.
@@ -267,6 +319,45 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       source: "places",
       filter: ["==", ["get", "id"], ""],
       paint: { "circle-radius": 8, "circle-color": "#ffffff", "circle-stroke-color": "#1f6feb", "circle-stroke-width": 3 },
+    });
+    // A ring that spreads from a station when a vehicle pulls in (each ring carries its own radius and fade).
+    if (living) {
+      m.addLayer({
+        id: "ripple-rings",
+        type: "circle",
+        source: "ripples",
+        paint: {
+          "circle-radius": ["get", "r"],
+          "circle-color": "rgba(0,0,0,0)",
+          "circle-stroke-color": ["get", "color"],
+          "circle-stroke-width": 2.5,
+          "circle-stroke-opacity": ["get", "a"],
+          "circle-pitch-alignment": "map",
+        },
+      });
+    }
+    // Aircraft have no track, so each shows where it has been (a fading trail) and where it is headed (a dashed line to
+    // its airport), and a soft halo that keeps it findable on any basemap, light or dark.
+    m.addLayer({
+      id: "lead-lines",
+      type: "line",
+      source: "leads",
+      layout: { "line-cap": "round" },
+      paint: { "line-color": "#8ab4ff", "line-width": 1.6, "line-dasharray": [1, 2.2], "line-opacity": ["get", "a"] },
+    });
+    m.addLayer({
+      id: "trail-lines",
+      type: "line",
+      source: "trails",
+      layout: { "line-cap": "round" },
+      paint: { "line-color": "#cfe2ff", "line-width": byZoom(1.6, 2.6, 3.6), "line-opacity": ["*", 0.8, ["get", "a"]] },
+    });
+    m.addLayer({
+      id: "plane-glow",
+      type: "circle",
+      source: "trips",
+      filter: ["==", ["get", "mode"], "flights"],
+      paint: { "circle-color": "#7cb3ff", "circle-blur": 0.8, "circle-opacity": 0.5, "circle-radius": byZoom(9, 13, 18) },
     });
     // Problems glow and pulse beneath everything else on the trains.
     m.addLayer({
@@ -326,7 +417,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       source: "trips",
       minzoom: LABEL_MIN_ZOOM,
       layout: { "text-field": ["get", "number"], "text-font": ["Noto Sans Bold"], "text-size": 10.5, "text-offset": [0, -1.5], "text-allow-overlap": true, "text-ignore-placement": true },
-      paint: { "text-color": "#1b2a41", "text-halo-color": "#ffffff", "text-halo-width": 1.8 },
+      paint: { "text-color": ink, "text-halo-color": halo, "text-halo-width": 1.8 },
     });
     // Crowds of on-time trains collapse into counted stacks until you zoom in.
     m.addLayer({
@@ -361,9 +452,27 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     });
     interactive(["stack-dots", "stack-labels"], (e) => m.easeTo({ center: e.lngLat, zoom: Math.min(m.getZoom() + 1.8, 13), duration: 600 }));
     setMap(m);
-  }, []);
+  }, [living]);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
+
+  // Night follows the real sun where the map is looking (and is skipped in the dark theme, which already dims the map).
+  useEffect(() => {
+    if (!map || !living) return;
+    const dark = prefersDark();
+    const apply = () => {
+      if (!map.getLayer("night")) return;
+      const c = map.getCenter();
+      map.setPaintProperty("night", "background-opacity", dark ? 0 : nightFactor(sunAltitudeDeg(c.lat, c.lng, new Date())) * NIGHT_DIM);
+    };
+    apply();
+    map.on("moveend", apply);
+    const timer = setInterval(apply, 60_000);
+    return () => {
+      clearInterval(timer);
+      map.off("moveend", apply);
+    };
+  }, [map, living]);
 
   // Which stations to show at which zoom: the interchanges and termini first, the rest as there is room.
   const detail = useMemo(() => {
@@ -390,7 +499,11 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
   useEffect(() => {
     const tripsSource = map?.getSource("trips") as GeoJSONSource | undefined;
     const stacksSource = map?.getSource("stacks") as GeoJSONSource | undefined;
-    if (!map || !tripsSource || !stacksSource) return;
+    const trailsSource = map?.getSource("trails") as GeoJSONSource | undefined;
+    const leadsSource = map?.getSource("leads") as GeoJSONSource | undefined;
+    if (!map || !tripsSource || !stacksSource || !trailsSource || !leadsSource) return;
+    const planes = trips.filter((t) => t.mode === "flights");
+    for (const id of history.current.keys()) if (!planes.some((t) => t.id === id)) history.current.delete(id);
     const t = Date.now();
     const next = new Map<string, Motion>();
     for (const trip of trips) {
@@ -414,6 +527,13 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       }
     }
     motions.current = next;
+
+    if (living && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const { arrivals, now: at } = newArrivals(atStation.current, trips);
+      atStation.current = at;
+      const started = Date.now();
+      ripples.current = [...ripples.current, ...arrivals.slice(0, 40).map((a) => ({ ...a, start: started }))].slice(-80);
+    }
 
     if (!fitted.current && next.size > 0 && frameTrips) {
       // Frame the action once, on first data; after that the user is in control.
@@ -458,6 +578,29 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       shown.current = placed;
       tripsSource.setData(tripFeatures(trips, placed, stacked.current, (Math.sin(now / 450) + 1) / 2));
       stacksSource.setData(stackFeatures(stacks.current, placed));
+      if (planes.length) drawPaths(now, placed);
+      if (living) drawRipples(map, ripples, hadRipples, now);
+    };
+
+    // Each aircraft's trail (where it has been) and heading line (to its airport, when known); the chosen one stands out.
+    const drawPaths = (now: number, placed: Map<string, Placed>) => {
+      const trail: Feature[] = [];
+      const lead: Feature[] = [];
+      const keep = now - lastTrail.current >= TRAIL_STEP_MS;
+      if (keep) lastTrail.current = now;
+      for (const t of planes) {
+        const p = placed.get(t.id);
+        if (!p) continue;
+        const selected = t.id === selectedRef.current;
+        if (keep) history.current.set(t.id, extendTrail(history.current.get(t.id), p, now));
+        for (const s of trailSegments(history.current.get(t.id) ?? [], p)) {
+          trail.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[s.from.lon, s.from.lat], [s.to.lon, s.to.lat]] }, properties: { a: selected ? Math.min(1, s.a + 0.3) : s.a } });
+        }
+        const to = t.stops[0] && airport.get(t.stops[0].id);
+        if (to) lead.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[p.lon, p.lat], [to.lon, to.lat]] }, properties: { a: selected ? 0.95 : 0.45 } });
+      }
+      trailsSource.setData({ type: "FeatureCollection", features: trail });
+      leadsSource.setData({ type: "FeatureCollection", features: lead });
     };
 
     shown.current = new Map([...next].map(([id, m]) => [id, motionPosition(m, t)]));
@@ -484,7 +627,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     };
     raf.current = requestAnimationFrame(loop);
     return stop;
-  }, [map, trips, frameTrips]);
+  }, [map, trips, frameTrips, living, airport]);
 
   const fitted_ = useRef<string | undefined>(undefined);
   useEffect(() => {

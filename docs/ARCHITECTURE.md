@@ -233,6 +233,18 @@ board. The boards are still listed below the map, so nothing depends on the canv
   Metro, Flights, Buses) turn layers on and off and show how many vehicles each has moving right now.
 - **Living, not scored.** The aim is a model that is pleasant to watch because it is real; there are no points or
   levels. Anything the page remembers (the last board) stays on the person's device.
+- **Living touches** (`living` on `TripMap`, used by the home page only). The basemap is calmer so the network is
+  what you see. The basemap dims to a navy tint at night by the real sun at the center of the map (`lib/sun.ts`,
+  NOAA equations, no network, no stored location; skipped when the device is already in a dark theme). When a vehicle
+  newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
+  reduced-motion turns them off).
+- **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
+  (`lib/trail.ts`, about two minutes, never sent anywhere), and where it is headed, a dashed line to its airport
+  when known. The chosen plane's lines are brighter. Planes are drawn 1.5x larger with a soft halo so they stay
+  findable on any basemap.
+- **Dark mode is a real dark basemap** (OpenFreeMap `dark`), not an inverted light one, so our own colors (white
+  plane bodies, station rings, trails) keep their meaning. `BaseMap` picks the style from the device's appearance;
+  `NEXT_PUBLIC_MAP_STYLE_URL` overrides both. Map labels switch to light text with a dark halo.
 
 ## Brand and design system
 
