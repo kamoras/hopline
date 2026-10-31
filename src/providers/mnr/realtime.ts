@@ -1,4 +1,5 @@
-import { fetchMtaFeed, type FeedMessage } from "../mta/feed";
+import type { FeedMessage } from "../gtfs/feed";
+import { fetchMtaFeed } from "../mta/feed";
 
 export type { FeedMessage };
 

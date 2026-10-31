@@ -5,7 +5,7 @@ import { dateInZone, serviceDayStart } from "@/lib/time";
 import { normalizeAmtrakTrip } from "../amtrak/normalize";
 import { AmtrakTrainSchema } from "../amtrak/schema";
 import { mnrProvider } from "../mnr";
-import { indexAlerts } from "../mnr/alerts";
+import { indexAlerts } from "../gtfs/alerts";
 import { buildMnrTrips, MNR_TIMEZONE } from "../mnr/normalize";
 import { loadStaticData } from "../mnr/static";
 import type { FetchContext, TransitProvider } from "../types";

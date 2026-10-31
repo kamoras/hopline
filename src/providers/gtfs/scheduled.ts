@@ -71,6 +71,20 @@ export function buildScheduledTrips({ id, name, staticData, region, now, diag }:
   return trips;
 }
 
+/** The map lines and stations every GTFS-backed rail provider serves from its bundled schedule. */
+export function staticLinesAndPlaces(staticData: () => GtfsStaticData): Pick<TransitProvider, "fetchLines" | "fetchPlaces"> {
+  return {
+    async fetchLines() {
+      return staticData().lines();
+    },
+    async fetchPlaces({ region }) {
+      return Object.values(staticData().stops)
+        .filter((s) => inBounds(region, s.lat, s.lon))
+        .map((s) => ({ name: s.name, lat: s.lat, lon: s.lon, mode: "rail" as const, regionId: region.id }));
+    },
+  };
+}
+
 export interface ScheduledProviderConfig {
   id: string;
   name: string;
@@ -90,13 +104,6 @@ export function createScheduledProvider({ id, name, attribution, regionIds, stat
     async fetchTrips({ region, now, diag }) {
       return buildScheduledTrips({ id, name, staticData: staticData(), region, now, diag });
     },
-    async fetchLines() {
-      return staticData().lines();
-    },
-    async fetchPlaces({ region }) {
-      return Object.values(staticData().stops)
-        .filter((s) => inBounds(region, s.lat, s.lon))
-        .map((s) => ({ name: s.name, lat: s.lat, lon: s.lon, mode: "rail" as const, regionId: region.id }));
-    },
+    ...staticLinesAndPlaces(staticData),
   };
 }

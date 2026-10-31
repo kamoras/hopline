@@ -26,6 +26,10 @@ interface Agency {
   url?: string;
   /** Keep only these route ids (for a feed shared by several operators). */
   routes?: string[];
+  /** Keep only routes of these GTFS route types (2 = rail), in addition to `routes`. */
+  routeTypes?: string[];
+  /** Stations are child platforms (MBTA): name each after its parent station and read its track from the platform. */
+  platformStops?: boolean;
   /** Replace the feed's route name/color on every kept route. */
   style?: { name?: string; color?: string };
   /** Strip this from train numbers ("CTrail 4462" -> "4462"). */
@@ -58,6 +62,22 @@ const AGENCIES: Record<string, Agency> = {
     numberPrefix: /^CTrail\s+/i,
     headsignPrefix: /^(north|south)bound to /i,
     stationNames: { "New Haven Union Station": "New Haven", "State Street Station": "New Haven-State St" },
+  },
+  // MBTA Commuter Rail: route type 2 of the MBTA's all-modes feed, whose stops are per-track platforms.
+  "mbta-cr": {
+    url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
+    routeTypes: ["2"],
+    platformStops: true,
+    // Match the names Amtrak (Amtraker) uses for the same stations, so each is listed once; Kingston, MA is not Kingston, RI.
+    stationNames: {
+      "South Station": "Boston South",
+      "North Station": "Boston North",
+      "Back Bay": "Boston Back Bay",
+      "Route 128": "Westwood-Route 128",
+      "Anderson/Woburn": "Woburn-Anderson",
+      Kingston: "Kingston MA",
+    },
+    coarseGapM: 5_000,
   },
   // Track for Amtrak's Northeast trains (Amtraker supplies the trips): Northeast Regional, Acela, Keystone,
   // Hartford Line, Vermonter, Empire Service, Adirondack.
@@ -209,9 +229,35 @@ async function main() {
     const entry = zip.getEntry(name);
     return entry ? parseCsv(entry.getData().toString("utf8")) : [];
   };
+  /** Rows whose first column is in `keep`; skips the rest before parsing (stop_times can be 100+ MB). */
+  const readFiltered = (name: string, keep: Set<string>) => {
+    const text = zip.getEntry(name)!.getData().toString("utf8");
+    const out: string[] = [text.slice(0, text.indexOf("\n"))];
+    for (let at = text.indexOf("\n") + 1; at > 0 && at < text.length; ) {
+      const end = text.indexOf("\n", at);
+      const line = text.slice(at, end < 0 ? text.length : end);
+      if (keep.has(line.slice(0, line.indexOf(",")))) out.push(line);
+      at = end < 0 ? text.length : end + 1;
+    }
+    return parseCsv(out.join("\n"));
+  };
   const read = (name: string) => {
     if (!zip.getEntry(name)) throw new Error(`${name} missing from GTFS feed`);
     return optional(name);
+  };
+
+  const routeRows = read("routes.txt").filter(
+    (r) => (!agency.routes || agency.routes.includes(r.route_id!)) && (!agency.routeTypes || agency.routeTypes.includes(r.route_type!)),
+  );
+  const keptRoutes = new Set(routeRows.map((r) => r.route_id!));
+  const filtered = !!(agency.routes || agency.routeTypes); // a shared feed lists every operator's routes and stations
+
+  const stopRows = read("stops.txt");
+  const stopById = new Map(stopRows.map((s) => [s.stop_id!, s]));
+  /** The track a child platform serves ("Track 2" -> "2"), where the feed names platforms that way. */
+  const platformTrack = (stopId: string): string => {
+    const s = stopById.get(stopId);
+    return agency.platformStops && s && /track/i.test(s.platform_name ?? "") ? (s.platform_code ?? "").trim() : "";
   };
 
   const today = new Date();
@@ -266,7 +312,7 @@ async function main() {
     return agency.stationNames?.[name] ?? name;
   };
   for (const t of read("trips.txt")) {
-    if (agency.routes && !agency.routes.includes(t.route_id!)) continue;
+    if (!keptRoutes.has(t.route_id!)) continue;
     const dates = datesByService.get(t.service_id!);
     if (!dates?.size) continue;
     let idx = serviceIndex.get(t.service_id!);
@@ -294,7 +340,7 @@ async function main() {
   }
 
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
-  for (const st of read("stop_times.txt")) {
+  for (const st of readFiltered("stop_times.txt", new Set(Object.keys(trips)))) {
     if (!trips[st.trip_id!]) continue;
     const list = byTrip.get(st.trip_id!) ?? [];
     list.push({
@@ -302,7 +348,7 @@ async function main() {
       stop: st.stop_id!,
       arr: minutes(st.arrival_time!),
       dep: minutes(st.departure_time!),
-      track: trackOf(st.track),
+      track: trackOf(st.track) || platformTrack(st.stop_id!),
     });
     byTrip.set(st.trip_id!, list);
   }
@@ -317,9 +363,10 @@ async function main() {
 
   const stops: Record<string, [string, number, number]> = {};
   const served = new Set([...byTrip.values()].flatMap((list) => list.map((s) => s.stop)));
-  for (const s of read("stops.txt")) {
-    if (agency.routes && !served.has(s.stop_id!)) continue; // a shared feed lists every operator's stations
-    const name = tidyName(s.stop_name!);
+  for (const s of stopRows) {
+    if (filtered && !served.has(s.stop_id!)) continue;
+    const parent = agency.platformStops ? stopById.get(s.parent_station ?? "") : undefined;
+    const name = tidyName((parent ?? s).stop_name!);
     stops[s.stop_id!] = [agency.stationNames?.[s.stop_id!] ?? agency.stationNames?.[name] ?? name, Number(s.stop_lat), Number(s.stop_lon)];
   }
 
@@ -366,8 +413,7 @@ async function main() {
   }
 
   const routes: Record<string, { name: string; color: string }> = {};
-  for (const r of read("routes.txt")) {
-    if (agency.routes && !agency.routes.includes(r.route_id!)) continue;
+  for (const r of routeRows) {
     routes[r.route_id!] = {
       name: agency.style?.name ?? (r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,

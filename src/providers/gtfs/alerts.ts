@@ -1,8 +1,8 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { GTFS_CAUSE_TEXT } from "@/domain/delay";
 import type { DelayReason } from "@/domain/trip";
-import { englishText, isActive } from "../mta/alert-utils";
-import type { FeedMessage } from "./realtime";
+import { englishText, isActive } from "./alert-utils";
+import type { FeedMessage } from "./feed";
 
 export interface AlertIndex {
   byTrip: Map<string, DelayReason>;
