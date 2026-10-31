@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type { CatalogHit } from "@/server/catalog";
 
 /** Universal search: boards and stations across every mode and region. */
-export function HomeSearch() {
+export function HomeSearch({ floating = false, placeholder = "Where are you? Station, airport, city…" }: { floating?: boolean; placeholder?: string }) {
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<CatalogHit[]>([]);
   const active = q.trim().length >= 2;
@@ -33,13 +33,13 @@ export function HomeSearch() {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Where are you? Station, airport, city…"
+          placeholder={placeholder}
           autoComplete="off"
-          className="w-full rounded-2xl border border-line bg-surface px-4 py-4 text-lg shadow-sm outline-none placeholder:text-muted focus:border-accent"
+          className={`w-full rounded-2xl border border-line bg-surface/95 outline-none backdrop-blur placeholder:text-muted focus:border-accent ${floating ? "px-4 py-3 text-base shadow-card" : "px-4 py-4 text-lg shadow-sm"}`}
         />
       </label>
       {active && (
-        <ul className="mt-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+        <ul className="mt-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-lift">
           {hits.length === 0 ? (
             <li className="px-4 py-3 text-sm text-muted">No matches yet.</li>
           ) : (

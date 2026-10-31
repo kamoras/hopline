@@ -63,6 +63,7 @@ All state below lives in the URL or in the browser; none of it reaches a server.
 | Person | Fastest path |
 | --- | --- |
 | Daily commuter | **My commutes** (saved "A to B") sit at the top of the board with the next departures; **My trains** pin by number and survive across days. `/` offers "Continue" to the last board. |
+| Just looking, or in a hurry | The home page is a live model of everything moving: pan and zoom to browse, or search at the top; tap a vehicle or station for its answer card. |
 | Knows their train | Type the number. Or open the shareable deep link `/{mode}/{region}/trip/{operator}-{number}`. |
 | Thinks in sentences | Natural language works: `new haven to new york round trip`, `trains leaving stamford to grand central right now`, `nyc`. `src/lib/query.ts` turns text into an intent (legs, round trip, time window) and region `aliases` map city names to station names; anything unrecognized falls back to number/station search. |
 | Knows their station | Type it: autocomplete opens its departures (`/{mode}/{region}/stop/{place}`). Type `A to B` for trains that call at both, then save it as a commute. |
@@ -213,6 +214,25 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   by the map in-browser and drawn locally. The one exception is Vercel Web Analytics (`<Analytics />` in
   `app/layout.tsx`): anonymous, cookieless page-view counts. Note that paths such as `/stop/...` and
   `/trip/...` are recorded as page views, so aggregate station popularity is visible, never who looked.
+
+## The model: Hopline's home page
+
+Hopline opens on a live scale model of transit, not a list: everything that is moving, drawn as a calm diagram
+you can pan and zoom, so people can drop in just to look, or get an answer fast. The answer to "where's my train,
+bus or flight" is always one step away: a search bar floats on top of the map, and tapping any vehicle or station
+opens an answer card (next stop and time, status, the next arrivals at a station) with one button for the full
+board. The boards are still listed below the map, so nothing depends on the canvas.
+
+- **One map, every board.** `useWorld` (`hooks/use-world.ts`) merges the boards in view into one set of trips, track
+  and stations. `lib/world.ts` decides which boards those are: in view, switched on, and past their mode's zoom
+  (`MODE_MIN_ZOOM`: trains 5, flights 6, metro 8, buses 12), so a board nobody can read is never fetched. Small
+  boards load whole once; a big network (buses) is asked for the visible area, rounded outward. A station's id on
+  the combined map carries its board (`worldPlaceId`) so equal ids on different boards stay apart.
+- **The same drawing as a board.** The map is the board map (`TripMap`): schematic lines, stations thinned by
+  importance as you zoom, vehicles gliding between refreshes, delays that pop, stacks for crowds. Mode switches (Trains,
+  Metro, Flights, Buses) turn layers on and off and show how many vehicles each has moving right now.
+- **Living, not scored.** The aim is a model that is pleasant to watch because it is real; there are no points or
+  levels. Anything the page remembers (the last board) stays on the person's device.
 
 ## Brand and design system
 

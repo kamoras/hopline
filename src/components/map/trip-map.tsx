@@ -66,6 +66,10 @@ interface Props {
   onViewChange?(view: MapView): void;
   /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
   showDelays?: boolean;
+  /** Where the late/on-time legend sits (default top left). */
+  legendClassName?: string;
+  /** Where the zoom buttons sit (default top right). */
+  controlsPosition?: "top-right" | "bottom-right";
   selectedTripId?: string;
   selectedPlaceId?: string;
   onSelectTrip(id: string): void;
@@ -190,7 +194,7 @@ function mutedBasemap(map: MapLibreMap) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -520,7 +524,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
   }, [map, selectedPlaceId]);
 
   return (
-    <BaseMap bounds={region.bounds} onReady={setup}>
+    <BaseMap bounds={region.bounds} onReady={setup} controlsPosition={controlsPosition}>
       <button
         type="button"
         onClick={locate.toggle}
@@ -529,18 +533,18 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       >
         {locate.label}
       </button>
-      {showDelays && <Legend />}
+      {showDelays && <Legend className={legendClassName} />}
     </BaseMap>
   );
 }
 
-function Legend() {
+function Legend({ className }: { className: string }) {
   const items: [string, string][] = [
     ["Late", PROBLEM_COLOR.minor],
     ["15+ min", PROBLEM_COLOR.major],
   ];
   return (
-    <div className="absolute top-3 left-3 flex gap-3 rounded-full border border-line bg-surface/95 px-3 py-1.5 text-xs font-medium shadow">
+    <div className={`absolute flex gap-3 rounded-full border border-line bg-surface/95 px-3 py-1.5 text-xs font-medium shadow ${className}`}>
       <span className="text-muted">On time: line color</span>
       {items.map(([label, color]) => (
         <span key={label} className="flex items-center gap-1.5">
