@@ -1,3 +1,5 @@
+import type { Arrival } from "@/domain/arrival";
+import type { Mode } from "@/domain/modes";
 import { inBounds, type Region } from "@/domain/region";
 import type { Attribution, Diagnostics, Trip } from "@/domain/trip";
 import { dateInZone, serviceDayStart } from "@/lib/time";
@@ -20,6 +22,8 @@ export interface ScheduledInput {
   staticData: GtfsStaticData;
   region: Region;
   now: number;
+  /** Defaults to rail. */
+  mode?: Mode;
   diag?: Diagnostics;
 }
 
@@ -28,7 +32,7 @@ export interface ScheduledInput {
  * their status is "unknown" and nothing is claimed about lateness. Midnight-crossing trips of yesterday's
  * service day are included.
  */
-export function buildScheduledTrips({ id, name, staticData, region, now, diag }: ScheduledInput): Trip[] {
+export function buildScheduledTrips({ id, name, staticData, region, now, mode = "rail", diag }: ScheduledInput): Trip[] {
   const trips: Trip[] = [];
   let considered = 0;
   for (const date of [dateInZone(now - DAY, region.timeZone), dateInZone(now, region.timeZone)]) {
@@ -52,7 +56,7 @@ export function buildScheduledTrips({ id, name, staticData, region, now, diag }:
         finalizeTrip({
           id: `${id}:${scheduleId}`,
           operatorId: id,
-          mode: "rail",
+          mode,
           number: trip.number,
           routeName: route?.name ?? name,
           routeColor: route?.color ?? "#0b5ea8",
@@ -109,4 +113,43 @@ export function createScheduledProvider({ id, name, attribution, regionIds, stat
     },
     ...staticLinesAndPlaces(staticData),
   };
+}
+
+/** How far ahead a station lists scheduled trains. */
+const ARRIVALS_HORIZON_MS = 45 * MIN;
+const ARRIVALS_MAX = 60;
+
+/**
+ * Trains the timetable says call at a station (any of its platforms) soon. There is no live data behind them, so
+ * these are scheduled times, nothing more.
+ */
+export function buildScheduledArrivals({
+  staticData,
+  lineOf,
+  region,
+  platforms,
+  now,
+}: {
+  staticData: GtfsStaticData;
+  /** The public line (badge text and colors) of a route id. */
+  lineOf(routeId: string): { route: string; color: string; textColor: string } | undefined;
+  region: Region;
+  platforms: readonly string[];
+  now: number;
+}): Arrival[] {
+  const wanted = new Set(platforms);
+  const out: Arrival[] = [];
+  for (const date of [dateInZone(now - DAY, region.timeZone), dateInZone(now, region.timeZone)]) {
+    const dayStart = serviceDayStart(date, region.timeZone);
+    for (const { id, trip } of staticData.tripsOn(date)) {
+      const line = lineOf(trip.routeId);
+      if (!line) continue;
+      for (const st of trip.stopTimes) {
+        if (!wanted.has(st.stopId)) continue;
+        const at = dayStart + st.departureMin * MIN;
+        if (at >= now && at - now <= ARRIVALS_HORIZON_MS) out.push({ tripId: id, ...line, headsign: trip.headsign, at, platform: st.stopId });
+      }
+    }
+  }
+  return out.sort((a, b) => a.at - b.at).slice(0, ARRIVALS_MAX);
 }
