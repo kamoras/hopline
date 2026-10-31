@@ -1,13 +1,21 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
+import { EmptyState } from "@/components/empty-state";
 
 export default function NotFound() {
   return (
-    <main className="mx-auto max-w-md px-4 py-20 text-center">
-      <h1 className="text-2xl font-bold">Nothing here</h1>
-      <p className="mt-2 text-muted">We don&apos;t cover that mode or area yet.</p>
-      <Link href="/" className="mt-6 inline-block rounded-xl bg-accent px-4 py-2 font-semibold text-on-accent">
-        Choose a board
-      </Link>
+    <main className="mx-auto max-w-md space-y-8 px-4 py-12">
+      <Logo />
+      <EmptyState
+        art="lost"
+        title="We couldn't find that page"
+        body="That page or board doesn't exist, or we don't cover it yet."
+        action={
+          <Link href="/" className="inline-block rounded-xl bg-brand px-5 py-2.5 font-semibold text-white press">
+            Back to Hopline
+          </Link>
+        }
+      />
     </main>
   );
 }

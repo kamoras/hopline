@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { BoardLink } from "@/domain/board";
 import { MODES, type Mode } from "@/domain/modes";
+import { BRAND } from "@/brand";
+import { Logo } from "../brand/logo";
 import { HomeSearch } from "./home-search";
 import { ResumeCard } from "./resume-card";
 import type { RegionPin } from "./types";
@@ -21,9 +23,12 @@ export function BoardChooser({ boards, pins }: { boards: BoardLink[]; pins: Regi
   const byMode = Object.groupBy(boards, (b) => b.mode);
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Hopline</h1>
-        <p className="mt-1 text-muted">Live transit, one place at a time.</p>
+      <header className="space-y-4">
+        <Logo size={40} />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{BRAND.tagline}</h1>
+          <p className="mt-1.5 max-w-xl text-muted">{BRAND.coverage} Pick where you are, and see what is moving.</p>
+        </div>
       </header>
       <ResumeCard boards={boards} />
       <HomeSearch />

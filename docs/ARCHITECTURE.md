@@ -206,6 +206,25 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `app/layout.tsx`): anonymous, cookieless page-view counts. Note that paths such as `/stop/...` and
   `/trip/...` are recorded as page views, so aggregate station popularity is visible, never who looked.
 
+## Brand and design system
+
+Calm and trustworthy: cool neutral surfaces, ink text, a navy brand and one blue accent for interaction. Status
+colors (green, amber, red) mean service status and are never reused for decoration.
+
+- **One source of truth.** `src/brand.ts` holds the name, tagline ("Know before you go."; two alternatives are
+  noted beside it), description and brand colors used in JavaScript. Change them there: the page metadata, social
+  card, web manifest and home page all read it. CSS tokens live in `src/app/globals.css` (surfaces, text, accent,
+  status colors, shadows), each with a dark-theme value; `tests/contrast.test.ts` fails the build if any
+  text/background pair drops below WCAG AA in either theme.
+- **The mark** is a hop between two stops on a line (`components/brand/mark.tsx`, plain SVG so it also draws the
+  favicon, the iOS home-screen icon, the PWA icons and the share card: `app/icon.tsx`, `apple-icon.tsx`,
+  `opengraph-image.tsx`, `manifest.ts`). `Logo` is the mark plus a live-text wordmark.
+- **Type** is Inter (variable, self-hosted via `@fontsource-variable/inter`, so there are no font requests to a third
+  party) with tabular figures for times.
+- **Empty states** share one component (`components/empty-state.tsx`: calm line art for quiet, search, offline and
+  lost) so "nothing here" always says why and what to do next.
+- **Motion** is short and purposeful (sheets, new cards, a tap), and all of it stops under reduced motion.
+
 ## Scaling
 
 Hopline is built so that adding places adds cost only where people are looking. The rules, and what
