@@ -89,6 +89,12 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   both just that. The MBTA publishes trip updates and vehicle positions as separate feeds for every mode, so its
   provider merges them and keeps commuter rail; its stops are per-track platforms, which the build script
   (`platformStops`) names after the parent station and reads the track from.
+- **Boston subway, a second station-first board.** `providers/mbta-subway` is the NYC subway's counterpart with one
+  difference that matters: every MBTA train reports a GPS position, so the map shows where trains are, not an
+  estimate. Trip updates add each train's next stops and the station arrivals; the schedule is not bundled (only
+  stations, lines and track, `realtimeOnly` in the build script). It is its own region (`boston`), since a subway
+  board cannot span two cities. Alert-to-line-status logic is shared with the NYC subway (`gtfs/line-status.ts`);
+  each operator only says which public line a route rolls up into.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
