@@ -108,12 +108,23 @@ export interface SubwayTripsInput {
  */
 export function buildSubwayTrips({ operatorId, mode = "subway", staticData, tripUpdates, vehicles, now, diag }: SubwayTripsInput): Trip[] {
   const updates = new Map<string, rt.ITripUpdate>();
-  for (const e of tripUpdates.entity) if (e.tripUpdate?.trip.tripId) updates.set(e.tripUpdate.trip.tripId, e.tripUpdate);
+  // Some operators (SEPTA) report a vehicle's position without its trip, but say which vehicle each trip
+  // update is for: join the two by vehicle id.
+  const updatesByVehicle = new Map<string, rt.ITripUpdate>();
+  for (const e of tripUpdates.entity) {
+    const tu = e.tripUpdate;
+    if (!tu) continue;
+    if (tu.trip.tripId) updates.set(tu.trip.tripId, tu);
+    const vehicleId = tu.vehicle?.id ?? tu.vehicle?.label;
+    if (vehicleId) updatesByVehicle.set(vehicleId, tu);
+  }
 
   const trips: Trip[] = [];
   for (const entity of vehicles.entity) {
     const v = entity.vehicle;
-    const routeId = v?.trip?.routeId;
+    const vehicleId = v?.vehicle?.id ?? v?.vehicle?.label;
+    const joined = v?.trip?.tripId ? undefined : vehicleId ? updatesByVehicle.get(vehicleId) : undefined;
+    const routeId = v?.trip?.routeId ?? joined?.trip.routeId;
     const line = routeId ? staticData.lines[routeId] : undefined;
     if (!v || !line) continue; // the MBTA shares its feed with buses, commuter rail and ferries; WMATA lists trains with no trip
     bump(diag, "vehicles");
@@ -121,7 +132,7 @@ export function buildSubwayTrips({ operatorId, mode = "subway", staticData, trip
       bump(diag, "noPosition");
       continue;
     }
-    const tripId = v.trip?.tripId ?? entity.id;
+    const tripId = v.trip?.tripId ?? joined?.trip.tripId ?? entity.id;
     const upcoming = upcomingStops(updates.get(tripId), staticData, now);
     const last = upcoming.at(-1);
     const stoppedAt = v.currentStatus === rt.VehiclePosition.VehicleStopStatus.STOPPED_AT;
