@@ -11,7 +11,7 @@ export function ResumeCard({ boards }: { boards: BoardLink[] }) {
   const last = boards.find((b) => b.href === lastHref);
   if (!last) return null;
   return (
-    <Link href={last.href} className="flex items-center justify-between rounded-2xl bg-accent px-5 py-4 text-white shadow-lg">
+    <Link href={last.href} className="flex items-center justify-between rounded-2xl bg-accent px-5 py-4 text-on-accent shadow-lg">
       <span>
         <span className="block text-xs font-semibold tracking-wide uppercase opacity-80">Continue</span>
         <span className="text-lg font-bold">

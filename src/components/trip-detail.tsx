@@ -84,7 +84,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
               type="button"
               onClick={onTogglePin}
               aria-pressed={pinned}
-              className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold ${pinned ? "bg-accent text-white" : "border border-line hover:bg-surface-2"}`}
+              className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold ${pinned ? "bg-accent text-on-accent" : "border border-line hover:bg-surface-2"}`}
             >
               {pinned ? `★ In My ${mode.nounPlural}` : `☆ Add to My ${mode.nounPlural}`}
             </button>

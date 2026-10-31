@@ -40,6 +40,7 @@ HOPLINE_DEMO=1 npm run dev
 | `npm run lint` · `npm run typecheck` | ESLint · TypeScript |
 | `npm run data:mnr` | Regenerate Metro-North schedule data from official GTFS |
 | `npm run data:shoreline-east -- --zip feed.zip` | Build Shore Line East timetable data from a GTFS zip (also `data:hartford-line`, and `data:amtrak` for Amtrak's track geometry) |
+| `npm run a11y` | Accessibility audit (Lighthouse, must score 100); builds in demo mode with a blank map, then audits mobile-light and desktop-dark |
 
 ## Deploying on Vercel
 

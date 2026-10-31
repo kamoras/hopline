@@ -95,6 +95,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   GTFS shapes (`npm run data:amtrak`, lines only) and is cut to each region (`clipToRegion`). It lets Penn Station
   and the other Amtrak-only stations sit on a drawn line, and lets reported Amtrak positions snap to the rails.
   Where operators share track, the first registered provider is drawn on top (`server/lines.ts`).
+- **Accessibility is gated.** The `lighthouse` CI job (also required by the branch ruleset) audits the board, a
+  trip sheet and a station sheet at a perfect accessibility score, on mobile in the light theme and on desktop in the
+  dark theme (`lighthouserc*.json`, run locally with `npm run a11y`). It uses demo data and a blank map style so it is
+  deterministic. Lighthouse cannot click, so interactive states are reached through deep links.
 - **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
   that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
   from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches
