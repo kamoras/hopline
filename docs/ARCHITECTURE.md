@@ -86,8 +86,9 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
 - **Railroads with a GTFS-Realtime feed share one builder.** `providers/gtfs/realtime.ts` turns a schedule plus a
   GTFS-RT feed into trips (matching by trip id, or by train number and service date for feeds like Metro-North's whose
   ids are opaque); a railroad supplies a `RealtimeConfig` and its feeds. Metro-North and MBTA Commuter Rail are
-  both just that. The MBTA publishes trip updates and vehicle positions as separate feeds for every mode, so its
-  provider merges them and keeps commuter rail; its stops are per-track platforms, which the build script
+  both just that. Railroads that publish trip updates and vehicle positions as separate feeds (MBTA Commuter Rail,
+  MARC, VRE) are a config for `createRealtimeRailProvider`, which merges them and keeps only the schedule's routes;
+  the MBTA's feeds also carry its buses, subway and ferries; its stops are per-track platforms, which the build script
   (`platformStops`) names after the parent station and reads the track from.
 - **Boston subway, a second station-first board.** `providers/mbta-subway` is the NYC subway's counterpart with one
   difference that matters: every MBTA train reports a GPS position, so the map shows where trains are, not an

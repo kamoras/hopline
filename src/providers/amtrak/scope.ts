@@ -14,6 +14,9 @@ export const REGION_STATION_CODES: Record<string, ReadonlySet<string>> = {
     "WFD", "MDN", "BER", "HFD", "WNL", "SPG", "YNY", "CRT", "POU",
     // Providence → Boston (Northeast Corridor), and the Downeaster / Lake Shore into Boston
     "RTE", "BBY", "BOS", "BON", "FRA", "WOR", "HHL", "WOB",
+    // Wilmington → Washington → Virginia (Northeast Regional, Carolinian, Palmetto, Cardinal)
+    "NRK", "ABE", "BAL", "BWI", "NCR", "WAS", "ALX", "LOR", "WDB", "QAN", "FBG", "ASD", "RVR", "RVM", "PTB", "WBG", "NPN", "NFK",
+    "CVS", "CLP", "LYH", "STA", "DAN", "MSS", "BCV", "RKV", "MRB", "HFY", "CUM",
   ]),
 };
 

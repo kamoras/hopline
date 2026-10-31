@@ -4,7 +4,7 @@
 Hopline merges live data from multiple operators into one simple view: which trains are
 running, who's late, why, and where every train is right now on a map.
 
-**Coverage:** Metro-North Railroad, MBTA Commuter Rail and Amtrak between Philadelphia, New York, Connecticut and Boston, plus Shore Line East and the Hartford Line (timetable only: no public live feed), the NYC subway (live trains on a map, and next trains at every station by line and direction) and the Boston subway ("the T", with real GPS positions, next trains and line status).
+**Coverage:** Metro-North Railroad, MBTA Commuter Rail, MARC, VRE and Amtrak between Boston, New York, Philadelphia, Washington and Norfolk, plus Shore Line East and the Hartford Line (timetable only: no public live feed), the NYC subway (live trains on a map, and next trains at every station by line and direction) and the Boston subway ("the T", with real GPS positions, next trains and line status).
 
 - **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see
   the trains due, in arrival order, with live delay.
@@ -38,7 +38,7 @@ HOPLINE_DEMO=1 npm run dev
 | `npm run dev` / `build` / `start` | Next.js dev server / production build / serve |
 | `npm test` | Unit tests (Vitest) |
 | `npm run lint` · `npm run typecheck` | ESLint · TypeScript |
-| `npm run data:mnr` | Regenerate Metro-North schedule data from official GTFS (also `data:mbta-cr`, `data:mbta-subway`) |
+| `npm run data:mnr` | Regenerate Metro-North schedule data from official GTFS (also `data:mbta-cr`, `data:mbta-subway`, `data:marc`, `data:vre`) |
 | `npm run data:shoreline-east -- --zip feed.zip` | Build Shore Line East timetable data from a GTFS zip (also `data:hartford-line`, and `data:amtrak` for Amtrak's track geometry) |
 | `npm run a11y` | Accessibility audit (Lighthouse, must score 100); builds in demo mode with a blank map, then audits mobile-light and desktop-dark |
 
@@ -52,6 +52,7 @@ so upstream feeds see roughly one request per 10 s regardless of traffic.
 
 | Source | Used for | Notes |
 | --- | --- | --- |
+| [MARC GTFS-Realtime](https://www.mta.maryland.gov/schedule-data) and [VRE GTFS-Realtime](https://www.vre.org/about/developers/) | Live Maryland and Virginia commuter rail: delays and GPS positions | Keyless. |
 | [MBTA GTFS-Realtime](https://www.mbta.com/developers) (trip updates, vehicle positions, alerts) | Live Boston-area commuter rail and subway: delays, GPS positions, next trains, alert-based reasons and line status | Keyless. `MBTA_API_KEY` is optional and raises the rate limit. |
 | [MTA GTFS-Realtime](https://www.mta.info/developers) (Metro-North trip updates, vehicles, alerts) | Live Metro-North delays and alert-based reasons | Currently keyless. If MTA requires a key, set `MTA_API_KEY`. |
 | MTA static GTFS | Station names, train numbers, schedules | Converted to JSON at build time, refreshed weekly by a GitHub Action. |
