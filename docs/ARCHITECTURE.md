@@ -172,6 +172,14 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   with no geometry at all are straight. GPS-reported positions (Amtrak) are snapped onto known track when within
   120 m (`server/snap.ts`). On the map, easing toward corrected data happens *along* the track, never by sliding
   across the landscape; a train drawn nowhere near its new path snaps instead.
+- **Crowded maps thin out by priority.** Stations are not all drawn at every zoom. `assignDetailZoom`
+  (`lib/declutter.ts`) gives each one the zoom it first appears at: most important first (`placeImportance`: the number
+  of different lines through it, a bonus for termini, a little for shared platforms), each appears when no more
+  important station on screen is within 20 px, and only if it also stays clear at every deeper zoom, so zoomed out a
+  metro shows its interchanges and termini and zooming in fills in the rest, and a station never vanishes as you
+  zoom in. One layer per zoom with a plain filter keeps hidden stations from taking up label room, labels are placed
+  in importance order, and the chosen station always shows. Train stacks use a radius wider than their badge so two
+  badges never overlap. A randomized test checks the 20 px rule against an independent projection.
 - **Map as a transit diagram.** A muted basemap with the network on top: thick colored lines with white
   casings, white station rings, and small train glyphs rotated to the direction of travel. Trains that are
   fine are quiet (white body, line-colored outline); problems are solid status colors with a pulsing glow,

@@ -2,19 +2,25 @@
 
 import { LngLatBounds, type ExpressionSpecification, type GeoJSONSource, type Map as MapLibreMap, type MapLayerMouseEvent } from "maplibre-gl";
 import type { Feature, FeatureCollection } from "geojson";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Line } from "@/domain/line";
 import type { Place } from "@/domain/place";
 import type { Region } from "@/domain/region";
 import type { DelayStatus, Trip } from "@/domain/trip";
 import { REFRESH_MS } from "@/hooks/use-trips";
+import { assignDetailZoom, DETAIL_MAX_ZOOM, DETAIL_MIN_ZOOM } from "@/lib/declutter";
 import { bearing, lerpLatLon, type LatLon } from "@/lib/geo";
+import { placeImportance } from "@/lib/importance";
 import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from "@/lib/motion";
 import { project } from "@/lib/polyline";
 import { BaseMap } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
 import { installTrainIcons, vehicleIconId } from "./train-icon";
 import { useLocate } from "./use-locate";
+
+/** Station names appear from this zoom, and only where they fit. */
+const LABEL_PLACE_MIN_ZOOM = 10;
+const PLACE_LAYERS = Array.from({ length: DETAIL_MAX_ZOOM - DETAIL_MIN_ZOOM + 1 }, (_, i) => [`place-dots-${DETAIL_MIN_ZOOM + i}`, `place-labels-${DETAIL_MIN_ZOOM + i}`]).flat();
 
 /** Frame rate of marker updates (~25 fps keeps it smooth without taxing the map). */
 const FRAME_MS = 40;
@@ -26,7 +32,8 @@ const CORRECTION_MS = 700;
 const SLIDE_MAX_OFF_M = 120;
 /** Below this zoom, crowds of on-time trains collapse into counted stacks. */
 const STACK_MAX_ZOOM = 11.5;
-const STACK_RADIUS_PX = 16;
+/** Wider than a badge (24 px), so two stack badges never overlap each other. */
+const STACK_RADIUS_PX = 26;
 /** Zoom at which trains switch from tiny dots to oriented train glyphs, and get number labels. */
 const GLYPH_MIN_ZOOM = 9;
 const LABEL_MIN_ZOOM = 11.5;
@@ -155,13 +162,14 @@ function lineFeatures(lines: readonly Line[]): FeatureCollection {
   };
 }
 
-function placeFeatures(places: readonly Place[]): FeatureCollection {
+/** `dz` is the zoom a station first appears at (see `assignDetailZoom`): crowded stations thin out when zoomed out. */
+function placeFeatures(places: readonly Place[], detail: ReadonlyMap<string, number>): FeatureCollection {
   return {
     type: "FeatureCollection",
     features: places.map((p) => ({
       type: "Feature",
       geometry: { type: "Point", coordinates: [p.lon, p.lat] },
-      properties: { id: p.id, name: p.name },
+      properties: { id: p.id, name: p.name, dz: detail.get(p.id) ?? DETAIL_MAX_ZOOM },
     })),
   };
 }
@@ -219,25 +227,42 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       layout: { "line-cap": "round", "line-join": "round" },
       paint: { "line-color": ["get", "color"], "line-width": byZoom(2.2, 4.5, 7.5, [6, 10, 13]) },
     });
-    // Stations: white rings with a dark outline.
+    // Stations: white rings with a dark outline. A station is drawn from the zoom its `dz` says (the crowded ones
+    // wait until there is room), by one layer per zoom with a plain filter, so no hidden marker takes up space.
+    for (let z = DETAIL_MIN_ZOOM; z <= DETAIL_MAX_ZOOM; z++) {
+      m.addLayer({
+        id: `place-dots-${z}`,
+        type: "circle",
+        source: "places",
+        minzoom: z,
+        filter: ["==", ["get", "dz"], z],
+        paint: {
+          "circle-radius": byZoom(2.6, 4.2, 6.5, [7, 10, 13]),
+          "circle-color": "#ffffff",
+          "circle-stroke-color": "#1b2a41",
+          "circle-stroke-width": byZoom(1, 1.6, 2.2, [7, 10, 13]),
+        },
+      });
+    }
+    // Labels are placed most important first (layers are added in that order), and the map drops any that collide.
+    for (let z = DETAIL_MIN_ZOOM; z <= DETAIL_MAX_ZOOM; z++) {
+      m.addLayer({
+        id: `place-labels-${z}`,
+        type: "symbol",
+        source: "places",
+        minzoom: Math.max(z, LABEL_PLACE_MIN_ZOOM),
+        filter: ["==", ["get", "dz"], z],
+        layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 11, "text-offset": [0, 1.2], "text-anchor": "top" },
+        paint: { "text-color": "#1b2a41", "text-halo-color": "#ffffff", "text-halo-width": 1.6 },
+      });
+    }
+    // A chosen station always shows, however crowded.
     m.addLayer({
-      id: "place-dots",
+      id: "place-selected",
       type: "circle",
       source: "places",
-      paint: {
-        "circle-radius": byZoom(2.2, 4.2, 6.5, [7, 10, 13]),
-        "circle-color": "#ffffff",
-        "circle-stroke-color": "#1b2a41",
-        "circle-stroke-width": byZoom(1, 1.6, 2.2, [7, 10, 13]),
-      },
-    });
-    m.addLayer({
-      id: "place-labels",
-      type: "symbol",
-      source: "places",
-      minzoom: 10,
-      layout: { "text-field": ["get", "name"], "text-font": ["Noto Sans Regular"], "text-size": 11, "text-offset": [0, 1.2], "text-anchor": "top" },
-      paint: { "text-color": "#1b2a41", "text-halo-color": "#ffffff", "text-halo-width": 1.6 },
+      filter: ["==", ["get", "id"], ""],
+      paint: { "circle-radius": 8, "circle-color": "#ffffff", "circle-stroke-color": "#1f6feb", "circle-stroke-width": 3 },
     });
     // Problems glow and pulse beneath everything else on the trains.
     m.addLayer({
@@ -326,7 +351,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       const id = pickId(e);
       if (id) handlers.current.onSelectTrip(id);
     });
-    interactive(["place-dots", "place-labels"], (e) => {
+    interactive([...PLACE_LAYERS, "place-selected"], (e) => {
       const id = pickId(e);
       if (id) handlers.current.onSelectPlace(id);
     });
@@ -336,9 +361,19 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
 
+  // Which stations to show at which zoom: the interchanges and termini first, the rest as there is room.
+  const detail = useMemo(() => {
+    const importance = placeImportance(places, lines);
+    return assignDetailZoom(places.map((p) => ({ id: p.id, lat: p.lat, lon: p.lon, importance: importance.get(p.id) ?? 1 })));
+  }, [places, lines]);
+
   useEffect(() => {
-    (map?.getSource("places") as GeoJSONSource | undefined)?.setData(placeFeatures(places));
-  }, [map, places]);
+    (map?.getSource("places") as GeoJSONSource | undefined)?.setData(placeFeatures(places, detail));
+  }, [map, places, detail]);
+
+  useEffect(() => {
+    map?.setFilter("place-selected", ["==", ["get", "id"], selectedPlaceId ?? ""]);
+  }, [map, selectedPlaceId]);
 
   useEffect(() => {
     (map?.getSource("lines") as GeoJSONSource | undefined)?.setData(lineFeatures(lines));
