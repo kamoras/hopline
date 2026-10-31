@@ -24,6 +24,8 @@ function trackOf(raw: string | undefined): string {
 interface Agency {
   /** Where the feed is downloaded from; agencies without one need `--zip`. */
   url?: string;
+  /** The feed is a zip of zips: read this one inside it (SEPTA publishes bus and rail separately). */
+  innerZip?: string;
   /** Keep only these route ids (for a feed shared by several operators). */
   routes?: string[];
   /** Keep only routes of these GTFS route types (2 = rail), in addition to `routes`. */
@@ -127,6 +129,18 @@ const AGENCIES: Record<string, Agency> = {
     scanStops: true,
     routeTextColor: true,
     coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  // SEPTA's buses and trolleys (Philadelphia): an outer zip holds google_bus.zip. Vehicles report a position but only
+  // some a trip, so the live feeds are joined by vehicle id.
+  "septa-bus": {
+    url: process.env.SEPTA_GTFS_URL ?? "https://github.com/septadev/GTFS/releases/latest/download/gtfs_public.zip",
+    innerZip: "google_bus.zip",
+    routeTypes: ["3", "0", "11"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9,
   },
   // The T's subway: every trip is live (GPS), so only stations, lines and track are kept.
   "mbta-subway": {
@@ -295,7 +309,8 @@ async function main() {
   const days = Number(arg(args, "--days") ?? 60);
   const OUT_DIR = join(ROOT, "data", agencyId);
 
-  const zip = await loadZip(agency.url, arg(args, "--zip"), agency.apiKeyEnv);
+  const outer = await loadZip(agency.url, arg(args, "--zip"), agency.apiKeyEnv);
+  const zip = agency.innerZip ? new AdmZip(outer.getEntry(agency.innerZip)!.getData()) : outer;
   const optional = (name: string) => {
     const entry = zip.getEntry(name);
     return entry ? parseCsv(entry.getData().toString("utf8")) : [];
