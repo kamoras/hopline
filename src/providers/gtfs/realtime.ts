@@ -166,8 +166,14 @@ export function buildRealtimeTrips({ config, staticData, realtime, alerts, regio
     const tripId = tu.trip.tripId ?? "";
 
     const canceled = tu.trip.scheduleRelationship === rt.TripDescriptor.ScheduleRelationship.CANCELED;
+    const vehicle = [tripId, entity.id, ...numberCandidates(entity, tu)].map((k) => (k ? vehicles.get(k) : undefined)).find(Boolean);
+    // Some feeds (SEPTA) give the delay by stop sequence only, as one update for where the train is now: that is the
+    // stop its vehicle reports, so key it there.
     const updates = new Map<string, StopUpdate>();
-    for (const u of tu.stopTimeUpdate ?? []) if (u.stopId) updates.set(u.stopId, updateFor(u));
+    for (const u of tu.stopTimeUpdate ?? []) {
+      const stopId = u.stopId || (tu.stopTimeUpdate?.length === 1 ? vehicle?.stopId : undefined);
+      if (stopId) updates.set(stopId, updateFor(u));
+    }
 
     const start = serviceStart(tu.trip.startDate || resolved.startDate, trip, now, tz);
     const stops = buildStops(trip, staticData.stops, start, updates, now);
@@ -178,7 +184,6 @@ export function buildRealtimeTrips({ config, staticData, realtime, alerts, regio
       continue;
     }
 
-    const vehicle = [tripId, entity.id, ...numberCandidates(entity, tu)].map((k) => (k ? vehicles.get(k) : undefined)).find(Boolean);
     const reported = vehicle?.position
       ? ({
           lat: vehicle.position.latitude,

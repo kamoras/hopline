@@ -46,6 +46,8 @@ interface Agency {
   trackFrom?: string[];
   /** Route display names by route id, for feeds that name routes in capitals ("PENN - WASHINGTON"). */
   routeNames?: Record<string, string>;
+  /** Colors by route id, for a feed that gives every line the same one. */
+  routeColors?: Record<string, string>;
   /** Regex rewrites applied to every station name before tidying ("ROCKVILLE MARC eb" -> "ROCKVILLE"). */
   stationClean?: [RegExp, string][];
   /** Short public names by route id (a line badge: "RL"), kept in routes.json. */
@@ -119,6 +121,26 @@ const AGENCIES: Record<string, Agency> = {
     platformStops: true,
     coarseGapM: 5_000,
     stationNames: { "Union Station": "Washington Union", "L Enfant": "L'Enfant" },
+  },
+  // SEPTA Regional Rail (Philadelphia and its suburbs, to Trenton, Wilmington, Newark DE and Doylestown): the rail zip
+  // inside SEPTA's outer zip. Its live feeds carry trip, position and delay for each train that is running.
+  "septa-rail": {
+    url: process.env.SEPTA_GTFS_URL ?? "https://github.com/septadev/GTFS/releases/latest/download/gtfs_public.zip",
+    innerZip: "google_rail.zip",
+    routeTypes: ["2"],
+    // SEPTA gives all thirteen lines one color; a diagram needs them apart (each reads 4.5:1 or better with white text).
+    routeColors: {
+      AIR: "#6d4c9f", CHE: "#0b7a5a", CHW: "#1f6aa5", CYN: "#8a5a2b", FOX: "#b3306a", LAN: "#b45309", MED: "#00778b",
+      NOR: "#2f7d32", PAO: "#a12d2d", TRE: "#1d4e89", WAR: "#4a5ab9", WIL: "#7a5c00", WTR: "#5f6b7a",
+    },
+    // Match the names Amtrak (Amtraker) uses for the same stations, so each is listed once.
+    stationNames: {
+      "Gray 30th St Station": "Philadelphia 30th Street",
+      "Trenton Transit Center": "Trenton",
+      "Newark DE": "Newark",
+      "North Philadelphia Amtrak": "Philadelphia North",
+    },
+    coarseGapM: 5_000,
   },
   // The T's buses: every trip is live (GPS), so only stops, routes and track are kept.
   "mbta-bus": {
@@ -541,7 +563,7 @@ async function main() {
   for (const r of routeRows) {
     routes[r.route_id!] = {
       name: agency.style?.name ?? agency.routeNames?.[r.route_id!] ?? tidyName(r.route_long_name || r.route_short_name!),
-      color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
+      color: agency.style?.color ?? agency.routeColors?.[r.route_id!] ?? `#${r.route_color || "0b5ea8"}`,
       ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
       ...(agency.shortFromFeed ? { short: r.route_short_name || (r.route_long_name ?? "").split(/[ -]/)[0] || r.route_id! } : {}),
       ...(agency.routeTextColor && r.route_text_color ? { text: `#${r.route_text_color}` } : {}),
