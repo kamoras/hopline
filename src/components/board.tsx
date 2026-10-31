@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
 import type { BoardLink, Focus } from "@/domain/board";
 import { isDelayed } from "@/domain/delay";
 import { MODES, type Mode, type ModeInfo } from "@/domain/modes";
@@ -21,9 +21,11 @@ import { useNow } from "@/hooks/use-now";
 import { usePinned } from "@/hooks/use-pinned";
 import { useTrips } from "@/hooks/use-trips";
 import { formatAgo } from "@/lib/format";
+import type { LatLon } from "@/lib/geo";
 import { describeIntent, describeLeg, parseIntent, type Route } from "@/lib/query";
 import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
+import { ModeTabs } from "./mode-tabs";
 import { Commutes } from "./commutes";
 import { ArrivalsSheet } from "./arrivals-sheet";
 import { LineStatusSheet } from "./line-status-sheet";
@@ -104,6 +106,12 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
   const operators = useMemo(() => [...new Set(snapshot.trips.map((t) => t.operatorId))].sort(), [snapshot.trips]);
   const nearby = useMemo(() => (geo.state.status === "ready" ? nearestPlaces(places, geo.state.at) : []), [geo.state, places]);
 
+  // Where the map is looking, so a mode tab can open the other mode for the same place.
+  const viewCenter = useRef<LatLon | undefined>(undefined);
+  const setViewCenter = useCallback((c: LatLon) => {
+    viewCenter.current = c;
+  }, []);
+  const getViewCenter = useCallback(() => viewCenter.current, []);
   const togglePin = useCallback((t: Trip) => toggle(pinKey(t)), [toggle]);
   const openTripOnMap = useCallback(() => setView("map"), []);
   const openTripById = useCallback((id: string) => {
@@ -171,6 +179,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
             </div>
           </div>
         </div>
+        <ModeTabs mode={mode} regionId={region.id} boards={boards} viewCenter={getViewCenter} />
       </header>
 
       <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1">
@@ -320,6 +329,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               trips={mapTrips}
               places={places}
               lines={lines}
+              onViewChange={setViewCenter}
               showDelays={vocab.reportsDelay}
               selectedTripId={selected?.id}
               selectedPlaceId={selectedPlace?.id}
