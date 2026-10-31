@@ -15,7 +15,7 @@ interface Props {
 }
 
 /**
- * Always-visible tabs for the modes available (Rail, Subway, later Flights): one tap, no menu. The area
+ * Always-visible tabs for the modes available (Trains, Metro, Flights, later buses): one tap, no menu. The area
  * carries over: a tab opens the board of that mode for wherever the map is looking. Real links, so they
  * work without JavaScript, open in a new tab, and fall back to the current area's board.
  */

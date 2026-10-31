@@ -6,7 +6,7 @@ const MAX_RESULTS = 40;
 const BROWSE_ALL_UP_TO = 12;
 
 /**
- * The home of a station-first board (the subway): riders think in stations, not individual trains, so
+ * The home of a station-first board (metro, flights): riders think in stations, not individual trains, so
  * the list is a station finder rather than a feed of every train.
  */
 export function StationList({ places, query, vocab, onPick }: { places: readonly Place[]; query: string; vocab: ModeInfo; onPick(id: string): void }) {

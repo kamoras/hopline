@@ -1,5 +1,5 @@
 import type { Board } from "@/domain/board";
-import { getMode } from "@/domain/modes";
+import { getMode, MODES } from "@/domain/modes";
 import { getRegion } from "@/domain/region";
 import { adsbProvider } from "./adsb";
 import { amtrakProvider } from "./amtrak";
@@ -39,7 +39,9 @@ export function deriveBoards(all: readonly TransitProvider[]): Board[] {
       if (region) boards.set(`${p.mode}/${id}`, { mode: p.mode, region });
     }
   }
-  return [...boards.values()].sort((a, b) => a.mode.localeCompare(b.mode) || a.region.name.localeCompare(b.region.name));
+  // Modes in the order MODES lists them (trains, metro, flights): the order of the mode tabs and the chooser.
+  const modeOrder = (m: Board["mode"]) => Object.keys(MODES).indexOf(m);
+  return [...boards.values()].sort((a, b) => modeOrder(a.mode) - modeOrder(b.mode) || a.region.name.localeCompare(b.region.name));
 }
 
 export const listBoards = () => deriveBoards(PROVIDERS);

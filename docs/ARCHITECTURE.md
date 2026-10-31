@@ -38,6 +38,10 @@ shows everything in a region. The unit of navigation is a **board**: one **mode*
 - **URLs:** `/` is a chooser grouped by mode (it redirects straight to the board when only one
   exists, keeping "where's my train" one step away); each board is `/{mode}/{region}`, e.g.
   `/rail/northeast`.
+- **Naming.** Rapid transit is a mode called **Metro** (`MODES.subway`, slug `metro`, board `/metro/nyc`), because
+  cities do not agree on "subway"; the operator keeps the local name (NYC Subway, The T, Washington Metro). The
+  mode's internal id stays `subway`, which `getMode` still accepts, so the API and old `/subway/...` links keep
+  working (the board page redirects them to the canonical `/metro/...`).
 - **Moving between modes** needs no menu. Tabs for every mode available sit in the header (`ModeTabs`); the
   area carries over: a tab opens the board of that mode for wherever the map is looking
   (`nearestBoard` in `domain/board.ts`: the board whose area contains the point, else the closest), so Trains

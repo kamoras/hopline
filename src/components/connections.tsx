@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MODES, type Mode } from "@/domain/modes";
 import { useConnections } from "@/hooks/use-connections";
 
-/** "Also here": the same interchange on another board (a station's subway, trains, later flights). */
+/** "Also here": the same interchange on another board (a station's metro, trains, flights). */
 export function Connections({ mode, regionId, placeId, className = "" }: { mode: Mode; regionId: string; placeId: string; className?: string }) {
   const connections = useConnections(mode, regionId, placeId);
   if (connections.length === 0) return null;

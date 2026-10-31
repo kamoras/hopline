@@ -42,9 +42,11 @@ export const MODES = {
     searchHint: "Try a train number like 2150, a station like Stamford, or a trip like “New Haven to New York round trip”.",
     lineNoun: "line",
   },
+  // Rapid transit in every city, whatever it is called there (subway, the T, Metro, the L): the mode's
+  // internal id stays `subway`, but riders see "Metro" and each operator keeps its own name.
   subway: {
-    slug: "subway",
-    label: "Subway",
+    slug: "metro",
+    label: "Metro",
     noun: "train",
     nounPlural: "trains",
     numberLabel: "Line",
@@ -74,6 +76,7 @@ export const MODES = {
 
 export type Mode = keyof typeof MODES;
 
-export function getMode(slug: string): Mode | undefined {
-  return (Object.keys(MODES) as Mode[]).find((m) => MODES[m].slug === slug);
+/** A mode from its URL slug or its internal id (so old `/subway/...` links still resolve). */
+export function getMode(slugOrId: string): Mode | undefined {
+  return (Object.keys(MODES) as Mode[]).find((m) => MODES[m].slug === slugOrId || m === slugOrId);
 }

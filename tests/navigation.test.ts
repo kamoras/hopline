@@ -33,7 +33,7 @@ describe("connections between modes", () => {
     const subway = findBoard("subway", "nyc")!;
     const gct = (await getPlaces(rail)).find((p) => p.name === "Grand Central")!;
     const toSubway = await getConnections(rail, gct);
-    expect(toSubway.some((c) => c.mode === "subway" && /grand central/i.test(c.name) && c.href.startsWith("/subway/nyc/stop/"))).toBe(true);
+    expect(toSubway.some((c) => c.mode === "subway" && /grand central/i.test(c.name) && c.href.startsWith("/metro/nyc/stop/"))).toBe(true);
 
     const station = (await getPlaces(subway)).find((p) => /^Grand Central/.test(p.name))!;
     const toRail = await getConnections(subway, station);
@@ -44,5 +44,19 @@ describe("connections between modes", () => {
     const rail = findBoard("rail", "northeast")!;
     const stamford = (await getPlaces(rail)).find((p) => p.name === "Stamford")!;
     expect(await getConnections(rail, stamford)).toEqual([]); // no subway in Connecticut
+  });
+});
+
+describe("mode names", () => {
+  it("calls rapid transit Metro, and still resolves the old subway address", async () => {
+    const { MODES, getMode } = await import("@/domain/modes");
+    expect(MODES.subway.label).toBe("Metro");
+    expect(MODES.subway.slug).toBe("metro");
+    expect(getMode("metro")).toBe("subway");
+    expect(getMode("subway")).toBe("subway"); // an old link, or the internal id used by the API
+    expect(getMode("rail")).toBe("rail");
+    expect(getMode("nope")).toBeUndefined();
+    expect(findBoard("subway", "nyc")?.mode).toBe("subway");
+    expect(findBoard("metro", "boston")?.region.id).toBe("boston");
   });
 });
