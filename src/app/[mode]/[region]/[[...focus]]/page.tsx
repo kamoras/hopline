@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Board } from "@/components/board";
 import { boardHref, parseFocus, toLink } from "@/domain/board";
 import { MODES } from "@/domain/modes";
@@ -33,6 +33,8 @@ export default async function Page({ params }: { params: Params }) {
   const board = findBoard(mode, region);
   const focus = parseFocus(segments);
   if (!board || !focus) notFound();
+  // Old links used the mode's internal id ("/subway/..."): send them to the canonical address.
+  if (mode !== MODES[board.mode].slug) redirect([boardHref(board.mode, board.region.id), ...segments].join("/"));
 
   const [snapshot, places] = await Promise.all([getSnapshot(board), getPlaces(board)]);
   if (focus.placeId && !places.some((p) => p.id === focus.placeId)) notFound();

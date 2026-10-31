@@ -5,7 +5,7 @@ import { NORTHEAST, type Region } from "@/domain/region";
 import { deriveBoards, findBoard, selectProviders } from "@/providers/registry";
 import type { TransitProvider } from "@/providers/types";
 
-const provider = (id: string, mode: "rail", regionIds: string[]): TransitProvider => ({
+const provider = (id: string, mode: TransitProvider["mode"], regionIds: string[]): TransitProvider => ({
   id, name: id, attribution: { label: id, url: "https://example.com" }, mode, regionIds, fetchTrips: async () => [], fetchPlaces: async () => [],
 });
 
@@ -36,5 +36,12 @@ describe("boards", () => {
   it("round-trips mode slugs into hrefs", () => {
     expect(getMode(MODES.rail.slug)).toBe("rail");
     expect(boardHref("rail", "northeast")).toBe("/rail/northeast");
+  });
+});
+
+describe("board order", () => {
+  it("lists modes in the order MODES defines (trains, metro, flights), not alphabetically", () => {
+    const boards = deriveBoards([provider("f", "flights", ["northeast"]), provider("s", "subway", ["northeast"]), provider("r", "rail", ["northeast"])]);
+    expect(boards.map((b) => b.mode)).toEqual(["rail", "subway", "flights"]);
   });
 });
