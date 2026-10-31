@@ -138,7 +138,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
       <header className="z-20 border-b border-line bg-bg/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <Link href="/" aria-label="Hopline home" className="grid h-8 w-8 place-items-center rounded-xl bg-accent text-lg font-black text-white">
+            <Link href="/" aria-label="Hopline home" className="grid h-8 w-8 place-items-center rounded-xl bg-accent text-lg font-black text-on-accent">
               h
             </Link>
             <h1 className="contents">
@@ -163,7 +163,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                   role="tab"
                   aria-selected={view === v}
                   onClick={() => setView(v)}
-                  className={`rounded-full px-3.5 py-1 text-sm font-semibold capitalize ${view === v ? "bg-accent text-white" : "text-muted"}`}
+                  className={`rounded-full px-3.5 py-1 text-sm font-semibold capitalize ${view === v ? "bg-accent text-on-accent" : "text-muted"}`}
                 >
                   {v}
                 </button>
@@ -254,7 +254,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                   type="button"
                   onClick={() => toggleCommute(intent.legs)}
                   aria-pressed={allSaved}
-                  className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${allSaved ? "bg-accent text-white" : "border border-line bg-surface hover:bg-surface-2"}`}
+                  className={`w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${allSaved ? "bg-accent text-on-accent" : "border border-line bg-surface hover:bg-surface-2"}`}
                 >
                   {allSaved ? "⇄ Saved to My commutes" : intent.roundTrip ? "⇄ Save this round trip" : "⇄ Save this commute"}
                 </button>
@@ -374,7 +374,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick(): void;
       onClick={onClick}
       aria-pressed={active}
       className={`rounded-full border px-3.5 py-1.5 font-medium transition ${
-        active ? "border-accent bg-accent text-white" : "border-line bg-surface text-muted hover:text-text"
+        active ? "border-accent bg-accent text-on-accent" : "border-line bg-surface text-muted hover:text-text"
       }`}
     >
       {children}

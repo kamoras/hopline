@@ -17,6 +17,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "a11y": "HOPLINE_DEMO=1 NEXT_PUBLIC_MAP_STYLE_URL=http://localhost:3123/ci-map-style.json next build && HOPLINE_DEMO=1 lhci autorun --config=lighthouserc.json && HOPLINE_DEMO=1 lhci autorun --config=lighthouserc.desktop.json",
     "test:watch": "vitest",
     "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
     "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",
@@ -35,6 +36,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/adm-zip": "^0.6.0",
     "@types/geojson": "^7946.0.16",

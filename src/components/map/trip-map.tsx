@@ -435,7 +435,7 @@ export default function TripMap({ region, trips, places, lines, showDelays = tru
       <button
         type="button"
         onClick={locate.toggle}
-        className={`absolute bottom-6 left-3 rounded-full border border-line px-4 py-2 text-sm font-semibold shadow-lg ${locate.state === "on" ? "bg-accent text-white" : "bg-surface"}`}
+        className={`absolute bottom-6 left-3 rounded-full border border-line px-4 py-2 text-sm font-semibold shadow-lg ${locate.state === "on" ? "bg-accent text-on-accent" : "bg-surface"}`}
         title="Your location stays on this device"
       >
         {locate.label}

@@ -30,12 +30,11 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
 
   return (
     <li className="card-cv">
-      <div className="group relative rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(0,0,0,0.02)] transition hover:border-accent/50">
+      <div className="group flex rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(0,0,0,0.02)] transition hover:border-accent/50">
         <button
           type="button"
           onClick={() => onSelect(trip.id)}
-          className="flex w-full flex-col gap-2.5 rounded-2xl p-4 text-left"
-          aria-label={`${mode.numberLabel} ${trip.number} to ${trip.destination}, ${trip.routeName}`}
+          className="flex min-w-0 flex-1 flex-col gap-2.5 rounded-2xl p-4 text-left"
         >
           <div className="flex items-center justify-between gap-3">
             <OperatorLine trip={trip} />
@@ -47,7 +46,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
           </div>
 
           {focus && trip.state !== "canceled" && (
-            <div className="tabular flex flex-wrap items-baseline gap-x-2 pr-9 text-[15px]">
+            <div className="tabular flex flex-wrap items-baseline gap-x-2 text-[15px]">
               <span className="text-muted">{stop ? "From" : trip.state === "scheduled" ? "Departs" : "Next"}</span>
               <span className="font-semibold">{focus.name}</span>
               <span className="font-semibold">
@@ -64,7 +63,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
           )}
 
           {late && trip.delayReason && (
-            <p className="pr-9 text-sm text-muted">
+            <p className="text-sm text-muted">
               <span className="font-medium text-text">Why: </span>
               {trip.delayReason.text}
             </p>
@@ -76,8 +75,8 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
           onClick={() => onTogglePin(trip)}
           aria-pressed={pinned}
           aria-label={`${pinned ? "Remove" : "Add"} ${mode.noun} ${trip.number} ${pinned ? "from" : "to"} My ${mode.nounPlural}`}
-          className={`absolute right-3 bottom-3 grid h-9 w-9 place-items-center rounded-full text-lg transition ${
-            pinned ? "bg-accent text-white" : "text-muted hover:bg-surface-2"
+          className={`m-3 mt-auto grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg transition ${
+            pinned ? "bg-accent text-on-accent" : "text-muted hover:bg-surface-2"
           }`}
         >
           {pinned ? "★" : "☆"}

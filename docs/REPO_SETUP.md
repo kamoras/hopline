@@ -8,7 +8,7 @@ repo settings, so they can't live in code. Do them once:
    choose [`.github/rulesets/main.json`](../.github/rulesets/main.json). It protects the default
    branch:
    - changes only via pull request, squash merge only (one commit per PR, linear history);
-   - the `verify` CI check must pass, so `--auto` waits for CI instead of merging immediately;
+   - the `verify` and `lighthouse` CI checks must pass, so `--auto` waits for CI instead of merging immediately;
    - no force-pushes or deletion of `main`;
    - 0 required approvals (solo-friendly); repository admins can bypass on a PR, never by direct push.
    Raise `required_approving_review_count` in the file if you add collaborators.
@@ -25,7 +25,7 @@ repo settings, so they can't live in code. Do them once:
 ## Merge policy
 | PR | Auto-merges when |
 | --- | --- |
-| Any Dependabot PR (patch, minor, major, security) | The `verify` job passes (the merge job runs after it in `ci.yml`) |
+| Any Dependabot PR (patch, minor, major, security) | The `verify` and `lighthouse` jobs pass (the merge job runs after them in `ci.yml`) |
 | Metro-North schedule refresh | Its own test run passes |
 
 A major bump that breaks lint, types, tests or the build fails `verify` and stays open for a

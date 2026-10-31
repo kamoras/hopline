@@ -1,0 +1,37 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npm run start -- -p 3123",
+      "startServerReadyPattern": "Ready",
+      "url": [
+        "http://localhost:3123/",
+        "http://localhost:3123/rail/northeast",
+        "http://localhost:3123/rail/northeast/trip/mnr-1384",
+        "http://localhost:3123/subway/nyc",
+        "http://localhost:3123/subway/nyc/stop/1-av"
+      ],
+      "numberOfRuns": 1,
+      "settings": {
+        "onlyCategories": [
+          "accessibility"
+        ],
+        "preset": "desktop",
+        "chromeFlags": "--no-sandbox --headless=new"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:accessibility": [
+          "error",
+          {
+            "minScore": 1
+          }
+        ]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/desktop"
+    }
+  }
+}

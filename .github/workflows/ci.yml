@@ -25,11 +25,33 @@ jobs:
         env:
           HOPLINE_DEMO: "1" # build without depending on live upstream feeds
 
+  # Accessibility must stay at a perfect Lighthouse score on every PR: the board, a trip sheet and a station
+  # sheet, on mobile (light) and desktop (dark). Built in demo mode with a blank map so it needs no network.
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          HOPLINE_DEMO: "1"
+          NEXT_PUBLIC_MAP_STYLE_URL: http://localhost:3123/ci-map-style.json
+      - run: npx lhci autorun --config=lighthouserc.json
+        env:
+          HOPLINE_DEMO: "1"
+      - run: npx lhci autorun --config=lighthouserc.desktop.json
+        env:
+          HOPLINE_DEMO: "1"
+
   # Dependabot PRs (dependency, major and security updates) merge themselves, but only
-  # after `verify` passes in this same run. Gating on `needs: verify` keeps this safe
+  # after `verify` and `lighthouse` pass in this same run. Gating on `needs: verify` keeps this safe
   # even if branch protection is misconfigured: a failing PR never reaches this job.
   automerge:
-    needs: verify
+    needs: [verify, lighthouse]
     if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
