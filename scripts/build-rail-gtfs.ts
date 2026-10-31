@@ -141,6 +141,17 @@ const AGENCIES: Record<string, Agency> = {
     routeTextColor: true,
     coarseGapM: 1e9,
   },
+  // NYC buses: MTA publishes one static feed per borough plus the MTA Bus Company's (each lists every NYCT route but
+  // only its own trips), so scripts/build-mta-bus.ts builds each with this entry and merges them. Live data is the
+  // BusTime GTFS-Realtime feed (needs MTA_BUSTIME_KEY); its route ids match these.
+  "mta-bus": {
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9,
+  },
   // SEPTA's buses and trolleys (Philadelphia): an outer zip holds google_bus.zip. Vehicles report a position but only
   // some a trip, so the live feeds are joined by vehicle id.
   "septa-bus": {
@@ -318,7 +329,7 @@ async function main() {
   const agency = AGENCIES[agencyId];
   if (!agency) throw new Error(`Usage: build-rail-gtfs <${Object.keys(AGENCIES).join("|")}> [--zip file] [--days n]`);
   const days = Number(arg(args, "--days") ?? 60);
-  const OUT_DIR = join(ROOT, "data", agencyId);
+  const OUT_DIR = arg(args, "--out") ?? join(ROOT, "data", agencyId); // --out: build into another folder (used to merge several feeds)
 
   const outer = await loadZip(agency.url, arg(args, "--zip"), agency.apiKeyEnv);
   const zip = agency.innerZip ? new AdmZip(outer.getEntry(agency.innerZip)!.getData()) : outer;
