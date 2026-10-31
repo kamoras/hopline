@@ -71,8 +71,18 @@ export const WASHINGTON: Region = {
   timeZone: "America/New_York",
 };
 
+/** The airports around New York, Philadelphia and Hartford (a flights board covers the sky above them). */
+export const NORTHEAST_AIR: Region = {
+  id: "northeast-air",
+  name: "NYC · Philadelphia · Hartford airports",
+  bounds: [-76.4, 39.2, -71.9, 42.1],
+  center: [-74.2, 40.7],
+  zoom: 7.2,
+  timeZone: "America/New_York",
+};
+
 /** Add new regions here; providers declare which ids they can serve. */
-export const REGIONS: readonly Region[] = [NORTHEAST, NYC, BOSTON, WASHINGTON];
+export const REGIONS: readonly Region[] = [NORTHEAST, NYC, BOSTON, WASHINGTON, NORTHEAST_AIR];
 
 export function getRegion(id: string | null | undefined): Region | undefined {
   return REGIONS.find((r) => r.id === id);

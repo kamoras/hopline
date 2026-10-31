@@ -4,7 +4,7 @@
 Hopline merges live data from multiple operators into one simple view: which trains are
 running, who's late, why, and where every train is right now on a map.
 
-**Coverage:** Metro-North Railroad, MBTA Commuter Rail, MARC, VRE and Amtrak between Boston, New York, Philadelphia, Washington and Norfolk, plus Shore Line East and the Hartford Line (timetable only: no public live feed), the NYC subway (live trains on a map, and next trains at every station by line and direction) the Boston subway ("the T") and the Washington subway (Metrorail), both with real GPS positions, next trains and line status.
+**Coverage:** Metro-North Railroad, MBTA Commuter Rail, MARC, VRE and Amtrak between Boston, New York, Philadelphia, Washington and Norfolk, plus Shore Line East and the Hartford Line (timetable only: no public live feed), live flights over the New York, Philadelphia and Hartford airports (real aircraft positions on a map, and FAA airport delays and ground stops), the NYC subway (live trains on a map, and next trains at every station by line and direction) the Boston subway ("the T") and the Washington subway (Metrorail), both with real GPS positions, next trains and line status.
 
 - **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see
   the trains due, in arrival order, with live delay.
@@ -53,6 +53,7 @@ so upstream feeds see roughly one request per 10 s regardless of traffic.
 
 | Source | Used for | Notes |
 | --- | --- | --- |
+| [adsb.lol](https://adsb.lol) (community ADS-B aircraft positions) and the [FAA airport status feed](https://nasstatus.faa.gov) | Live flights, inbound flights per airport, airport delays and ground stops | Keyless. adsb.lol asks for fair use; its data is ODbL. |
 | [MARC GTFS-Realtime](https://www.mta.maryland.gov/schedule-data) and [VRE GTFS-Realtime](https://www.vre.org/about/developers/) | Live Maryland and Virginia commuter rail: delays and GPS positions | Keyless. |
 | [MBTA GTFS-Realtime](https://www.mbta.com/developers) (trip updates, vehicle positions, alerts) | Live Boston-area commuter rail and subway: delays, GPS positions, next trains, alert-based reasons and line status | Keyless. `MBTA_API_KEY` is optional and raises the rate limit. |
 | [WMATA GTFS-Realtime](https://developer.wmata.com) (Metrorail trip updates, vehicle positions, alerts) | Live Washington subway: GPS positions, next trains, alert-based line status | Requires a free key, `WMATA_API_KEY`, sent as `api_key` from the server only. |

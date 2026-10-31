@@ -1,6 +1,7 @@
 import type { Map as MapLibreMap } from "maplibre-gl";
 
 const PREFIX = "train:";
+const PLANE_PREFIX = "plane:";
 
 /**
  * The sprite id for a train. Features reference it; it is drawn on first use.
@@ -8,6 +9,12 @@ const PREFIX = "train:";
  * colored outline, so they read clearly on a line of the same color without shouting.
  */
 export const trainIconId = (color: string, solid: boolean) => `${PREFIX}${solid ? "solid" : "quiet"}:${color}`;
+
+/** The same, for an aircraft: a small airplane silhouette. */
+export const planeIconId = (color: string, solid: boolean) => `${PLANE_PREFIX}${solid ? "solid" : "quiet"}:${color}`;
+
+/** The sprite for a trip of this mode. */
+export const vehicleIconId = (mode: string, color: string, solid: boolean) => (mode === "flights" ? planeIconId(color, solid) : trainIconId(color, solid));
 
 /**
  * A small train glyph pointing right (east): a rounded body with a pointed nose and a white outline so it
@@ -43,12 +50,50 @@ function draw(color: string, solid: boolean): ImageData | undefined {
   return ctx.getImageData(0, 0, w, h);
 }
 
-/** Registers a handler that draws a train sprite the first time the map asks for one. */
+/** A small airplane pointing right (east): fuselage, swept wings and tailplane, outlined so it reads over any basemap. */
+function drawPlane(color: string, solid: boolean): ImageData | undefined {
+  const w = 48;
+  const h = 40;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return undefined;
+  ctx.beginPath();
+  ctx.moveTo(44, 20); // nose
+  ctx.quadraticCurveTo(42, 17, 34, 17);
+  ctx.lineTo(24, 4); // right wing tip (up on screen)
+  ctx.lineTo(19, 4);
+  ctx.lineTo(24, 17);
+  ctx.lineTo(10, 17);
+  ctx.lineTo(5, 10); // tailplane
+  ctx.lineTo(2, 10);
+  ctx.lineTo(5, 20);
+  ctx.lineTo(2, 30);
+  ctx.lineTo(5, 30);
+  ctx.lineTo(10, 23);
+  ctx.lineTo(24, 23);
+  ctx.lineTo(19, 36);
+  ctx.lineTo(24, 36);
+  ctx.lineTo(34, 23);
+  ctx.quadraticCurveTo(42, 23, 44, 20);
+  ctx.closePath();
+  ctx.lineJoin = "round";
+  ctx.lineWidth = solid ? 3.5 : 4;
+  ctx.strokeStyle = solid ? "#ffffff" : color;
+  ctx.stroke();
+  ctx.fillStyle = solid ? color : "#ffffff";
+  ctx.fill();
+  return ctx.getImageData(0, 0, w, h);
+}
+
+/** Registers a handler that draws a train or plane sprite the first time the map asks for one. */
 export function installTrainIcons(map: MapLibreMap) {
   map.on("styleimagemissing", (e) => {
-    if (!e.id.startsWith(PREFIX) || map.hasImage(e.id)) return;
-    const [, style, color] = e.id.split(/^train:(solid|quiet):/);
-    const image = style && color ? draw(color, style === "solid") : undefined;
+    const plane = e.id.startsWith(PLANE_PREFIX);
+    if ((!plane && !e.id.startsWith(PREFIX)) || map.hasImage(e.id)) return;
+    const [, style, color] = e.id.split(plane ? /^plane:(solid|quiet):/ : /^train:(solid|quiet):/);
+    const image = style && color ? (plane ? drawPlane : draw)(color, style === "solid") : undefined;
     if (image) map.addImage(e.id, image, { pixelRatio: 2 });
   });
 }

@@ -1,9 +1,10 @@
 import { createRealtimeRailProvider } from "../gtfs/rail-provider";
-import { lazyStaticData } from "../gtfs/dataset";
+import { lazyStaticData, type DataFiles } from "../gtfs/dataset";
 
 export const MARC_ID = "marc";
 
-const staticData = lazyStaticData("marc", { id: MARC_ID, name: "MARC Train" });
+const files: DataFiles = (name) => import(`../../../data/marc/${name}.json`);
+const staticData = lazyStaticData(files, { id: MARC_ID, name: "MARC Train" });
 
 /** MARC Train via its GTFS-Realtime feeds plus the bundled schedule. */
 export const marcProvider = createRealtimeRailProvider({

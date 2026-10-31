@@ -85,11 +85,11 @@ export function ArrivalsSheet({ mode, regionId, place, now, lineStatus, onClose 
             <p className="px-2 text-sm text-muted">No {vocab.nounPlural} due in the next 45 minutes. Overnight and weekend service can be much less frequent.</p>
           )}
           {groups.map((g) => (
-            <section key={g.key} className="rounded-2xl border border-line p-3" aria-label={`${g.route} to ${g.headsign}`}>
+            <section key={g.key} className="rounded-2xl border border-line p-3" aria-label={`${g.route} ${mode === "flights" ? "" : "to "}${g.headsign}`}>
               <div className="flex items-center gap-3">
-                <LineBadge route={g.route} color={g.color} textColor={g.textColor} />
+                <LineBadge route={g.route} color={g.color} textColor={g.textColor} label={g.route} />
                 <div className="min-w-0 flex-1">
-                  <div className="line-clamp-2 leading-snug font-semibold">to {g.headsign}</div>
+                  <div className="line-clamp-2 leading-snug font-semibold">{mode === "flights" ? "" : "to "}{g.headsign}</div>
                   {g.warning && <div className="text-xs font-medium text-warn">{g.warning}</div>}
                 </div>
                 <div className="tabular text-right">

@@ -273,7 +273,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
               {stationsFirst && !query && (
                 <div className="mb-4">
-                  <LineStatusStrip lines={status.lines} unavailable={status.unavailable} loading={status.isLoading} onOpen={setStatusRoute} />
+                  <LineStatusStrip lines={status.lines} noun={vocab.lineNoun} unavailable={status.unavailable} loading={status.isLoading} onOpen={setStatusRoute} />
                 </div>
               )}
               {stationsFirst ? (
@@ -371,7 +371,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
         ))
       )}
       {statusRoute && !selected && !selectedPlace && status.lines.find((l) => l.route === statusRoute) && (
-        <LineStatusSheet line={status.lines.find((l) => l.route === statusRoute)!} onClose={() => setStatusRoute(undefined)} />
+        <LineStatusSheet line={status.lines.find((l) => l.route === statusRoute)!} noun={vocab.lineNoun} onClose={() => setStatusRoute(undefined)} />
       )}
     </div>
   );

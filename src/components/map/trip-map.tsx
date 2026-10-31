@@ -13,7 +13,7 @@ import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from
 import { project } from "@/lib/polyline";
 import { BaseMap } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
-import { installTrainIcons, trainIconId } from "./train-icon";
+import { installTrainIcons, vehicleIconId } from "./train-icon";
 import { useLocate } from "./use-locate";
 
 /** Frame rate of marker updates (~25 fps keeps it smooth without taxing the map). */
@@ -110,7 +110,7 @@ function tripFeatures(trips: readonly Trip[], at: Map<string, Placed>, stacked: 
         number: t.number,
         status: t.delayStatus,
         color,
-        icon: trainIconId(color, problem),
+        icon: vehicleIconId(t.mode, color, problem),
         heading: p.heading,
         scale: problem ? 1.25 : 0.95,
         pulse: problem ? pulse : 0,

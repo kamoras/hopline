@@ -7,7 +7,7 @@ import { formatRelative } from "@/lib/format";
 import { isDelayed } from "@/domain/delay";
 import { MODES } from "@/domain/modes";
 import { StatusPill } from "./status-pill";
-import { OperatorLine, PlatformTag, StopTime, stopTimes } from "./trip-parts";
+import { destinationPhrase, OperatorLine, PlatformTag, StopTime, stopTimes } from "./trip-parts";
 
 interface Props {
   trip: Trip;
@@ -42,7 +42,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
           </div>
           <div className="flex items-baseline gap-2">
             <span className="tabular text-2xl font-bold tracking-tight">{trip.number}</span>
-            <span className="text-lg leading-snug font-medium">to {trip.destination}</span>
+            <span className="text-lg leading-snug font-medium">{destinationPhrase(trip)}</span>
           </div>
 
           {focus && trip.state !== "canceled" && (

@@ -8,7 +8,9 @@
         "http://localhost:3123/rail/northeast",
         "http://localhost:3123/rail/northeast/trip/mnr-1384",
         "http://localhost:3123/subway/nyc",
-        "http://localhost:3123/subway/nyc/stop/1-av"
+        "http://localhost:3123/subway/nyc/stop/1-av",
+        "http://localhost:3123/flights/northeast-air",
+        "http://localhost:3123/flights/northeast-air/stop/jfk"
       ],
       "numberOfRuns": 1,
       "settings": {
