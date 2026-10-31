@@ -1,9 +1,10 @@
 import { createRealtimeRailProvider } from "../gtfs/rail-provider";
-import { lazyStaticData } from "../gtfs/dataset";
+import { lazyStaticData, type DataFiles } from "../gtfs/dataset";
 
 export const VRE_ID = "vre";
 
-const staticData = lazyStaticData("vre", { id: VRE_ID, name: "VRE" });
+const files: DataFiles = (name) => import(`../../../data/vre/${name}.json`);
+const staticData = lazyStaticData(files, { id: VRE_ID, name: "VRE" });
 
 /** VRE via its GTFS-Realtime feeds plus the bundled schedule. */
 export const vreProvider = createRealtimeRailProvider({

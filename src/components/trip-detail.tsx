@@ -8,7 +8,7 @@ import { MODES } from "@/domain/modes";
 import { StatusPill } from "./status-pill";
 import { formatAgo } from "@/lib/format";
 import { StopTimeline } from "./stop-timeline";
-import { OperatorLine } from "./trip-parts";
+import { destinationPhrase, OperatorLine } from "./trip-parts";
 
 interface Props {
   trip: Trip;
@@ -44,7 +44,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
           <div className="min-w-0">
             <OperatorLine trip={trip} />
             <h2 className="mt-1 text-2xl font-bold tracking-tight">
-              <span className="tabular">{trip.number}</span> to {trip.destination}
+              <span className="tabular">{trip.number}</span> {destinationPhrase(trip)}
             </h2>
             {trip.origin && <p className="text-sm text-muted">from {trip.origin}</p>}
           </div>
@@ -60,6 +60,7 @@ export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, 
               <span className="text-sm text-muted">
                 {trip.position.source === "reported" ? "Live GPS" : "Estimated from schedule"}
                 {trip.position.source === "reported" ? ` · updated ${formatAgo(trip.updatedAt, now)}` : ""}
+                {trip.position.altitudeFt ? ` · ${trip.position.altitudeFt.toLocaleString("en-US")} ft` : ""}
                 {trip.position.speedMph ? ` · ${Math.round(trip.position.speedMph)} mph` : ""}
               </span>
             )}

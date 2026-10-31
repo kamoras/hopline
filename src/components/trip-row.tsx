@@ -17,8 +17,8 @@ export function TripRow({ match, region, onOpen }: { match: Match; region: Regio
       >
         <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: trip.routeColor }} aria-hidden />
         <span className="min-w-0 flex-1">
-          <span className="tabular font-bold">{trip.number}</span> <span className="text-muted">to</span>{" "}
-          <span className="font-medium">{trip.destination}</span>
+          <span className="tabular font-bold">{trip.number}</span>{" "}
+          <span className="font-medium">{trip.destination && <span className="font-normal text-muted">to </span>}{trip.destination}</span>
           <span className="tabular block text-sm text-muted">
             {here && <StopTime stop={here} region={region} emphasize={false} showScheduled={false} />}
             {here?.platform && (

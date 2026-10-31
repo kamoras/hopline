@@ -1,7 +1,8 @@
-import { lazyStaticData } from "../gtfs/dataset";
+import { lazyStaticData, type DataFiles } from "../gtfs/dataset";
 import { createScheduledProvider } from "../gtfs/scheduled";
 
-const staticData = lazyStaticData("shoreline-east", { id: "shoreline-east", name: "Shore Line East" });
+const files: DataFiles = (name) => import(`../../../data/shoreline-east/${name}.json`);
+const staticData = lazyStaticData(files, { id: "shoreline-east", name: "Shore Line East" });
 
 /** Shore Line East (CTrail) from the bundled timetable; there is no public real-time feed yet. */
 export const shorelineEastProvider = createScheduledProvider({

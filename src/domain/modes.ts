@@ -23,6 +23,8 @@ export interface ModeInfo {
   searchPlaceholder: string;
   /** Shown when a search finds nothing. */
   searchHint: string;
+  /** What the service-status strip lists: lines for rail and subway, airports for flights. */
+  lineNoun: string;
 }
 
 export const MODES = {
@@ -38,6 +40,7 @@ export const MODES = {
     platformNoun: "Track",
     searchPlaceholder: "Station, train #, or “A to B”…",
     searchHint: "Try a train number like 2150, a station like Stamford, or a trip like “New Haven to New York round trip”.",
+    lineNoun: "line",
   },
   subway: {
     slug: "subway",
@@ -51,6 +54,21 @@ export const MODES = {
     platformNoun: "Platform",
     searchPlaceholder: "Station or line…",
     searchHint: "Try a station name, or a line like L or Red.",
+    lineNoun: "line",
+  },
+  flights: {
+    slug: "flights",
+    label: "Flights",
+    noun: "flight",
+    nounPlural: "flights",
+    numberLabel: "Flight",
+    stopNoun: "airport",
+    reportsDelay: false,
+    browse: "stations",
+    platformNoun: "Gate",
+    searchPlaceholder: "Airport or flight…",
+    searchHint: "Try an airport like JFK or Bradley, or a flight like DAL1283.",
+    lineNoun: "airport",
   },
 } as const satisfies Record<string, ModeInfo>;
 

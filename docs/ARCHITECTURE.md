@@ -115,6 +115,16 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   the static build reads it too, or takes `--zip`). Some vehicles report a position but no trip and are skipped. And
   Yellow, Orange and Silver badges use dark text, so the build keeps each route's text color (`routeTextColor`) and
   arrivals carry it. Region `washington` covers DC and its Maryland and Virginia suburbs out to Ashburn.
+- **Flights (a station-first mode with real positions).** `mode: "flights"` is `browse: "stations"`: the board lists
+  airports, with live aircraft on the map. `providers/adsb` reads adsb.lol's ADS-B feed (one query around the
+  airports, shared by trips and arrivals for a few seconds) and the FAA's airport status. ADS-B carries no route or
+  schedule, so no lateness is claimed (delay status is "unknown", `reportsDelay: false`) and a flight's destination
+  is only known when it is descending into a covered airport; `classify` infers arriving, departing or
+  overflying from altitude, climb rate and heading, and refuses an airport the plane is too high to land at
+  (about 350 ft per nautical mile). Each plane gets a short motion leg along its heading, from when the aircraft
+  actually reported, so it glides between the ten-second refreshes like a train. FAA delays, ground stops and
+  closures reuse the line-status strip and sheet, with airports as the "lines" (`lineNoun`). Real departures and
+  arrivals boards (scheduled times, gates) need a keyed schedule API and are not included.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
@@ -185,7 +195,8 @@ enforces them:
   straightforward brute-force version it replaced (`tests/track-index.test.ts`, `tests/stacking.test.ts`,
   `tests/polyline.test.ts`) plus a generous time budget, so a regression to quadratic fails CI.
 - **Data loads when its board is used.** An agency's bundled schedule and track are separate lazy chunks
-  (`providers/gtfs/dataset.ts`: `lazyStaticData`, `loadDataFile`), so a server instance only reads and keeps
+  (`providers/gtfs/dataset.ts`: `lazyStaticData`, `loadDataFile`; each provider supplies its own literal
+  `import(`../../../data/<id>/${name}.json`)` so one agency's files can never change what another resolves), so a server instance only reads and keeps
   the agencies whose boards are requested (Boston's subway alone: +10 MB; the Northeast rail data: +60 MB).
   Never import `data/**/*.json` at module level in a provider.
 - **The schedule is scanned once per date**, and schedule-only providers decide from a trip's first and
@@ -212,8 +223,8 @@ Known limits on the way to a national network, in the order they will bite:
    `mode`, `regionIds`, `fetchTrips`, `fetchPlaces`). `attribution` is required: read the source's terms
    and credit it as asked; the footer renders it automatically. Map raw data to `Trip`; call `finalizeTrip` for derived fields.
 2. Register it in `src/providers/registry.ts` and add its display name in `src/domain/operators.ts`.
-3. Load bundled data lazily: build it with `scripts/build-rail-gtfs.ts` and use `lazyStaticData("<id>", brand)`
-   (or `loadDataFile` for custom data) instead of importing the JSON. See "Scaling".
+3. Load bundled data lazily: build it with `scripts/build-rail-gtfs.ts` and use `lazyStaticData(files, brand)`
+   with `const files: DataFiles = (name) => import(`../../../data/<id>/${name}.json`)` (or `loadDataFile` for custom data) instead of importing the JSON. See "Scaling".
 4. Add fixture-based tests in `tests/`.
 
 ### Add a region (a city, a network, or a single airport)

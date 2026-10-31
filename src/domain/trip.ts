@@ -42,6 +42,8 @@ export interface Position {
   /** Degrees clockwise from north. */
   heading?: number;
   speedMph?: number;
+  /** Feet above sea level (aircraft). */
+  altitudeFt?: number;
   /** "reported" comes from the vehicle; "estimated" is interpolated from the schedule. */
   source: "reported" | "estimated";
 }

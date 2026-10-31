@@ -1,9 +1,10 @@
 import { createRealtimeRailProvider } from "../gtfs/rail-provider";
-import { lazyStaticData } from "../gtfs/dataset";
+import { lazyStaticData, type DataFiles } from "../gtfs/dataset";
 
 export const MBTA_CR_ID = "mbta-cr";
 
-const staticData = lazyStaticData("mbta-cr", { id: MBTA_CR_ID, name: "MBTA Commuter Rail" });
+const files: DataFiles = (name) => import(`../../../data/mbta-cr/${name}.json`);
+const staticData = lazyStaticData(files, { id: MBTA_CR_ID, name: "MBTA Commuter Rail" });
 
 /** MBTA Commuter Rail via the MBTA's GTFS-Realtime feeds (shared with its buses, subway and ferries) plus the bundled schedule. */
 export const mbtaCommuterRailProvider = createRealtimeRailProvider({

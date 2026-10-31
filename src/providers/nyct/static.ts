@@ -1,6 +1,8 @@
 import type { Line } from "@/domain/line";
 import { createPolyline, type Polyline } from "@/lib/polyline";
-import { lazy, loadDataFile } from "../gtfs/dataset";
+import { lazy, loadDataFile, type DataFiles } from "../gtfs/dataset";
+
+const files: DataFiles = (name) => import(`../../../data/subway/${name}.json`);
 
 /** A station as riders know it: one name, possibly several stations and platforms behind it. */
 export interface Station {
@@ -80,9 +82,9 @@ export function createNyctStatic(raw: RawSubway): NyctStatic {
 /** The NYC subway's stations, lines and track, loaded on first use. */
 export const loadNyctStatic = lazy(async () => {
   const [stations, routes, shapes] = await Promise.all([
-    loadDataFile<RawSubway["stations"]>("subway", "stations"),
-    loadDataFile<RawSubway["routes"]>("subway", "routes"),
-    loadDataFile<RawSubway["shapes"]>("subway", "shapes"),
+    loadDataFile<RawSubway["stations"]>(files, "stations"),
+    loadDataFile<RawSubway["routes"]>(files, "routes"),
+    loadDataFile<RawSubway["shapes"]>(files, "shapes"),
   ]);
   return createNyctStatic({ stations, routes, shapes });
 });

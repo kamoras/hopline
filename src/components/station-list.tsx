@@ -2,6 +2,8 @@ import { normalizeName, type Place } from "@/domain/place";
 import type { ModeInfo } from "@/domain/modes";
 
 const MAX_RESULTS = 40;
+/** A board with this few stations (a handful of airports) lists them all; a big one waits for a search. */
+const BROWSE_ALL_UP_TO = 12;
 
 /**
  * The home of a station-first board (the subway): riders think in stations, not individual trains, so
@@ -14,9 +16,11 @@ export function StationList({ places, query, vocab, onPick }: { places: readonly
         .filter((p) => normalizeName(p.name).includes(q))
         .sort((a, b) => Number(!normalizeName(a.name).startsWith(q)) - Number(!normalizeName(b.name).startsWith(q)) || a.name.localeCompare(b.name))
         .slice(0, MAX_RESULTS)
-    : [];
+    : places.length <= BROWSE_ALL_UP_TO
+      ? [...places].sort((a, b) => a.name.localeCompare(b.name))
+      : [];
 
-  if (!q) {
+  if (!q && matches.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-line px-6 py-10 text-center">
         <p className="text-lg font-semibold tracking-tight">Find your {vocab.stopNoun}</p>

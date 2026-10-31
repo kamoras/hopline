@@ -15,6 +15,9 @@ export function OperatorLine({ trip }: { trip: Pick<Trip, "operatorId" | "routeN
   );
 }
 
+/** "to Stamford", or nothing when the destination isn't known (a flight overhead has no published route). */
+export const destinationPhrase = (trip: Pick<Trip, "destination">) => (trip.destination ? `to ${trip.destination}` : "");
+
 /** "Track 17" where the stop's platform is known, nothing otherwise. */
 export function PlatformTag({ stop, noun }: { stop: Pick<StopCall, "platform">; noun: string }) {
   return stop.platform ? <span className="font-semibold text-accent">{noun} {stop.platform}</span> : null;
