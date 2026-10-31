@@ -4,6 +4,8 @@
 Hopline merges live data from multiple operators into one simple view: which trains are
 running, who's late, why, and where every train is right now on a map.
 
+**Open the site and you see a live model of transit**: a calm, game-like scale model of everything moving in real time that you can pan and zoom, with a search bar on top so the answer to "where's my train, bus or flight?" is always a tap away.
+
 **Coverage:** Metro-North Railroad, MBTA Commuter Rail, MARC, VRE and Amtrak between Boston, New York, Philadelphia, Washington and Norfolk, plus Shore Line East and the Hartford Line (timetable only: no public live feed), the Boston, New York, Philadelphia and Washington buses (every MBTA, MTA, SEPTA and Metrobus bus on a live map when zoomed in, a route followed from a search, next buses at every stop), live flights over the New York, Philadelphia and Hartford airports (real aircraft positions on a map, and FAA airport delays and ground stops), the NYC subway (live trains on a map, and next trains at every station by line and direction) the Boston subway ("the T") and the Washington subway (Metrorail), both with real GPS positions, next trains and line status.
 
 - **Answer in one step.** Type a train number (`2150`) or your station (`Stamford`) and see

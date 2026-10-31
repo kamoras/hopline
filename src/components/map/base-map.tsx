@@ -14,12 +14,14 @@ interface Props {
   bounds: [number, number, number, number];
   /** Called once the style has loaded; add sources and layers here. */
   onReady(map: MapLibreMap): void;
+  /** Where the zoom buttons sit (default top right); a map with a floating header moves them out from under it. */
+  controlsPosition?: "top-right" | "bottom-right";
   /** Overlays (legends, buttons) drawn over the map. */
   children?: ReactNode;
 }
 
 /** The one place that knows how to create, theme and tear down a map. */
-export function BaseMap({ bounds, onReady, children }: Props) {
+export function BaseMap({ bounds, onReady, controlsPosition = "top-right", children }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const ready = useRef(onReady);
   const [failed, setFailed] = useState(false);
@@ -40,7 +42,7 @@ export function BaseMap({ bounds, onReady, children }: Props) {
       pitchWithRotate: false,
     });
     map.touchZoomRotate.disableRotation();
-    map.addControl(new NavigationControl({ showCompass: false }), "top-right");
+    map.addControl(new NavigationControl({ showCompass: false }), controlsPosition);
 
     let loaded = false;
     map.on("error", (e) => {
@@ -53,7 +55,7 @@ export function BaseMap({ bounds, onReady, children }: Props) {
     });
     return () => map.remove();
     // The map is created once per bounds; callbacks are read through a ref.
-  }, [bounds]);
+  }, [bounds, controlsPosition]);
 
   return (
     // Dark mode inverts the light basemap instead of shipping a second style (see globals.css).
