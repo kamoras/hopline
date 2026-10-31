@@ -42,6 +42,10 @@ interface Agency {
   coarseGapM?: number;
   /** Route ids whose track to use for trips that have no geometry of their own. */
   trackFrom?: string[];
+  /** Route display names by route id, for feeds that name routes in capitals ("PENN - WASHINGTON"). */
+  routeNames?: Record<string, string>;
+  /** Regex rewrites applied to every station name before tidying ("ROCKVILLE MARC eb" -> "ROCKVILLE"). */
+  stationClean?: [RegExp, string][];
   /** Short public names by route id (a line badge: "RL"), kept in routes.json. */
   routeShort?: Record<string, string>;
   /** Keep stations, routes and track but not the schedule, for operators whose trips come entirely from live feeds. */
@@ -83,6 +87,26 @@ const AGENCIES: Record<string, Agency> = {
     },
     coarseGapM: 5_000,
   },
+  // MARC (Maryland commuter rail): trip updates and vehicle positions are separate feeds, trip ids match the schedule.
+  marc: {
+    url: process.env.MARC_GTFS_URL ?? "https://feeds.mta.maryland.gov/gtfs/marc",
+    numberPrefix: /^Train\s+/i,
+    coarseGapM: 5_000,
+    routeNames: { "11704": "Brunswick Line", "11705": "Penn Line", "11706": "Camden Line" },
+    // Stations are named per direction and operator ("ROCKVILLE MARC eb"); Amtrak's names for shared ones.
+    stationClean: [
+      [/\s+MARC(\s+Washington)?(\s+(eb|wb|nb|sb))?$/i, ""],
+      [/\s+(W VA|MD)$/i, ""],
+    ],
+    stationNames: { "Union Station": "Washington Union", "Penn Station": "Baltimore Penn", "Bwi Rail Station": "Baltimore Airport" },
+  },
+  // Virginia Railway Express: child stops are numbered tracks under a named station.
+  vre: {
+    url: process.env.VRE_GTFS_URL ?? "https://gtfs.vre.org/containercdngtfsupload/google_transit.zip",
+    platformStops: true,
+    coarseGapM: 5_000,
+    stationNames: { "Union Station": "Washington Union", "L Enfant": "L'Enfant" },
+  },
   // The T's subway: every trip is live (GPS), so only stations, lines and track are kept.
   "mbta-subway": {
     url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
@@ -93,10 +117,10 @@ const AGENCIES: Record<string, Agency> = {
     routeShort: { Red: "RL", Orange: "OL", Blue: "BL", Mattapan: "M", "Green-B": "B", "Green-C": "C", "Green-D": "D", "Green-E": "E" },
   },
   // Track for Amtrak's Northeast trains (Amtraker supplies the trips): Northeast Regional, Acela, Keystone,
-  // Hartford Line, Vermonter, Empire Service, Adirondack.
+  // Hartford Line, Vermonter, Empire Service, Adirondack, Carolinian, Palmetto.
   amtrak: {
     url: process.env.AMTRAK_GTFS_URL ?? "https://content.amtrak.com/content/gtfs/GTFS.zip",
-    routes: ["88", "40751", "94", "41042", "90", "36921", "95"],
+    routes: ["88", "40751", "94", "41042", "90", "36921", "95", "85", "69"],
     style: { color: "#4a6fa5" },
     // Amtrak shapes are sparse on straight stretches; they are still the real alignment, so keep them.
     coarseGapM: 20_000,
@@ -263,14 +287,16 @@ async function main() {
     (r) => (!agency.routes || agency.routes.includes(r.route_id!)) && (!agency.routeTypes || agency.routeTypes.includes(r.route_type!)),
   );
   const keptRoutes = new Set(routeRows.map((r) => r.route_id!));
-  const filtered = !!(agency.routes || agency.routeTypes); // a shared feed lists every operator's routes and stations
+  const filtered = !!(agency.routes || agency.routeTypes || agency.platformStops); // a shared feed lists every operator's routes and stations
 
   const stopRows = read("stops.txt");
   const stopById = new Map(stopRows.map((s) => [s.stop_id!, s]));
   /** The track a child platform serves ("Track 2" -> "2"), where the feed names platforms that way. */
   const platformTrack = (stopId: string): string => {
     const s = stopById.get(stopId);
-    return agency.platformStops && s && /track/i.test(s.platform_name ?? "") ? (s.platform_code ?? "").trim() : "";
+    if (!agency.platformStops || !s) return "";
+    if (/track/i.test(s.platform_name ?? "")) return (s.platform_code ?? "").trim();
+    return s.parent_station && /^\d+$/.test(s.stop_name!.trim()) ? s.stop_name!.trim() : ""; // VRE names its platforms by track
   };
 
   const today = new Date();
@@ -379,7 +405,7 @@ async function main() {
   for (const s of stopRows) {
     if (filtered && !served.has(s.stop_id!)) continue;
     const parent = agency.platformStops ? stopById.get(s.parent_station ?? "") : undefined;
-    const name = tidyName((parent ?? s).stop_name!);
+    const name = tidyName((agency.stationClean ?? []).reduce((n, [re, to]) => n.replace(re, to), (parent ?? s).stop_name!));
     stops[s.stop_id!] = [agency.stationNames?.[s.stop_id!] ?? agency.stationNames?.[name] ?? name, Number(s.stop_lat), Number(s.stop_lon)];
   }
 
@@ -428,7 +454,7 @@ async function main() {
   const routes: Record<string, { name: string; color: string; short?: string }> = {};
   for (const r of routeRows) {
     routes[r.route_id!] = {
-      name: agency.style?.name ?? (r.route_long_name || r.route_short_name!),
+      name: agency.style?.name ?? agency.routeNames?.[r.route_id!] ?? tidyName(r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
       ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
     };
