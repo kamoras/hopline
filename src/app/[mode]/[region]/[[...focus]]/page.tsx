@@ -4,7 +4,7 @@ import { Board } from "@/components/board";
 import { boardHref, parseFocus, toLink } from "@/domain/board";
 import { MODES } from "@/domain/modes";
 import { findBoard, listBoards } from "@/providers/registry";
-import { getPlaces } from "@/server/places";
+import { getPlaceIndex, getPlaces } from "@/server/places";
 import { getSnapshot } from "@/server/snapshot";
 
 // Server-render with fresh data so the first paint already shows trips;
@@ -36,8 +36,10 @@ export default async function Page({ params }: { params: Params }) {
   // Old links used the mode's internal id ("/subway/..."): send them to the canonical address.
   if (mode !== MODES[board.mode].slug) redirect([boardHref(board.mode, board.region.id), ...segments].join("/"));
 
-  const [snapshot, places] = await Promise.all([getSnapshot(board), getPlaces(board)]);
-  if (focus.placeId && !places.some((p) => p.id === focus.placeId)) notFound();
+  // A big network (buses) never ships its thousands of stops with the page; the browser asks for the ones it needs.
+  const viewport = MODES[board.mode].viewport;
+  const [snapshot, places] = await Promise.all([getSnapshot(board), viewport ? [] : getPlaces(board)]);
+  if (focus.placeId && !(viewport ? (await getPlaceIndex(board)).get(focus.placeId) : places.some((p) => p.id === focus.placeId))) notFound();
 
   return (
     <Board

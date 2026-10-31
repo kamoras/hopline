@@ -28,6 +28,7 @@ export async function searchCatalog(query: string): Promise<CatalogHit[]> {
     const detail = `${MODES[board.mode].label} · ${board.region.name}`;
     if (normalizeName(detail).includes(q)) hits.push({ kind: "board", label: detail, detail: "Board", href, rank: 1 });
 
+    if (MODES[board.mode].viewport) continue; // thousands of stops named "Main St" are not universal-search material
     for (const place of await getPlaces(board)) {
       const name = normalizeName(place.name);
       if (name.includes(q)) {

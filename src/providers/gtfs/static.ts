@@ -166,6 +166,7 @@ export function createStaticData(
             id: `${brand.id}-${i}`,
             name: raw.routes[s.routeId]?.name ? (brand.routeLabel?.(raw.routes[s.routeId]!.name) ?? raw.routes[s.routeId]!.name) : brand.name,
             color: raw.routes[s.routeId]?.color ?? "#0b5ea8",
+            route: (raw.routes[s.routeId] as { short?: string } | undefined)?.short ?? s.routeId,
             coords: pts.map((p) => [p.lon, p.lat] as [number, number]),
           },
         ];

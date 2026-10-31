@@ -129,6 +129,14 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   actually reported, so it glides between the ten-second refreshes like a train. FAA delays, ground stops and
   closures reuse the line-status strip and sheet, with airports as the "lines" (`lineNoun`). Real departures and
   arrivals boards (scheduled times, gates) need a keyed schedule API and are not included.
+- **Buses (a viewport-scoped, stop-first mode).** `mode: "bus"` is `browse: "stations"` and `viewport: true`.
+  `providers/mbta-bus` reuses the metro machinery in `providers/gtfs/subway.ts` (vehicle positions plus trip
+  updates; arrivals per stop) with every stop its own place (`placeIds: "stop"`, since stops share names), and only
+  bundles stops, routes and track (`data:mbta-bus`, `realtimeOnly` and `scanStops` in the build script: the schedule
+  has millions of stop times that are never needed). The board is stop-first plus route search: find a stop (by
+  name, near you, or on the map once zoomed in) for the next buses by route, or search a route number to follow it
+  (its track and every bus on it, at any zoom). Zoomed out, the map shows a prompt instead of buses; buses appear
+  from zoom 12 and stops from zoom 14. Boston buses share the `boston` region with the T.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
@@ -211,10 +219,18 @@ enforces them:
 - **Static data is cached long, live data briefly**: lines for a day at the CDN, places for an hour, trips
   for 5 s, so traffic costs a handful of upstream fetches however many people look.
 
+- **Big networks load by viewport.** A mode with `viewport: true` (buses) never sends its network whole: the page
+  ships no stops and no vehicles; `/api/trips` takes `bbox` (what is on screen) or `route`, `/api/places` takes
+  `bbox`, `near`, `q` or `id`, `/api/lines` takes `route`, and `/api/routes` searches routes by number or name.
+  Server-side, `PlaceIndex` (a grid plus a normalized-name list) answers those without scanning, providers' runs
+  are shared for a few seconds across the many slightly different rectangles, and the client rounds rectangles
+  outward to a grid (`snapBbox`) so panning reuses cacheable requests. Each has a randomized test against the
+  obvious version and a time budget on a 200,000-place list (`tests/viewport.test.ts`).
+
 Known limits on the way to a national network, in the order they will bite:
-1. A board is `mode + region` and returns every trip in the region. Regions should stay city- or
-   corridor-sized; the Northeast rail board (Boston to Norfolk) is already about as large as is comfortable.
-   Beyond that, split regions or add a bounding-box query to `/api/trips`.
+1. A small mode's board is `mode + region` and returns every trip in the region. Keep regions city- or
+   corridor-sized (the Northeast rail board, Boston to Norfolk, is about as large as is comfortable); a mode
+   that outgrows that sets `viewport: true`.
 2. `/api/lines` ships every line of a board as JSON (about 1 MB for the Northeast). Fine behind a day-long
    CDN cache; compress (encoded polylines) or simplify by zoom before adding much more track.
 3. Schedule-only providers still decode every trip active on a date once; a per-date index by start and end
@@ -237,7 +253,8 @@ the `regionIds` of the providers that serve it. The board `/{mode}/{region}`, th
 the switcher entry and `/api/trips?mode=&region=` all appear automatically.
 
 ### Add a mode (flights, buses, subway, ferry)
-1. Add an entry to `MODES` in `src/domain/modes.ts` (slug, nouns, search copy).
+1. Add an entry to `MODES` in `src/domain/modes.ts` (slug, nouns, search copy). Set `viewport: true` if the network is
+   too big to send whole (see "Scaling").
 2. Write providers with that `mode` that emit `Trip`s. `Trip` is deliberately generic: stops
    (airports, bus stops), position, delay, reason. Map mode-specific fields in the adapter.
 3. If the mode needs different presentation (gates, tracks, icons), branch on `trip.mode` in the

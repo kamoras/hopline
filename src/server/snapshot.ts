@@ -1,4 +1,6 @@
 import type { Board } from "@/domain/board";
+import { MODES } from "@/domain/modes";
+import { inBBox, type BBox } from "@/lib/bbox";
 import type { Diagnostics, ProviderStatus, Snapshot, Trip } from "@/domain/trip";
 import { providersFor } from "@/providers/registry";
 import { getTrack } from "./lines";
@@ -15,6 +17,31 @@ interface Good {
 }
 /** Per-instance cache of public transit data only. Nothing user-specific lives here. */
 const lastGood = new Map<string, Good>();
+
+/**
+ * What part of a viewport board a request wants: the trips inside a rectangle, or every trip of one route.
+ * A big network (buses) never returns everything, so a request with neither gets no trips.
+ */
+export interface Scope {
+  bbox?: BBox;
+  route?: string;
+}
+
+export function scopeTrips(trips: readonly Trip[], scope: Scope | undefined): Trip[] {
+  if (scope?.route) {
+    const route = scope.route.toLowerCase();
+    return trips.filter((t) => t.number.toLowerCase() === route);
+  }
+  const box = scope?.bbox;
+  return box ? trips.filter((t) => t.position && inBBox(box, t.position.lat, t.position.lon)) : [];
+}
+
+/**
+ * Many requests for slightly different rectangles arrive together; they share one run of each provider for a
+ * few seconds instead of rebuilding every trip per request.
+ */
+const SHARE_MS = 3_000;
+const shared = new Map<string, { at: number; run: Promise<{ status: ProviderStatus; trips: Trip[] }> }>();
 
 async function runProvider(
   provider: TransitProvider,
@@ -51,17 +78,31 @@ async function runProvider(
   }
 }
 
+function runShared(provider: TransitProvider, board: Board, now: number) {
+  const key = `${provider.id}:${board.mode}:${board.region.id}`;
+  const hit = shared.get(key);
+  if (hit && now - hit.at < SHARE_MS) return hit.run;
+  const run = runProvider(provider, board, now);
+  shared.set(key, { at: now, run });
+  return run;
+}
+
 /** Fan out to every provider for the board; one failing source never blocks the others. */
-export async function getSnapshot(board: Board, now = Date.now()): Promise<Snapshot> {
+export async function getSnapshot(board: Board, now = Date.now(), scope?: Scope): Promise<Snapshot> {
+  const viewport = MODES[board.mode].viewport;
   const [results, track] = await Promise.all([
-    Promise.all(providersFor(board).map((p) => runProvider(p, board, now))),
+    Promise.all(providersFor(board).map((p) => (viewport ? runShared(p, board, now) : runProvider(p, board, now)))),
     getTrack(board).catch(() => undefined), // no track data just means nothing to snap to
   ]);
   return {
     mode: board.mode,
     regionId: board.region.id,
     generatedAt: now,
-    trips: track ? snapToTrack(results.flatMap((r) => r.trips), track) : results.flatMap((r) => r.trips),
+    trips: (() => {
+      const all = results.flatMap((r) => r.trips);
+      const wanted = viewport ? scopeTrips(all, scope) : all;
+      return track ? snapToTrack(wanted, track) : wanted;
+    })(),
     providers: results.map((r) => r.status),
   };
 }
