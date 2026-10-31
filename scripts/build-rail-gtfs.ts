@@ -48,6 +48,10 @@ interface Agency {
   stationClean?: [RegExp, string][];
   /** Short public names by route id (a line badge: "RL"), kept in routes.json. */
   routeShort?: Record<string, string>;
+  /** Environment variable holding the key the download needs, sent as `api_key` (WMATA). Never logged. */
+  apiKeyEnv?: string;
+  /** Keep each route's text color (`text` in routes.json), for lines whose badge is not white on its color. */
+  routeTextColor?: boolean;
   /** Keep stations, routes and track but not the schedule, for operators whose trips come entirely from live feeds. */
   realtimeOnly?: boolean;
   /** Keep only track geometry (no trips or stations), for operators whose trips come from a live feed. */
@@ -115,6 +119,17 @@ const AGENCIES: Record<string, Agency> = {
     coarseGapM: 5_000,
     realtimeOnly: true,
     routeShort: { Red: "RL", Orange: "OL", Blue: "BL", Mattapan: "M", "Green-B": "B", "Green-C": "C", "Green-D": "D", "Green-E": "E" },
+  },
+  // Washington's Metrorail: live trains and arrivals come from WMATA's GTFS-Realtime feeds, so only stations
+  // (platforms are named after their parent station), lines and track are kept. The download needs WMATA_API_KEY.
+  wmata: {
+    url: process.env.WMATA_GTFS_URL ?? "https://api.wmata.com/gtfs/rail-gtfs-static.zip",
+    apiKeyEnv: "WMATA_API_KEY",
+    routeTypes: ["1"],
+    platformStops: true,
+    realtimeOnly: true,
+    routeTextColor: true,
+    routeShort: { RED: "RD", ORANGE: "OR", BLUE: "BL", YELLOW: "YL", GREEN: "GR", SILVER: "SV" },
   },
   // Track for Amtrak's Northeast trains (Amtraker supplies the trips): Northeast Regional, Acela, Keystone,
   // Hartford Line, Vermonter, Empire Service, Adirondack, Carolinian, Palmetto.
@@ -228,10 +243,12 @@ function ymd(d: Date): string {
   return d.toISOString().slice(0, 10).replaceAll("-", "");
 }
 
-async function loadZip(url: string | undefined, local: string | undefined): Promise<AdmZip> {
+async function loadZip(url: string | undefined, local: string | undefined, apiKeyEnv?: string): Promise<AdmZip> {
   if (local) return new AdmZip(readFileSync(local));
   if (!url) throw new Error("No download URL for this agency; pass --zip <file> (or set its *_GTFS_URL variable)");
-  const res = await fetch(url);
+  const key = apiKeyEnv ? process.env[apiKeyEnv] : undefined;
+  if (apiKeyEnv && !key) throw new Error(`Set ${apiKeyEnv} to download this feed, or pass --zip <file>`);
+  const res = await fetch(url, { headers: key ? { api_key: key } : {} });
   if (!res.ok) throw new Error(`Failed to download ${url}: ${res.status}`);
   return new AdmZip(Buffer.from(await res.arrayBuffer()));
 }
@@ -261,7 +278,7 @@ async function main() {
   const days = Number(arg(args, "--days") ?? 60);
   const OUT_DIR = join(ROOT, "data", agencyId);
 
-  const zip = await loadZip(agency.url, arg(args, "--zip"));
+  const zip = await loadZip(agency.url, arg(args, "--zip"), agency.apiKeyEnv);
   const optional = (name: string) => {
     const entry = zip.getEntry(name);
     return entry ? parseCsv(entry.getData().toString("utf8")) : [];
@@ -375,7 +392,7 @@ async function main() {
       }
       shapeIndexById.set(t.shape_id!, shape);
     }
-    trips[t.trip_id!] = [t.trip_short_name!.replace(agency.numberPrefix ?? "", ""), t.route_id!, tidyHeadsign(t.trip_headsign!), Number(t.direction_id), "", idx, shape];
+    trips[t.trip_id!] = [(t.trip_short_name ?? "").replace(agency.numberPrefix ?? "", ""), t.route_id!, tidyHeadsign(t.trip_headsign!), Number(t.direction_id), "", idx, shape];
   }
 
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
@@ -451,12 +468,13 @@ async function main() {
     shapes[idx]!.pts = simplify(pts, 8).flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
   }
 
-  const routes: Record<string, { name: string; color: string; short?: string }> = {};
+  const routes: Record<string, { name: string; color: string; short?: string; text?: string }> = {};
   for (const r of routeRows) {
     routes[r.route_id!] = {
       name: agency.style?.name ?? agency.routeNames?.[r.route_id!] ?? tidyName(r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
       ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
+      ...(agency.routeTextColor && r.route_text_color ? { text: `#${r.route_text_color}` } : {}),
     };
   }
 

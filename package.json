@@ -22,6 +22,7 @@
     "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
     "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",
     "data:mbta-subway": "tsx scripts/build-rail-gtfs.ts mbta-subway",
+    "data:wmata": "tsx scripts/build-rail-gtfs.ts wmata",
     "data:marc": "tsx scripts/build-rail-gtfs.ts marc",
     "data:vre": "tsx scripts/build-rail-gtfs.ts vre",
     "data:mbta-cr": "tsx scripts/build-rail-gtfs.ts mbta-cr",

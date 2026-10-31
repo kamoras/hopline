@@ -62,8 +62,17 @@ export const BOSTON: Region = {
   timeZone: "America/New_York",
 };
 
+export const WASHINGTON: Region = {
+  id: "washington",
+  name: "Washington",
+  bounds: [-77.55, 38.72, -76.78, 39.17],
+  center: [-77.03, 38.92],
+  zoom: 9.6,
+  timeZone: "America/New_York",
+};
+
 /** Add new regions here; providers declare which ids they can serve. */
-export const REGIONS: readonly Region[] = [NORTHEAST, NYC, BOSTON];
+export const REGIONS: readonly Region[] = [NORTHEAST, NYC, BOSTON, WASHINGTON];
 
 export function getRegion(id: string | null | undefined): Region | undefined {
   return REGIONS.find((r) => r.id === id);

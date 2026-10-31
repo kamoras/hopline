@@ -73,6 +73,12 @@ describe("buildLineStatus", () => {
     expect(line(s, "C").state).toBe("good");
   });
 
+  it("treats an end of 0 as open-ended (WMATA sends it as the string \"0\")", () => {
+    const open = { activePeriod: [{ start: sec(NOW - 60_000), end: "0" }] };
+    const s = build([alert("1", ["A"], Effect.SIGNIFICANT_DELAYS, "Delays", open as never)]);
+    expect(line(s, "A").state).toBe("delays");
+  });
+
   it("ignores alerts that name no line (station notices)", () => {
     const s = build([{ id: "x", alert: { effect: Effect.SIGNIFICANT_DELAYS, headerText: { translation: [{ text: "Delay at a station", language: "en" }] }, informedEntity: [{ stopId: "127" }] } }]);
     expect(s.every((x) => x.state === "good")).toBe(true);
