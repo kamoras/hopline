@@ -107,6 +107,14 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   stations, lines and track, `realtimeOnly` in the build script). It is its own region (`boston`), since a subway
   board cannot span two cities. Alert-to-line-status logic is shared with the NYC subway (`gtfs/line-status.ts`);
   each operator only says which public line a route rolls up into.
+- **Washington subway, the same board on a keyed feed.** `providers/wmata` reuses the Boston subway's machinery, now
+  shared as `providers/gtfs/subway.ts` (station grouping by name, trips from vehicle positions plus trip updates,
+  station arrivals): an operator supplies its bundled stations and lines, its feed URLs and its line badges. Metrorail
+  differs in three ways. The feeds (`api.wmata.com/gtfs/rail-gtfsrt-{tripupdates,vehiclepositions,alerts}.pb`) need a
+  key, sent as the `api_key` header from `WMATA_API_KEY` on the server only (never logged, never sent to the browser;
+  the static build reads it too, or takes `--zip`). Some vehicles report a position but no trip and are skipped. And
+  Yellow, Orange and Silver badges use dark text, so the build keeps each route's text color (`routeTextColor`) and
+  arrivals carry it. Region `washington` covers DC and its Maryland and Virginia suburbs out to Ashburn.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and

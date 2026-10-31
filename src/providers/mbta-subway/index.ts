@@ -1,8 +1,7 @@
-import type { Place } from "@/domain/place";
-import { placeSlug } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
 import { fetchGtfsRt } from "../gtfs/feed";
 import { summarizeLineStatus } from "../gtfs/line-status";
+import { subwayPlaces } from "../gtfs/subway";
 import type { FetchContext, TransitProvider } from "../types";
 import { buildMbtaSubwayArrivals, buildMbtaSubwayTrips } from "./normalize";
 import { loadMbtaSubwayStatic, MBTA_SUBWAY_ID } from "./static";
@@ -44,15 +43,7 @@ export const mbtaSubwayProvider: TransitProvider = {
   },
 
   async fetchPlaces({ region }) {
-    return (await loadMbtaSubwayStatic()).stations.map((s): Omit<Place, "id"> & { id: string } => ({
-      id: placeSlug(s.name),
-      name: s.name,
-      lat: s.lat,
-      lon: s.lon,
-      mode: "subway",
-      regionId: region.id,
-      codes: s.platforms,
-    }));
+    return subwayPlaces(await loadMbtaSubwayStatic(), region.id);
   },
 
   async fetchArrivals({ signal, now }, place) {

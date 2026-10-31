@@ -7,6 +7,7 @@ const NAMES: Record<string, string> = {
   vre: "VRE",
   "mbta-subway": "MBTA Subway",
   nyct: "NYC Subway",
+  wmata: "Washington Metro",
   "shoreline-east": "Shore Line East",
   "hartford-line": "Hartford Line",
 };

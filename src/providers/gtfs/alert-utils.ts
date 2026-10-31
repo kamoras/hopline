@@ -7,9 +7,9 @@ export function englishText(ts: rt.ITranslatedString | null | undefined): string
   return pick?.text?.trim() || undefined;
 }
 
-/** Whether an alert is in effect at `nowSec` (no active period means always). */
+/** Whether an alert is in effect at `nowSec` (no active period means always; a start or end of 0 is unset, which some feeds send as "0"). */
 export function isActive(alert: rt.IAlert, nowSec: number): boolean {
   const periods = alert.activePeriod ?? [];
   if (periods.length === 0) return true;
-  return periods.some((p) => (!p.start || Number(p.start) <= nowSec) && (!p.end || Number(p.end) >= nowSec));
+  return periods.some((p) => !(Number(p.start) > nowSec) && !(Number(p.end) > 0 && Number(p.end) < nowSec));
 }
