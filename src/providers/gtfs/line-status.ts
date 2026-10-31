@@ -2,6 +2,7 @@ import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import { LINE_STATE_RANK, type LineAlert, type LineState, type LineStatus } from "@/domain/line-status";
 import { englishText, isActive } from "./alert-utils";
 import type { FeedMessage } from "./feed";
+import type { SubwayStatic } from "./subway";
 
 const MAX_ALERTS_PER_LINE = 4;
 const PLANNED = /\b(planned|weekends?|late[- ]nights?|overnight|track work|maintenance|construction)\b/i;
@@ -52,7 +53,9 @@ export function summarizeLineStatus({ feed, now, order, lineOf, style }: LineSta
       const route = informed.routeId ? lineOf(informed.routeId) : undefined;
       if (!route) continue;
       const alerts = byLine.get(route) ?? new Map<string, LineAlert>();
-      alerts.set(headline, { headline, detail: detail && detail !== headline ? detail : undefined, state });
+      // "No service" at one stop (a closed stop or station) is not the route stopping.
+      const scoped = informed.stopId && state === "suspended" ? "change" : state;
+      alerts.set(headline, { headline, detail: detail && detail !== headline ? detail : undefined, state: scoped });
       byLine.set(route, alerts);
     }
   }
@@ -67,4 +70,16 @@ export function summarizeLineStatus({ feed, now, order, lineOf, style }: LineSta
     const state: LineState = alerts[0]?.state ?? "good";
     return [{ route, color: look.color, textColor: look.text, state, alerts }];
   });
+}
+
+/**
+ * What is wrong on a bus system's routes right now. A city has hundreds of routes, so only routes with an active alert
+ * are listed (worst first); an empty list means nothing to report. Routes the schedule doesn't know are ignored, which
+ * also drops other modes from feeds shared with them (the MBTA's alerts cover trains and ferries too).
+ */
+export function summarizeRouteAlerts(feed: FeedMessage, staticData: SubwayStatic, now: number): LineStatus[] {
+  const style = new Map(Object.values(staticData.lines).map((l) => [l.short, { color: l.color, text: l.text ?? "#FFFFFF" }]));
+  return summarizeLineStatus({ feed, now, order: [], lineOf: (routeId) => staticData.lines[routeId]?.short, style }).sort(
+    (a, b) => LINE_STATE_RANK[b.state] - LINE_STATE_RANK[a.state] || a.route.localeCompare(b.route, undefined, { numeric: true }),
+  );
 }

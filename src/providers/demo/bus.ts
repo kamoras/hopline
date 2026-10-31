@@ -1,4 +1,5 @@
 import type { Arrival } from "@/domain/arrival";
+import type { LineStatus } from "@/domain/line-status";
 import type { Trip } from "@/domain/trip";
 import { createPolyline, pointAlong, polylineLength, project } from "@/lib/polyline";
 import { finalizeTrip } from "../finalize";
@@ -58,6 +59,19 @@ export const demoBusProvider: TransitProvider = {
     return [...routes].slice(0, 4).flatMap((route, i) => {
       const info = Object.values(lines).find((l) => l.short === route)!;
       return [3 + i * 2, 12 + i * 3].map((min): Arrival => ({ tripId: `demo-${route}-${min}`, route, color: info.color, textColor: info.text ?? "#000000", headsign: info.name, at: now + min * 60_000, platform: place.id }));
+    });
+  },
+  /** Two made-up alerts on real routes, so the service-alert strip is exercised. */
+  async fetchLineStatus(): Promise<LineStatus[]> {
+    const { data } = await loadMbtaBusStatic();
+    const states = [
+      ["delays", "Delays on route"],
+      ["change", "Detour on route"],
+    ] as const;
+    return data.lines().slice(0, states.length).map((line, i): LineStatus => {
+      const [state, text] = states[i]!;
+      const route = line.route ?? line.name;
+      return { route, color: line.color, textColor: "#FFFFFF", state, alerts: [{ headline: `${text} ${route}`, state }] };
     });
   },
 };

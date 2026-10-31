@@ -99,6 +99,11 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `LineStatus` per line (`good | planned | change | delays | suspended`, `src/providers/nyct/alerts.ts`, unit
   tested). The board shows a strip of lines with problems, a line sheet with the alerts, and station arrivals
   carry a banner for troubled lines serving that station. Served by `/api/line-status`.
+  Buses use `summarizeRouteAlerts` (`gtfs/line-status.ts`): with hundreds of routes only those with an active alert
+  are listed (worst first), so the strip appears only when something is wrong and is hidden otherwise. The feeds say
+  how a bus is predicted to run but not how late it is (no schedule is bundled for buses), so alerts are the only
+  disruption signal buses have. "No service" scoped to a stop (a closed stop or station) shows as a service change,
+  not a suspended route.
 - **Railroads with a GTFS-Realtime feed share one builder.** `providers/gtfs/realtime.ts` turns a schedule plus a
   GTFS-RT feed into trips (matching by trip id, or by train number and service date for feeds like Metro-North's whose
   ids are opaque); a railroad supplies a `RealtimeConfig` and its feeds. Metro-North and MBTA Commuter Rail are
