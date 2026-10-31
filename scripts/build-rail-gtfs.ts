@@ -130,6 +130,17 @@ const AGENCIES: Record<string, Agency> = {
     routeTextColor: true,
     coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
   },
+  // Metrobus (Washington): needs the same WMATA key as Metrorail. Vehicles report their trip, so no join is needed.
+  "wmata-bus": {
+    url: process.env.WMATA_BUS_GTFS_URL ?? "https://api.wmata.com/gtfs/bus-gtfs-static.zip",
+    apiKeyEnv: "WMATA_API_KEY",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9,
+  },
   // SEPTA's buses and trolleys (Philadelphia): an outer zip holds google_bus.zip. Vehicles report a position but only
   // some a trip, so the live feeds are joined by vehicle id.
   "septa-bus": {

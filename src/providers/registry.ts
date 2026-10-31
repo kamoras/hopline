@@ -19,12 +19,13 @@ import { shorelineEastProvider } from "./shoreline-east";
 import type { TransitProvider } from "./types";
 import { vreProvider } from "./vre";
 import { wmataProvider } from "./wmata";
+import { wmataBusProvider } from "./wmata-bus";
 
 /** Every data source the app knows about. Add new providers here. */
 export const PROVIDERS: readonly TransitProvider[] =
   process.env.HOPLINE_DEMO === "1"
     ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
-    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, mbtaBusProvider, septaBusProvider, adsbProvider];
+    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, adsbProvider];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {
