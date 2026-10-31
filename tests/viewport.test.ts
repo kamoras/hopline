@@ -123,11 +123,15 @@ describe("big-network APIs (MBTA buses)", () => {
     expect(await (await getRoutesRoute(url("routes?mode=bus&region=boston&q=zzzzzz"))).json()).toEqual([]);
   });
 
-  it("serves each bus network from its own data (Metrobus, SEPTA)", async () => {
+  it("serves each bus network from its own data (NYC, Metrobus, SEPTA)", async () => {
     const dc = await (await getRoutesRoute(url("routes?mode=bus&region=washington&q=D10"))).json();
     expect(dc[0]).toMatchObject({ route: "D10" });
     const philly = await (await getRoutesRoute(url("routes?mode=bus&region=philadelphia&q=40"))).json();
     expect(philly[0]).toMatchObject({ route: "40" });
+    const nyc = await (await getRoutesRoute(url("routes?mode=bus&region=nyc&q=m57"))).json();
+    expect(nyc[0]).toMatchObject({ route: "M57" });
+    const times = await (await getPlacesRoute(url("places?mode=bus&region=nyc&near=40.758,-73.9855"))).json();
+    expect(times).toHaveLength(5);
     const stops = await (await getPlacesRoute(url("places?mode=bus&region=washington&near=38.8977,-77.0365"))).json();
     expect(stops).toHaveLength(5);
     expect(stops.every((p: { mode: string; regionId: string }) => p.mode === "bus" && p.regionId === "washington")).toBe(true);

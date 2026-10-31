@@ -143,7 +143,13 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   contrast (`readableTextColor`), since the colors differ by operator. `providers/wmata-bus` (Metrobus, region
   `washington`) is the third: the same provider again, using Metrorail's key and feed helpers
   (`providers/wmata/feeds.ts`); the key is read on the server only and the build script's `--zip` path takes the
-  downloaded static feed.
+  downloaded static feed. `providers/mta-bus` (NYC, region `nyc`, sharing it with the metro) is the fourth. Its live
+  feed needs a BusTime key, sent as a `key` query parameter and read from `MTA_BUSTIME_KEY` on the server only (the
+  feed fetcher names only the host in an error, so a failing request cannot leak it, and a missing key says so on
+  the status page instead of failing silently). Its static data comes as one feed per borough plus the MTA Bus
+  Company's, each listing every NYCT route but only its own trips, so `scripts/build-mta-bus.ts` builds each with the
+  shared build script (`--out`) and merges them by stop, route and shape. A full NYC snapshot is about 2,200 buses
+  (2 MB), which is exactly what viewport scoping keeps off the wire.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
