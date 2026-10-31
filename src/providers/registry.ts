@@ -4,10 +4,12 @@ import { getRegion } from "@/domain/region";
 import { adsbProvider } from "./adsb";
 import { amtrakProvider } from "./amtrak";
 import { demoProvider } from "./demo";
+import { demoBusProvider } from "./demo/bus";
 import { demoFlightsProvider } from "./demo/flights";
 import { demoSubwayProvider } from "./demo/subway";
 import { hartfordLineProvider } from "./hartford-line";
 import { marcProvider } from "./marc";
+import { mbtaBusProvider } from "./mbta-bus";
 import { mbtaCommuterRailProvider } from "./mbta-cr";
 import { mbtaSubwayProvider } from "./mbta-subway";
 import { mnrProvider } from "./mnr";
@@ -20,8 +22,8 @@ import { wmataProvider } from "./wmata";
 /** Every data source the app knows about. Add new providers here. */
 export const PROVIDERS: readonly TransitProvider[] =
   process.env.HOPLINE_DEMO === "1"
-    ? [demoProvider, demoSubwayProvider, demoFlightsProvider]
-    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, adsbProvider];
+    ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
+    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, mbtaBusProvider, adsbProvider];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {

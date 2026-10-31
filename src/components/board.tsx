@@ -19,22 +19,32 @@ import { useRememberBoard } from "@/hooks/use-last-board";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useNow } from "@/hooks/use-now";
 import { usePinned } from "@/hooks/use-pinned";
-import { useTrips } from "@/hooks/use-trips";
+import { usePlaceIndex } from "@/hooks/use-place-index";
+import { useRoutes } from "@/hooks/use-routes";
+import { useTrips, type TripScope } from "@/hooks/use-trips";
+import { formatBbox, snapBbox } from "@/lib/bbox";
+import type { RouteSummary } from "@/server/routes";
 import { formatAgo } from "@/lib/format";
 import type { LatLon } from "@/lib/geo";
 import { describeIntent, describeLeg, parseIntent, type Route } from "@/lib/query";
 import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
+import type { MapView } from "./map/trip-map";
 import { ModeTabs } from "./mode-tabs";
 import { Commutes } from "./commutes";
 import { ArrivalsSheet } from "./arrivals-sheet";
 import { LineStatusSheet } from "./line-status-sheet";
 import { LineStatusStrip } from "./line-status-strip";
 import { PlaceSheet } from "./place-sheet";
+import { RouteChip } from "./route-chip";
 import { SearchBox } from "./search-box";
 import { StationList } from "./station-list";
 import { TripCard } from "./trip-card";
 import { TripDetail } from "./trip-detail";
+
+/** A big network (buses) shows vehicles from this zoom in, and stops from this zoom in (below it, a chosen route shows). */
+const MIN_VEHICLE_ZOOM = 12;
+const MIN_STOP_ZOOM = 14;
 
 const TripMap = dynamic(() => import("./map/trip-map"), {
   ssr: false,
@@ -55,13 +65,23 @@ interface Props {
   initial: Snapshot;
 }
 
-export function Board({ mode, region, href, boards, places, initialFocus, initial }: Props) {
+export function Board({ mode, region, href, boards, places: placesProp, initialFocus, initial }: Props) {
   const vocab = MODES[mode];
   const stationsFirst = vocab.browse === "stations";
-  const status = useLineStatus(mode, region.id, stationsFirst);
+  const status = useLineStatus(mode, region.id, stationsFirst && !vocab.viewport);
   const [statusRoute, setStatusRoute] = useState<string>();
   const boardKey = href.slice(1);
-  const { snapshot, error, isValidating, refresh } = useTrips(mode, region.id, initial);
+  const viewportScoped = vocab.viewport;
+  const [mapView, setMapView] = useState<MapView>();
+  const [routeFilter, setRouteFilter] = useState<RouteSummary>();
+  const tripScope: TripScope | undefined = !viewportScoped
+    ? undefined
+    : routeFilter
+      ? { route: routeFilter.route }
+      : mapView && mapView.zoom >= MIN_VEHICLE_ZOOM
+        ? { bbox: formatBbox(snapBbox(mapView.bbox)) }
+        : null;
+  const { snapshot, error, isValidating, refresh } = useTrips(mode, region.id, initial, tripScope);
   const now = useNow(initial.generatedAt);
   const { pinned, toggle } = usePinned();
   const { commutes, isSaved, toggle: toggleCommute } = useCommutes(boardKey);
@@ -76,6 +96,14 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
   const [delayedOnly, setDelayedOnly] = useState(false);
 
   const deferredQuery = useDeferredValue(query);
+  const placeIndex = usePlaceIndex(mode, region.id, viewportScoped, {
+    bbox: mapView && mapView.zoom >= MIN_STOP_ZOOM ? formatBbox(snapBbox(mapView.bbox)) : undefined,
+    near: geo.state.status === "ready" ? geo.state.at : undefined,
+    q: deferredQuery.trim().length >= 2 ? deferredQuery.trim() : undefined,
+    id: focus.placeId,
+  });
+  const places = viewportScoped ? placeIndex : placesProp;
+  const routeMatches = useRoutes(mode, region.id, deferredQuery, viewportScoped);
   const filters: Filters = useMemo(() => ({ query: deferredQuery, operator, delayedOnly }), [deferredQuery, operator, delayedOnly]);
   const intent = useMemo(() => parseIntent(query), [query]);
   const understood = query ? describeIntent(intent) : undefined;
@@ -108,8 +136,9 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
 
   // Where the map is looking, so a mode tab can open the other mode for the same place.
   const viewCenter = useRef<LatLon | undefined>(undefined);
-  const setViewCenter = useCallback((c: LatLon) => {
-    viewCenter.current = c;
+  const onViewChange = useCallback((v: MapView) => {
+    viewCenter.current = v.center;
+    setMapView(v);
   }, []);
   const getViewCenter = useCallback(() => viewCenter.current, []);
   const togglePin = useCallback((t: Trip) => toggle(pinKey(t)), [toggle]);
@@ -124,7 +153,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
   }, []);
 
   const showMap = isDesktop || view === "map";
-  const lines = useLines(mode, region.id, showMap);
+  const lines = useLines(mode, region.id, showMap && (!viewportScoped || !!routeFilter), routeFilter?.route);
   const showList = isDesktop || view === "list";
 
   const card = (m: Match) => (
@@ -162,7 +191,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               title="Refresh"
             >
               <span className={`h-2 w-2 rounded-full ${error || down.length === snapshot.providers.length ? "bg-bad" : "bg-ok live-dot"}`} aria-hidden />
-              <span className="whitespace-nowrap">{error ? "Reconnecting…" : isValidating ? "Updating…" : formatAgo(snapshot.generatedAt, now)}</span>
+              <span className="whitespace-nowrap">{error ? "Reconnecting…" : isValidating ? "Updating…" : tripScope === null ? "Ready" : formatAgo(snapshot.generatedAt, now)}</span>
             </button>
             <div className="flex rounded-full border border-line bg-surface p-0.5 lg:hidden" role="tablist" aria-label="View">
               {(["list", "map"] as const).map((v) => (
@@ -270,6 +299,7 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               )}
             </div>
 
+            {routeFilter && <RouteChip route={routeFilter} noun={vocab.lineNoun} onClear={() => setRouteFilter(undefined)} className="mx-4 mb-3 lg:hidden" />}
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
               {stationsFirst && !query && (
                 <div className="mb-4">
@@ -277,7 +307,18 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
                 </div>
               )}
               {stationsFirst ? (
-                <StationList places={places} query={query} vocab={vocab} onPick={openPlace} />
+                <StationList
+                  places={places}
+                  query={query}
+                  vocab={vocab}
+                  routes={routeMatches}
+                  onPick={openPlace}
+                  onPickRoute={(r) => {
+                    setRouteFilter(r);
+                    setQuery("");
+                    setView("map");
+                  }}
+                />
               ) : (
                 <>
                 {!query && (
@@ -329,13 +370,21 @@ export function Board({ mode, region, href, boards, places, initialFocus, initia
               trips={mapTrips}
               places={places}
               lines={lines}
-              onViewChange={setViewCenter}
+              fitLinesKey={routeFilter?.route}
+              frameTrips={!viewportScoped}
+              onViewChange={onViewChange}
               showDelays={vocab.reportsDelay}
               selectedTripId={selected?.id}
               selectedPlaceId={selectedPlace?.id}
               onSelectTrip={openTripById}
               onSelectPlace={openPlace}
             />
+            {viewportScoped && !routeFilter && (!mapView || mapView.zoom < MIN_VEHICLE_ZOOM) && (
+              <p role="status" className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-full border border-line bg-surface px-4 py-2 text-center text-sm font-medium shadow-lg">
+                Zoom in to see {vocab.nounPlural}, or search a {vocab.lineNoun}
+              </p>
+            )}
+            {routeFilter && <RouteChip route={routeFilter} noun={vocab.lineNoun} onClear={() => setRouteFilter(undefined)} className="absolute top-3 left-1/2 -translate-x-1/2 shadow-lg" />}
           </section>
         )}
       </div>

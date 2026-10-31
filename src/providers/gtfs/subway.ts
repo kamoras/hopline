@@ -2,14 +2,16 @@ import { transit_realtime as rt } from "gtfs-realtime-bindings";
 import type { Arrival } from "@/domain/arrival";
 import type { Place } from "@/domain/place";
 import { placeSlug } from "@/domain/place";
+import type { Mode } from "@/domain/modes";
 import type { Diagnostics, Position, StopCall, Trip } from "@/domain/trip";
 import { finalizeTrip } from "../finalize";
 import type { FeedMessage } from "./feed";
 import type { GtfsStaticData, StaticRoute } from "./static";
 
 /**
- * Subway boards built from an operator's GTFS-Realtime trip updates and vehicle positions, shared by
- * the Boston and Washington subways. Each operator supplies only its bundled stations and lines.
+ * Station-first boards built from an operator's GTFS-Realtime trip updates and vehicle positions, shared by
+ * the Boston and Washington metros and the bus networks. Each operator supplies only its bundled stops and
+ * lines. (The names say "subway" for historical reasons: nothing here is specific to trains.)
  */
 
 /** A station as riders know it: one name, with a platform stop id per track or direction behind it. */
@@ -29,27 +31,33 @@ export interface LineInfo extends StaticRoute {
 }
 
 export interface SubwayStatic {
+  /** How places are identified: by station name (a metro station has a platform per track) or by stop (a bus stop is one pole). */
+  placeIds: "name" | "stop";
   data: GtfsStaticData;
   stations: Station[];
   lines: Record<string, LineInfo>;
   stationOfPlatform(platformId: string): Station | undefined;
 }
 
-/** Groups the schedule's per-track platforms into stations by name (the feed names each after its station). */
-export function createSubwayStatic(data: GtfsStaticData): SubwayStatic {
+/**
+ * Groups the schedule's per-track platforms into stations by name (the feed names each after its station).
+ * With `placeIds: "stop"` every stop stays its own place, because bus stops share names ("Main St").
+ */
+export function createSubwayStatic(data: GtfsStaticData, placeIds: SubwayStatic["placeIds"] = "name"): SubwayStatic {
   const byName = new Map<string, { name: string; lat: number[]; lon: number[]; platforms: string[] }>();
   for (const [id, s] of Object.entries(data.stops)) {
-    const group = byName.get(s.name) ?? { name: s.name, lat: [], lon: [], platforms: [] };
+    const key = placeIds === "name" ? s.name : id;
+    const group = byName.get(key) ?? { name: s.name, lat: [], lon: [], platforms: [] };
     group.lat.push(s.lat);
     group.lon.push(s.lon);
     group.platforms.push(id);
-    byName.set(s.name, group);
+    byName.set(key, group);
   }
   const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
   const stations = [...byName.values()].map((g): Station => ({ id: g.platforms[0]!, name: g.name, lat: mean(g.lat), lon: mean(g.lon), platforms: g.platforms }));
   const byPlatform = new Map(stations.flatMap((s) => s.platforms.map((p) => [p, s] as const)));
   const lines = Object.fromEntries(Object.entries(data.routes).map(([id, r]) => [id, { ...r, short: (r as Partial<LineInfo>).short ?? id }]));
-  return { data, stations, lines, stationOfPlatform: (id) => byPlatform.get(id) };
+  return { placeIds, data, stations, lines, stationOfPlatform: (id) => byPlatform.get(id) };
 }
 
 /** Stops sent per trip: the next few and the destination. Station arrivals are served separately. */
@@ -85,6 +93,8 @@ function upcomingStops(tu: rt.ITripUpdate | null | undefined, data: SubwayStatic
 export interface SubwayTripsInput {
   /** The operator id, which prefixes trip ids and is the trip's operator. */
   operatorId: string;
+  /** Defaults to the metro. */
+  mode?: Mode;
   staticData: SubwayStatic;
   tripUpdates: FeedMessage;
   vehicles: FeedMessage;
@@ -96,7 +106,7 @@ export interface SubwayTripsInput {
  * Subway trips from an operator's feeds. Unlike the NYC subway, every train reports a GPS position, so
  * the map shows where it is; trip updates add the stops it is heading for.
  */
-export function buildSubwayTrips({ operatorId, staticData, tripUpdates, vehicles, now, diag }: SubwayTripsInput): Trip[] {
+export function buildSubwayTrips({ operatorId, mode = "subway", staticData, tripUpdates, vehicles, now, diag }: SubwayTripsInput): Trip[] {
   const updates = new Map<string, rt.ITripUpdate>();
   for (const e of tripUpdates.entity) if (e.tripUpdate?.trip.tripId) updates.set(e.tripUpdate.trip.tripId, e.tripUpdate);
 
@@ -138,7 +148,7 @@ export function buildSubwayTrips({ operatorId, staticData, tripUpdates, vehicles
       finalizeTrip({
         id: `${operatorId}:${tripId}`,
         operatorId,
-        mode: "subway",
+        mode,
         number: line.short,
         routeName: line.name,
         routeColor: line.color,
@@ -155,8 +165,8 @@ export function buildSubwayTrips({ operatorId, staticData, tripUpdates, vehicles
 }
 
 /** Every station as a searchable place; its platform ids are the `codes` that arrivals are matched on. */
-export const subwayPlaces = ({ stations }: SubwayStatic, regionId: string): (Omit<Place, "id"> & { id: string })[] =>
-  stations.map((s) => ({ id: placeSlug(s.name), name: s.name, lat: s.lat, lon: s.lon, mode: "subway", regionId, codes: s.platforms }));
+export const subwayPlaces = ({ stations, placeIds }: SubwayStatic, regionId: string, mode: Mode = "subway"): (Omit<Place, "id"> & { id: string })[] =>
+  stations.map((s) => ({ id: placeIds === "name" ? placeSlug(s.name) : s.id, name: s.name, lat: s.lat, lon: s.lon, mode, regionId, codes: s.platforms }));
 
 /** Trains due at a station (any of its platforms): when each arrives and where it is going. */
 export function buildSubwayArrivals({

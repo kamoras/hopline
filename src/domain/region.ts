@@ -56,7 +56,7 @@ export const NYC: Region = {
 export const BOSTON: Region = {
   id: "boston",
   name: "Boston",
-  bounds: [-71.3, 42.17, -70.95, 42.47],
+  bounds: [-71.5, 42.12, -70.8, 42.65],
   center: [-71.08, 42.34],
   zoom: 10.8,
   timeZone: "America/New_York",

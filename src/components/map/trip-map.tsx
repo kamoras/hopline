@@ -51,8 +51,12 @@ interface Props {
   trips: readonly Trip[];
   places: readonly Place[];
   lines: readonly Line[];
-  /** Reports where the map is looking (after each pan or zoom), so other modes can open the same place. */
-  onViewChange?(center: LatLon): void;
+  /** Frame the trains on first data (default). A big network leaves the camera alone: the person chose where to look. */
+  frameTrips?: boolean;
+  /** When this changes, frame all the lines on screen (a route was just chosen). */
+  fitLinesKey?: string;
+  /** Reports where the map is looking (after each pan or zoom): other modes open the same place, big networks load that part. */
+  onViewChange?(view: MapView): void;
   /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
   showDelays?: boolean;
   selectedTripId?: string;
@@ -90,6 +94,14 @@ function motionPosition(m: Motion, now: number): Placed {
   const p = lerpLatLon(m.from, m.to, m.duration > 0 ? (now - m.start) / m.duration : 1);
   const moved = Math.hypot(m.to.lat - m.from.lat, m.to.lon - m.from.lon) > 1e-4; // ~10 m
   return { ...p, heading: moved ? bearing(m.from, m.to) : m.heading };
+}
+
+/** What part of the world the map is showing. */
+export interface MapView {
+  center: LatLon;
+  /** [west, south, east, north]. */
+  bbox: [number, number, number, number];
+  zoom: number;
 }
 
 const empty: FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -170,7 +182,7 @@ function mutedBasemap(map: MapLibreMap) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, onViewChange, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -364,7 +376,7 @@ export default function TripMap({ region, trips, places, lines, onViewChange, sh
     }
     motions.current = next;
 
-    if (!fitted.current && next.size > 0) {
+    if (!fitted.current && next.size > 0 && frameTrips) {
       // Frame the action once, on first data; after that the user is in control.
       fitted.current = true;
       const b = new LngLatBounds();
@@ -433,11 +445,23 @@ export default function TripMap({ region, trips, places, lines, onViewChange, sh
     };
     raf.current = requestAnimationFrame(loop);
     return stop;
-  }, [map, trips]);
+  }, [map, trips, frameTrips]);
+
+  const fitted_ = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!map || !fitLinesKey || lines.length === 0 || fitted_.current === fitLinesKey) return;
+    fitted_.current = fitLinesKey;
+    const b = new LngLatBounds();
+    for (const l of lines) for (const c of l.coords) b.extend(c);
+    map.fitBounds(b, { padding: 64, maxZoom: 14, duration: 600 });
+  }, [map, lines, fitLinesKey]);
 
   useEffect(() => {
     if (!map || !onViewChange) return;
-    const report = () => onViewChange({ lat: map.getCenter().lat, lon: map.getCenter().lng });
+    const report = () => {
+      const b = map.getBounds();
+      onViewChange({ center: { lat: map.getCenter().lat, lon: map.getCenter().lng }, bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: map.getZoom() });
+    };
     report();
     map.on("moveend", report);
     return () => {

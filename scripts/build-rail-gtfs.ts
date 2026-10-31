@@ -52,6 +52,13 @@ interface Agency {
   apiKeyEnv?: string;
   /** Keep each route's text color (`text` in routes.json), for lines whose badge is not white on its color. */
   routeTextColor?: boolean;
+  /** Use the feed's own route_short_name as the badge ("1", "SL1"), for bus networks with hundreds of routes. */
+  shortFromFeed?: boolean;
+  /**
+   * Only collect which stops are served, without building each trip's stop list (large bus networks: millions of
+   * stop times). Only for `realtimeOnly` agencies, which keep no schedule.
+   */
+  scanStops?: boolean;
   /** Keep stations, routes and track but not the schedule, for operators whose trips come entirely from live feeds. */
   realtimeOnly?: boolean;
   /** Keep only track geometry (no trips or stations), for operators whose trips come from a live feed. */
@@ -110,6 +117,16 @@ const AGENCIES: Record<string, Agency> = {
     platformStops: true,
     coarseGapM: 5_000,
     stationNames: { "Union Station": "Washington Union", "L Enfant": "L'Enfant" },
+  },
+  // The T's buses: every trip is live (GPS), so only stops, routes and track are kept.
+  "mbta-bus": {
+    url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
   },
   // The T's subway: every trip is live (GPS), so only stations, lines and track are kept.
   "mbta-subway": {
@@ -395,8 +412,23 @@ async function main() {
     trips[t.trip_id!] = [(t.trip_short_name ?? "").replace(agency.numberPrefix ?? "", ""), t.route_id!, tidyHeadsign(t.trip_headsign!), Number(t.direction_id), "", idx, shape];
   }
 
+  const scanned = new Set<string>(); // stops served, for `scanStops` agencies
+  if (agency.scanStops) {
+    const keep = new Set(Object.keys(trips));
+    const text = zip.getEntry("stop_times.txt")!.getData().toString("utf8");
+    const header = text.slice(0, text.indexOf("\n")).split(",");
+    const stopCol = header.indexOf("stop_id");
+    for (let at = text.indexOf("\n") + 1; at > 0 && at < text.length; ) {
+      const end = text.indexOf("\n", at);
+      const line = text.slice(at, end < 0 ? text.length : end);
+      // trip ids and stop ids contain no commas in the feeds this is used for
+      const cols = line.split(",");
+      if (keep.has(cols[0]!)) scanned.add(cols[stopCol]!);
+      at = end < 0 ? text.length : end + 1;
+    }
+  }
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
-  for (const st of readFiltered("stop_times.txt", new Set(Object.keys(trips)))) {
+  for (const st of agency.scanStops ? [] : readFiltered("stop_times.txt", new Set(Object.keys(trips)))) {
     if (!trips[st.trip_id!]) continue;
     const list = byTrip.get(st.trip_id!) ?? [];
     list.push({
@@ -415,10 +447,10 @@ async function main() {
       .map((s) => `${s.stop}@${s.arr}${s.dep !== s.arr ? `-${s.dep}` : ""}${s.track ? `#${s.track}` : ""}`)
       .join(";");
   }
-  for (const id of Object.keys(trips)) if (!trips[id]![4]) delete trips[id];
+  if (!agency.scanStops) for (const id of Object.keys(trips)) if (!trips[id]![4]) delete trips[id];
 
   const stops: Record<string, [string, number, number]> = {};
-  const served = new Set([...byTrip.values()].flatMap((list) => list.map((s) => s.stop)));
+  const served = agency.scanStops ? scanned : new Set([...byTrip.values()].flatMap((list) => list.map((s) => s.stop)));
   for (const s of stopRows) {
     if (filtered && !served.has(s.stop_id!)) continue;
     const parent = agency.platformStops ? stopById.get(s.parent_station ?? "") : undefined;
@@ -474,6 +506,7 @@ async function main() {
       name: agency.style?.name ?? agency.routeNames?.[r.route_id!] ?? tidyName(r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
       ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
+      ...(agency.shortFromFeed ? { short: r.route_short_name || (r.route_long_name ?? "").split(/[ -]/)[0] || r.route_id! } : {}),
       ...(agency.routeTextColor && r.route_text_color ? { text: `#${r.route_text_color}` } : {}),
     };
   }
