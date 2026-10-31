@@ -50,6 +50,8 @@ interface Agency {
   routeColors?: Record<string, string>;
   /** Regex rewrites applied to every station name before tidying ("ROCKVILLE MARC eb" -> "ROCKVILLE"). */
   stationClean?: [RegExp, string][];
+  /** Stops whose name matches are not stops riders use (a yard or employee platform): left out of every trip. */
+  dropStops?: RegExp;
   /** Short public names by route id (a line badge: "RL"), kept in routes.json. */
   routeShort?: Record<string, string>;
   /** Environment variable holding the key the download needs, sent as `api_key` (WMATA). Never logged. */
@@ -173,6 +175,20 @@ const AGENCIES: Record<string, Agency> = {
     scanStops: true,
     routeTextColor: true,
     coarseGapM: 1e9,
+  },
+  // SEPTA's Metro (Philadelphia): the Market-Frankford Line (L), Broad Street Line (B, with its express and local
+  // patterns) and the Norristown High Speed Line (M), from the bus zip. SEPTA publishes almost no live positions for
+  // them, so the timetable is kept and trains are placed by it.
+  "septa-metro": {
+    url: process.env.SEPTA_GTFS_URL ?? "https://github.com/septadev/GTFS/releases/latest/download/gtfs_public.zip",
+    innerZip: "google_bus.zip",
+    routeTypes: ["1"],
+    routeTextColor: true,
+    routeShort: { L1: "L", B1: "B", B2: "B", B3: "B", M1: "M" },
+    // One station has a platform per pattern ("Olney Transit Center - B1"); two entries are not stations at all.
+    stationClean: [[/ - B\d( & B\d)?$/, ""]],
+    dropStops: /^(Employee Platform|End of WB trip)/,
+    coarseGapM: 5_000,
   },
   // SEPTA's buses and trolleys (Philadelphia): an outer zip holds google_bus.zip. Vehicles report a position but only
   // some a trip, so the live feeds are joined by vehicle id.
@@ -488,6 +504,7 @@ async function main() {
   }
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
   for (const st of agency.scanStops ? [] : readFiltered("stop_times.txt", new Set(Object.keys(trips)))) {
+    if (agency.dropStops?.test(stopById.get(st.stop_id!)?.stop_name ?? "")) continue;
     if (!trips[st.trip_id!]) continue;
     const list = byTrip.get(st.trip_id!) ?? [];
     list.push({

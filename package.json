@@ -28,6 +28,7 @@
     "data:mta-bus": "tsx scripts/build-mta-bus.ts",
     "data:wmata-bus": "tsx scripts/build-rail-gtfs.ts wmata-bus",
     "data:septa-rail": "tsx scripts/build-rail-gtfs.ts septa-rail",
+    "data:septa-metro": "tsx scripts/build-rail-gtfs.ts septa-metro",
     "data:septa-bus": "tsx scripts/build-rail-gtfs.ts septa-bus",
     "data:mbta-bus": "tsx scripts/build-rail-gtfs.ts mbta-bus",
     "data:mbta-cr": "tsx scripts/build-rail-gtfs.ts mbta-cr",

@@ -114,6 +114,11 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   over SEPTA's separate rail feeds (the rail schedule is `google_rail.zip` inside SEPTA's zip, and the build gives
   its thirteen identically colored lines distinct colors, `routeColors`). Its trip updates give a delay by stop
   sequence only, so the builder reads that delay at the stop the vehicle reports.
+  SEPTA Metro (Market-Frankford, Broad Street, Norristown) is the one metro with no live positions: SEPTA publishes
+  almost none for those lines. It is a station-first board over the bundled timetable (`septa-metro`): trains are
+  placed by the schedule (`buildScheduledTrips` with `mode: "subway"`, status "unknown", positions marked
+  "estimated"), a station lists its next scheduled trains (`buildScheduledArrivals`), and service alerts are live. If
+  SEPTA starts publishing positions, swap `fetchTrips` for the shared `buildSubwayTrips`.
 - **Boston subway, a second station-first board.** `providers/mbta-subway` is the NYC subway's counterpart with one
   difference that matters: every MBTA train reports a GPS position, so the map shows where trains are, not an
   estimate. Trip updates add each train's next stops and the station arrivals; the schedule is not bundled (only
