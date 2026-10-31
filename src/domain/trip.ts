@@ -77,6 +77,8 @@ export interface Trip {
    * between data refreshes instead of jumping. Absent when the source gives only a point (GPS).
    */
   motion?: MotionLeg[];
+  /** Where it is headed when that is off the map (a flight bound for Orlando), so the map can point toward it. */
+  destinationAt?: { lat: number; lon: number };
   stops: StopCall[];
   /** Delay at the most recent/next stop, in minutes. */
   delayMinutes?: number;

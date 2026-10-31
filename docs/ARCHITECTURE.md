@@ -253,7 +253,13 @@ board. The boards are still listed below the map, so nothing depends on the canv
   reduced-motion turns them off).
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
   (`lib/trail.ts`, about two minutes, never sent anywhere), and where it is headed, a dashed line to its airport
-  when known. The chosen plane's lines are brighter. Planes are drawn 1.5x larger with a soft halo so they stay
+  when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
+  flight's route is looked up by callsign in adsb.lol's public route files (`providers/adsb/routes.ts`: keyless,
+  kept six hours, a callsign with no route remembered as such, a few dozen new lookups per refresh so a busy sky
+  fills in over a few refreshes). The end its track points at is the destination (`Trip.destinationAt`, so the map
+  can point toward an airport off the board, like Orlando); the heading line is cut off 120 miles out, a direction
+  to look rather than a path across the country. On the living model trains, metros and buses leave a short wake in their own color (about 36 s,
+  from zoom 9, rebuilt once per step rather than every frame, never for vehicles inside a counted stack). Planes are drawn 1.5x larger with a soft halo so they stay
   findable on any basemap.
 - **Dark mode is a real dark basemap** (OpenFreeMap `dark`), not an inverted light one, so our own colors (white
   plane bodies, station rings, trails) keep their meaning. `BaseMap` picks the style from the device's appearance;

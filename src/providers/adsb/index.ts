@@ -3,6 +3,7 @@ import type { Trip } from "@/domain/trip";
 import type { FetchContext, TransitProvider } from "../types";
 import { NORTHEAST_AIRPORTS } from "./airports";
 import { buildAirportStatus, FAA_STATUS_URL } from "./faa";
+import { warmRoutes } from "./routes";
 import { ADSB_ID, buildFlightArrivals, buildFlights, type Aircraft } from "./normalize";
 
 /** Live aircraft near a point, from adsb.lol's community ADS-B network (no key; asks for fair use). */
@@ -35,8 +36,8 @@ function fetchAircraft(signal: AbortSignal, now: number): Promise<Aircraft[]> {
 
 /**
  * Flights over the airports of the Northeast: real positions from ADS-B, airport delays and ground stops from
- * the FAA. There is no schedule feed here, so no lateness is claimed; the destination of a flight is only
- * known when it is descending into one of the airports.
+ * the FAA. There is no schedule feed here, so no lateness is claimed; its destination comes from a
+ * route lookup by callsign (see routes.ts), or from the airport it is descending into.
  */
 export const adsbProvider: TransitProvider = {
   id: ADSB_ID,
@@ -50,7 +51,9 @@ export const adsbProvider: TransitProvider = {
   regionIds: REGION_IDS,
 
   async fetchTrips({ region, signal, now, diag }: FetchContext): Promise<Trip[]> {
-    return buildFlights({ aircraft: await fetchAircraft(signal, now), airports: NORTHEAST_AIRPORTS, region, now, diag });
+    const aircraft = await fetchAircraft(signal, now);
+    await warmRoutes(aircraft.map((ac) => (ac.flight ?? "").trim()).filter((c) => /^[A-Z]{3}\d{1,4}[A-Z]{0,2}$/.test(c)), now);
+    return buildFlights({ aircraft, airports: NORTHEAST_AIRPORTS, region, now, diag });
   },
 
   async fetchPlaces({ region }) {

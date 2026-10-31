@@ -7,6 +7,7 @@ import type { MotionLeg } from "@/lib/motion";
 import { finalizeTrip } from "../finalize";
 import type { Airport } from "./airports";
 import { carrierOf } from "./carriers";
+import { cachedRoute, routeEnds } from "./routes";
 
 export const ADSB_ID = "adsb";
 
@@ -142,6 +143,11 @@ export function buildFlights(input: FlightsInput): Trip[] {
         : [];
     const { name } = carrierOf(callsign);
     bump(diag, phase.kind);
+    // Where it is really going, from its route (an airport outside this board's map, like Orlando).
+    const known = cachedRoute(callsign, now);
+    const ends = known ? routeEnds(known, at, ac.track) : undefined;
+    const place = (a: { city: string; iata: string }) => `${a.city} (${a.iata})`;
+    if (ends) bump(diag, "withRoute");
     return finalizeTrip({
       id: `${ADSB_ID}:${ac.hex}`,
       operatorId: ADSB_ID,
@@ -149,8 +155,9 @@ export function buildFlights(input: FlightsInput): Trip[] {
       number: callsign,
       routeName: `${name}${ac.t ? ` ${ac.t}` : ""}`,
       routeColor: "#3b5b92",
-      origin: phase.kind === "departing" ? phase.airport.name : "",
-      destination: phase.kind === "arriving" ? phase.airport.name : "",
+      origin: phase.kind === "departing" ? phase.airport.name : ends ? place(ends.from) : "",
+      destination: phase.kind === "arriving" ? phase.airport.name : ends ? place(ends.to) : "",
+      destinationAt: phase.kind !== "arriving" && ends ? { lat: ends.to.lat, lon: ends.to.lon } : undefined,
       state: "enroute",
       position: {
         lat: now2.lat,
