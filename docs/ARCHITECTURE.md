@@ -136,7 +136,11 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   has millions of stop times that are never needed). The board is stop-first plus route search: find a stop (by
   name, near you, or on the map once zoomed in) for the next buses by route, or search a route number to follow it
   (its track and every bus on it, at any zoom). Zoomed out, the map shows a prompt instead of buses; buses appear
-  from zoom 12 and stops from zoom 14. Boston buses share the `boston` region with the T.
+  from zoom 12 and stops from zoom 14. Boston buses share the `boston` region with the T. `providers/septa-bus`
+  (region `philadelphia`) is the same provider with another feed: SEPTA's vehicles often report a position but no
+  trip, so the shared builder joins them to the trip update that names the same vehicle id. Its static feed is a zip of
+  zips, so the build script reads `google_bus.zip` inside it (`innerZip`). Route badges choose black or white text by
+  contrast (`readableTextColor`), since the colors differ by operator.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and

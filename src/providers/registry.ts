@@ -14,6 +14,7 @@ import { mbtaCommuterRailProvider } from "./mbta-cr";
 import { mbtaSubwayProvider } from "./mbta-subway";
 import { mnrProvider } from "./mnr";
 import { nyctProvider } from "./nyct";
+import { septaBusProvider } from "./septa-bus";
 import { shorelineEastProvider } from "./shoreline-east";
 import type { TransitProvider } from "./types";
 import { vreProvider } from "./vre";
@@ -23,7 +24,7 @@ import { wmataProvider } from "./wmata";
 export const PROVIDERS: readonly TransitProvider[] =
   process.env.HOPLINE_DEMO === "1"
     ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
-    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, mbtaBusProvider, adsbProvider];
+    : [mnrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, mbtaBusProvider, septaBusProvider, adsbProvider];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {

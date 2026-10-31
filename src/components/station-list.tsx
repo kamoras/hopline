@@ -1,6 +1,7 @@
 import { normalizeName, type Place } from "@/domain/place";
 import type { ModeInfo } from "@/domain/modes";
 import type { RouteSummary } from "@/server/routes";
+import { readableTextColor } from "@/lib/color";
 import { LineBadge } from "./line-badge";
 
 const MAX_RESULTS = 40;
@@ -57,7 +58,7 @@ export function StationList({
             {routes.map((r) => (
               <li key={r.route}>
                 <button type="button" onClick={() => onPickRoute(r)} className="press flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-surface-2">
-                  <LineBadge route={r.route} color={r.color} textColor="#000000" size={28} label={`${vocab.lineNoun} ${r.route}`} />
+                  <LineBadge route={r.route} color={r.color} textColor={readableTextColor(r.color)} size={28} label={`${vocab.lineNoun} ${r.route}`} />
                   <span className="min-w-0 flex-1 truncate font-medium">{r.name}</span>
                   <span className="flex items-center gap-1 text-xs text-muted">
                     Map <span aria-hidden>→</span>
