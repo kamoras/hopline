@@ -3,7 +3,7 @@ import { NYC } from "@/domain/region";
 import { project } from "@/lib/polyline";
 import { buildLineStatus } from "../nyct/alerts";
 import { buildNyctArrivals, buildNyctTrips } from "../nyct/normalize";
-import { loadNyctStatic } from "../nyct/static";
+import { loadNyctStatic, type NyctStatic } from "../nyct/static";
 import type { TransitProvider } from "../types";
 import { nyctProvider } from "../nyct";
 
@@ -15,8 +15,7 @@ const SPEED = 11; // m/s
 const DWELL_MS = 25_000;
 const TRAINS_PER_DIRECTION = 4;
 
-function syntheticFeed(now: number): rt.FeedMessage {
-  const data = loadNyctStatic();
+function syntheticFeed(data: NyctStatic, now: number): rt.FeedMessage {
   const entities: rt.IFeedEntity[] = [];
   for (const routeId of Object.keys(data.routes)) {
     for (const dir of ["N", "S"] as const) {
@@ -83,12 +82,14 @@ export const demoSubwayProvider: TransitProvider = {
   ...nyctProvider,
   id: "nyct",
   async fetchTrips({ now, region, diag }) {
-    return buildNyctTrips({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], region: region ?? NYC, now, diag });
+    const staticData = await loadNyctStatic();
+    return buildNyctTrips({ staticData, feeds: [syntheticFeed(staticData, now)], region: region ?? NYC, now, diag });
   },
   async fetchLineStatus({ now }) {
-    return buildLineStatus({ staticData: loadNyctStatic(), feed: syntheticAlerts(now), now });
+    return buildLineStatus({ staticData: await loadNyctStatic(), feed: syntheticAlerts(now), now });
   },
   async fetchArrivals({ now }, place) {
-    return buildNyctArrivals({ staticData: loadNyctStatic(), feeds: [syntheticFeed(now)], platforms: place.codes ?? [], now });
+    const staticData = await loadNyctStatic();
+    return buildNyctArrivals({ staticData, feeds: [syntheticFeed(staticData, now)], platforms: place.codes ?? [], now });
   },
 };

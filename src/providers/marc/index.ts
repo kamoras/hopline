@@ -1,19 +1,9 @@
 import { createRealtimeRailProvider } from "../gtfs/rail-provider";
-import { createStaticData, type GtfsStaticData, type RawTrips } from "../gtfs/static";
-import routes from "../../../data/marc/routes.json";
-import services from "../../../data/marc/services.json";
-import shapes from "../../../data/marc/shapes.json";
-import stops from "../../../data/marc/stops.json";
-import trips from "../../../data/marc/trips.json";
+import { lazyStaticData } from "../gtfs/dataset";
 
 export const MARC_ID = "marc";
 
-let loaded: GtfsStaticData | undefined;
-const staticData = () =>
-  (loaded ??= createStaticData(
-    { stops: stops as unknown as Record<string, [string, number, number]>, routes, trips: trips as unknown as RawTrips, services, shapes },
-    { id: MARC_ID, name: "MARC Train" },
-  ));
+const staticData = lazyStaticData("marc", { id: MARC_ID, name: "MARC Train" });
 
 /** MARC Train via its GTFS-Realtime feeds plus the bundled schedule. */
 export const marcProvider = createRealtimeRailProvider({

@@ -36,10 +36,13 @@ export function buildScheduledTrips({ id, name, staticData, region, now, diag }:
     for (const { id: scheduleId, trip } of staticData.tripsOn(date)) {
       considered++;
       if (trip.stopTimes.length === 0) continue;
+      // Decide from the timetable's first and last times, so only the few trips in the window are built out.
+      const departs = dayStart + trip.stopTimes[0]!.departureMin * MIN;
+      const arrives = dayStart + trip.stopTimes.at(-1)!.arrivalMin * MIN;
+      if (departs - now > LOOKAHEAD_MS || now - arrives > LINGER_MS) continue;
       const stops = buildStops(trip, staticData.stops, dayStart, new Map(), now);
       const first = stops[0]!;
       const last = stops.at(-1)!;
-      if (first.departure! - now > LOOKAHEAD_MS || now - last.arrival! > LINGER_MS) continue;
 
       const position = estimatePosition(stops, staticData.stops, now, trip.shape);
       if (position && !inBounds(region, position.lat, position.lon)) continue;
@@ -72,13 +75,13 @@ export function buildScheduledTrips({ id, name, staticData, region, now, diag }:
 }
 
 /** The map lines and stations every GTFS-backed rail provider serves from its bundled schedule. */
-export function staticLinesAndPlaces(staticData: () => GtfsStaticData): Pick<TransitProvider, "fetchLines" | "fetchPlaces"> {
+export function staticLinesAndPlaces(staticData: () => Promise<GtfsStaticData>): Pick<TransitProvider, "fetchLines" | "fetchPlaces"> {
   return {
     async fetchLines() {
-      return staticData().lines();
+      return (await staticData()).lines();
     },
     async fetchPlaces({ region }) {
-      return Object.values(staticData().stops)
+      return Object.values((await staticData()).stops)
         .filter((s) => inBounds(region, s.lat, s.lon))
         .map((s) => ({ name: s.name, lat: s.lat, lon: s.lon, mode: "rail" as const, regionId: region.id }));
     },
@@ -90,7 +93,7 @@ export interface ScheduledProviderConfig {
   name: string;
   attribution: Attribution;
   regionIds: readonly string[];
-  staticData(): GtfsStaticData;
+  staticData(): Promise<GtfsStaticData>;
 }
 
 /** A provider that serves the bundled timetable only. Add real-time later by swapping `fetchTrips`. */
@@ -102,7 +105,7 @@ export function createScheduledProvider({ id, name, attribution, regionIds, stat
     mode: "rail",
     regionIds,
     async fetchTrips({ region, now, diag }) {
-      return buildScheduledTrips({ id, name, staticData: staticData(), region, now, diag });
+      return buildScheduledTrips({ id, name, staticData: await staticData(), region, now, diag });
     },
     ...staticLinesAndPlaces(staticData),
   };

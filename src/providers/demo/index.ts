@@ -17,15 +17,15 @@ import type { FetchContext, TransitProvider } from "../types";
  */
 const MIN = 60_000;
 
-function syntheticMnr(now: number): Trip[] {
-  const staticData = loadStaticData();
+async function syntheticMnr(now: number): Promise<Trip[]> {
+  const staticData = await loadStaticData();
   const date = dateInZone(now, MNR_TIMEZONE);
   const start = serviceDayStart(date, MNR_TIMEZONE);
   const entities: rt.IFeedEntity[] = [];
   const seen = new Set<string>(); // schedules overlap across service days; one trip per trip number
   let n = 0;
 
-  for (const id of tripIds()) {
+  for (const id of staticData.tripIds()) {
     const trip = staticData.trip(id);
     if (!trip || seen.has(trip.number)) continue;
     const first = start + trip.stopTimes[0]!.departureMin * MIN;
@@ -58,7 +58,6 @@ function syntheticMnr(now: number): Trip[] {
   });
 }
 
-const tripIds = () => loadStaticData().tripIds();
 
 function syntheticAmtrak(now: number, region: FetchContext["region"]): Trip[] {
   const iso = (offsetMin: number) => new Date(now + offsetMin * MIN).toISOString();
@@ -95,7 +94,7 @@ export const demoProvider: TransitProvider = {
   mode: "rail",
   regionIds: ["northeast"],
   async fetchTrips({ now, region }) {
-    return [...syntheticMnr(now), ...syntheticAmtrak(now, region)];
+    return [...(await syntheticMnr(now)), ...syntheticAmtrak(now, region)];
   },
   fetchPlaces: (ctx) => mnrProvider.fetchPlaces(ctx),
   fetchLines: (ctx) => mnrProvider.fetchLines!(ctx),

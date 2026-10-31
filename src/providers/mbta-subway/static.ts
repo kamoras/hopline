@@ -1,10 +1,5 @@
-import type { StaticRoute } from "../gtfs/static";
-import { createStaticData, type GtfsStaticData, type RawTrips } from "../gtfs/static";
-import routes from "../../../data/mbta-subway/routes.json";
-import services from "../../../data/mbta-subway/services.json";
-import shapes from "../../../data/mbta-subway/shapes.json";
-import stops from "../../../data/mbta-subway/stops.json";
-import trips from "../../../data/mbta-subway/trips.json";
+import { lazy, lazyStaticData } from "../gtfs/dataset";
+import type { GtfsStaticData, StaticRoute } from "../gtfs/static";
 
 export const MBTA_SUBWAY_ID = "mbta-subway";
 
@@ -46,14 +41,7 @@ export function createMbtaSubwayStatic(data: GtfsStaticData): MbtaSubwayStatic {
   return { data, stations, lines, stationOfPlatform: (id) => byPlatform.get(id) };
 }
 
-let loaded: MbtaSubwayStatic | undefined;
+const subwayData = lazyStaticData(MBTA_SUBWAY_ID, { id: MBTA_SUBWAY_ID, name: "MBTA Subway" });
 
-export function loadMbtaSubwayStatic(): MbtaSubwayStatic {
-  loaded ??= createMbtaSubwayStatic(
-    createStaticData(
-      { stops: stops as unknown as Record<string, [string, number, number]>, routes, trips: trips as unknown as RawTrips, services, shapes },
-      { id: MBTA_SUBWAY_ID, name: "MBTA Subway" },
-    ),
-  );
-  return loaded;
-}
+/** The T's stations, lines and track, loaded on first use. */
+export const loadMbtaSubwayStatic = lazy(async () => createMbtaSubwayStatic(await subwayData()));

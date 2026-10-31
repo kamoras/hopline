@@ -1,19 +1,9 @@
 import { createRealtimeRailProvider } from "../gtfs/rail-provider";
-import { createStaticData, type GtfsStaticData, type RawTrips } from "../gtfs/static";
-import routes from "../../../data/vre/routes.json";
-import services from "../../../data/vre/services.json";
-import shapes from "../../../data/vre/shapes.json";
-import stops from "../../../data/vre/stops.json";
-import trips from "../../../data/vre/trips.json";
+import { lazyStaticData } from "../gtfs/dataset";
 
 export const VRE_ID = "vre";
 
-let loaded: GtfsStaticData | undefined;
-const staticData = () =>
-  (loaded ??= createStaticData(
-    { stops: stops as unknown as Record<string, [string, number, number]>, routes, trips: trips as unknown as RawTrips, services, shapes },
-    { id: VRE_ID, name: "VRE" },
-  ));
+const staticData = lazyStaticData("vre", { id: VRE_ID, name: "VRE" });
 
 /** VRE via its GTFS-Realtime feeds plus the bundled schedule. */
 export const vreProvider = createRealtimeRailProvider({

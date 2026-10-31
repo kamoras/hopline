@@ -55,13 +55,13 @@ async function runProvider(
 export async function getSnapshot(board: Board, now = Date.now()): Promise<Snapshot> {
   const [results, track] = await Promise.all([
     Promise.all(providersFor(board).map((p) => runProvider(p, board, now))),
-    getTrack(board).catch(() => []), // no track data just means nothing to snap to
+    getTrack(board).catch(() => undefined), // no track data just means nothing to snap to
   ]);
   return {
     mode: board.mode,
     regionId: board.region.id,
     generatedAt: now,
-    trips: snapToTrack(results.flatMap((r) => r.trips), track),
+    trips: track ? snapToTrack(results.flatMap((r) => r.trips), track) : results.flatMap((r) => r.trips),
     providers: results.map((r) => r.status),
   };
 }

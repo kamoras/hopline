@@ -12,7 +12,10 @@
 
 ## Adding a provider (operator, mode or region)
 
-See "Extending Hopline" in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See "Extending Hopline" in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Keep it scalable: load bundled data
+lazily (`lazyStaticData`), never loop over a whole network per request (use `TrackIndex` and grids), and when you
+replace a simple algorithm with a faster one, keep a test that checks it against the simple one. The rules are
+under "Scaling" in the same document.
 
 ## Automated PRs
 

@@ -22,11 +22,11 @@ export const nyctProvider: TransitProvider = {
   async fetchTrips({ region, signal, now, diag }: FetchContext): Promise<Trip[]> {
     const { feeds, failed } = await fetchSubwayFeeds(signal, now);
     if (failed.length) diag.failedFeeds = failed.join("; ");
-    return buildNyctTrips({ staticData: loadNyctStatic(), feeds, region, now, diag });
+    return buildNyctTrips({ staticData: await loadNyctStatic(), feeds, region, now, diag });
   },
 
   async fetchPlaces({ region }) {
-    const stations = loadNyctStatic().stations;
+    const stations = (await loadNyctStatic()).stations;
     // Station names repeat across the city ("86 St", "Canal St"), so ids add the station id when needed.
     const counts = new Map<string, number>();
     for (const s of stations) counts.set(placeSlug(s.name), (counts.get(placeSlug(s.name)) ?? 0) + 1);
@@ -38,14 +38,14 @@ export const nyctProvider: TransitProvider = {
 
   async fetchArrivals({ signal, now }, place) {
     const { feeds } = await fetchSubwayFeeds(signal, now);
-    return buildNyctArrivals({ staticData: loadNyctStatic(), feeds, platforms: place.codes ?? [], now });
+    return buildNyctArrivals({ staticData: await loadNyctStatic(), feeds, platforms: place.codes ?? [], now });
   },
 
   async fetchLineStatus({ signal, now }) {
-    return buildLineStatus({ staticData: loadNyctStatic(), feed: await fetchSubwayAlerts(signal, now), now });
+    return buildLineStatus({ staticData: await loadNyctStatic(), feed: await fetchSubwayAlerts(signal, now), now });
   },
 
   async fetchLines() {
-    return loadNyctStatic().lines();
+    return (await loadNyctStatic()).lines();
   },
 };

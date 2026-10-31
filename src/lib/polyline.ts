@@ -31,20 +31,25 @@ export function createPolyline(flat: readonly number[]): Polyline {
 
 export const polylineLength = (line: Polyline) => line.cum.at(-1) ?? 0;
 
+/** The closest point to `p` on segment `i` (from point i-1 to i): meters along the line, and meters off it. */
+export function projectSegment(line: Polyline, i: number, p: LatLon): { along: number; offMeters: number } {
+  const a = line.pts[i - 1]!;
+  const b = line.pts[i]!;
+  const ax = a.lon * line.kx;
+  const ay = a.lat * line.ky;
+  const dx = b.lon * line.kx - ax;
+  const dy = b.lat * line.ky - ay;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 ? Math.max(0, Math.min(1, ((p.lon * line.kx - ax) * dx + (p.lat * line.ky - ay) * dy) / len2)) : 0;
+  return { along: line.cum[i - 1]! + t * Math.sqrt(len2), offMeters: Math.hypot(p.lon * line.kx - (ax + t * dx), p.lat * line.ky - (ay + t * dy)) };
+}
+
 /** Where along the line (meters from its start) the point is closest, and how far off the line it is. */
 export function project(line: Polyline, p: LatLon): { along: number; offMeters: number } {
   let best = { along: 0, offMeters: Infinity };
   for (let i = 1; i < line.pts.length; i++) {
-    const a = line.pts[i - 1]!;
-    const b = line.pts[i]!;
-    const ax = a.lon * line.kx;
-    const ay = a.lat * line.ky;
-    const dx = b.lon * line.kx - ax;
-    const dy = b.lat * line.ky - ay;
-    const len2 = dx * dx + dy * dy;
-    const t = len2 ? Math.max(0, Math.min(1, ((p.lon * line.kx - ax) * dx + (p.lat * line.ky - ay) * dy) / len2)) : 0;
-    const off = Math.hypot(p.lon * line.kx - (ax + t * dx), p.lat * line.ky - (ay + t * dy));
-    if (off < best.offMeters) best = { along: line.cum[i - 1]! + t * Math.sqrt(len2), offMeters: off };
+    const hit = projectSegment(line, i, p);
+    if (hit.offMeters < best.offMeters) best = hit;
   }
   return best;
 }
@@ -52,8 +57,15 @@ export function project(line: Polyline, p: LatLon): { along: number; offMeters: 
 /** The point `along` meters from the start, with the bearing of the track there (degrees from north). */
 export function pointAlong(line: Polyline, along: number): LatLon & { heading: number } {
   const s = Math.max(0, Math.min(polylineLength(line), along));
-  let i = 1;
-  while (i < line.pts.length - 1 && line.cum[i]! < s) i++;
+  // The first segment that ends at or beyond `s` (binary search: tracks have thousands of points).
+  let lo = 1;
+  let hi = Math.max(1, line.pts.length - 1);
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (line.cum[mid]! < s) lo = mid + 1;
+    else hi = mid;
+  }
+  const i = lo;
   const a = line.pts[i - 1]!;
   const b = line.pts[i]!;
   const seg = line.cum[i]! - line.cum[i - 1]!;

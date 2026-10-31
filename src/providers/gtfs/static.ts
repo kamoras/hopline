@@ -126,13 +126,23 @@ export function createStaticData(
     return byNumber;
   };
 
-  const refs = (ids: string[], date: string): StaticTripRef[] =>
-    ids
-      .filter((id) => serviceDates[raw.trips[id]![5]]?.has(date))
-      .flatMap((id) => {
-        const trip = decode(id);
-        return trip ? [{ id, trip }] : [];
-      });
+  const decodeAll = (ids: string[]): StaticTripRef[] =>
+    ids.flatMap((id) => {
+      const trip = decode(id);
+      return trip ? [{ id, trip }] : [];
+    });
+
+  // Which trips run on a date never changes while the server is up, so scan the schedule once per date.
+  const idsByDate = new Map<string, string[]>();
+  const idsOn = (date: string) => {
+    let ids = idsByDate.get(date);
+    if (!ids) {
+      ids = Object.keys(raw.trips).filter((id) => serviceDates[raw.trips[id]![5]]?.has(date));
+      idsByDate.set(date, ids);
+      if (idsByDate.size > 4) idsByDate.delete(idsByDate.keys().next().value!); // yesterday, today, and a little slack
+    }
+    return ids;
+  };
 
   return {
     stops: stopsById,
@@ -162,10 +172,10 @@ export function createStaticData(
       });
     },
     tripsByNumber(number, date) {
-      return refs(numberIndex().get(number) ?? [], date);
+      return decodeAll((numberIndex().get(number) ?? []).filter((id) => serviceDates[raw.trips[id]![5]]?.has(date)));
     },
     tripsOn(date) {
-      return refs(Object.keys(raw.trips), date);
+      return decodeAll(idsOn(date));
     },
   };
 }

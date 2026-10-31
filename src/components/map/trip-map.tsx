@@ -18,6 +18,8 @@ import { useLocate } from "./use-locate";
 
 /** Frame rate of marker updates (~25 fps keeps it smooth without taxing the map). */
 const FRAME_MS = 40;
+/** How far past the screen edge (as a fraction of its size) trains are still moved, so they are ready when panned in. */
+const VIEW_MARGIN = 0.25;
 /** Time constant for blending out a correction when fresh data arrives. */
 const CORRECTION_MS = 700;
 /** A drawn train further than this from the new path is snapped to it instead of slid along it. */
@@ -385,22 +387,38 @@ export default function TripMap({ region, trips, places, lines, showDelays = tru
       stacked.current = new Set(stacks.current.flatMap((s) => s.ids));
     };
 
+    // Only trains on (or near) screen are moved and drawn each frame, so a continent of trains costs what the
+    // visible part of it costs. The selected train is always kept.
+    const visible = () => {
+      const b = map.getBounds();
+      const [dw, dh] = [(b.getEast() - b.getWest()) * VIEW_MARGIN, (b.getNorth() - b.getSouth()) * VIEW_MARGIN];
+      return new LngLatBounds([b.getWest() - dw, b.getSouth() - dh], [b.getEast() + dw, b.getNorth() + dh]);
+    };
+
     const draw = () => {
       const now = Date.now();
       const placed = new Map<string, Placed>();
-      for (const [id, m] of motions.current) placed.set(id, motionPosition(m, now));
+      const view = visible();
+      for (const [id, m] of motions.current) {
+        if (id === selectedRef.current || view.contains([m.to.lon, m.to.lat])) placed.set(id, motionPosition(m, now));
+      }
       shown.current = placed;
       tripsSource.setData(tripFeatures(trips, placed, stacked.current, (Math.sin(now / 450) + 1) / 2));
       stacksSource.setData(stackFeatures(stacks.current, placed));
     };
 
     shown.current = new Map([...next].map(([id, m]) => [id, motionPosition(m, t)]));
-    regroup();
-    draw();
-    map.on("zoomend", regroup);
+    // Panning or zooming brings other trains into view and changes how they stack.
+    const refresh = () => {
+      draw();
+      regroup();
+      draw();
+    };
+    refresh();
+    map.on("moveend", refresh);
     const stop = () => {
       cancelAnimationFrame(raf.current);
-      map.off("zoomend", regroup);
+      map.off("moveend", refresh);
     };
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return stop;
     let last = 0;
