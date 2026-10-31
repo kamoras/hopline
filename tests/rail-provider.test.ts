@@ -52,4 +52,24 @@ describe("realtime rail provider", () => {
     expect(diag).toMatchObject({ matchedByTripId: 1 });
     expect(fetchMock.mock.calls.every(([, init]) => (init?.headers as Record<string, string>)["x-api-key"] === "secret")).toBe(true);
   });
+  it("takes a delay given by stop sequence only (SEPTA) at the stop the vehicle reports", async () => {
+    const seq = {
+      "https://rt2.test/tu": encode([{ id: "1", tripUpdate: { trip: { tripId: "T1", routeId: "R1", startDate: DATE }, stopTimeUpdate: [{ stopSequence: 1, arrival: { delay: 600 } }] } }]),
+      "https://rt2.test/vp": encode([
+        { id: "v1", vehicle: { trip: { tripId: "T1", routeId: "R1", startDate: DATE }, stopId: "A", position: { latitude: 39.1, longitude: -76.9 }, timestamp: NOW / 1000 } },
+      ]),
+    };
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => new Response(seq[url as keyof typeof seq] as BodyInit)));
+    const provider = createRealtimeRailProvider({
+      realtime: { id: "test-rail", name: "Test Rail" },
+      attribution: { label: "Test", url: "https://test", notice: "n" },
+      regionIds: ["northeast"],
+      staticData: () => Promise.resolve(staticData),
+      feeds: { tripUpdates: "https://rt2.test/tu", vehicles: "https://rt2.test/vp" },
+    });
+    const now = Date.UTC(2026, 9, 30, 17, 30); // 1:30 pm in New York, ten minutes before the train is due
+    const [trip] = await provider.fetchTrips({ region: NORTHEAST, signal: AbortSignal.timeout(5000), now, diag: {} });
+    expect(trip!.delayMinutes).toBe(10);
+    expect(trip!.delayStatus).toBe("minor");
+  });
 });

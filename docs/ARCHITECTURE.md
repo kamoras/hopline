@@ -105,7 +105,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   both just that. Railroads that publish trip updates and vehicle positions as separate feeds (MBTA Commuter Rail,
   MARC, VRE) are a config for `createRealtimeRailProvider`, which merges them and keeps only the schedule's routes;
   the MBTA's feeds also carry its buses, subway and ferries; its stops are per-track platforms, which the build script
-  (`platformStops`) names after the parent station and reads the track from.
+  (`platformStops`) names after the parent station and reads the track from. SEPTA Regional Rail is the same config
+  over SEPTA's separate rail feeds (the rail schedule is `google_rail.zip` inside SEPTA's zip, and the build gives
+  its thirteen identically colored lines distinct colors, `routeColors`). Its trip updates give a delay by stop
+  sequence only, so the builder reads that delay at the stop the vehicle reports.
 - **Boston subway, a second station-first board.** `providers/mbta-subway` is the NYC subway's counterpart with one
   difference that matters: every MBTA train reports a GPS position, so the map shows where trains are, not an
   estimate. Trip updates add each train's next stops and the station arrivals; the schedule is not bundled (only

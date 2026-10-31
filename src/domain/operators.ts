@@ -9,6 +9,7 @@ const NAMES: Record<string, string> = {
   "mbta-bus": "MBTA Bus",
   "mta-bus": "NYC Bus",
   "septa-bus": "SEPTA Bus",
+  "septa-rail": "SEPTA Regional Rail",
   "wmata-bus": "Metrobus",
   "mbta-subway": "MBTA Subway",
   nyct: "NYC Subway",
