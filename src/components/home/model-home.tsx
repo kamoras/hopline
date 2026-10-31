@@ -72,6 +72,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
           places={world.places}
           lines={world.lines}
           frameTrips={false}
+          living
           controlsPosition="bottom-right"
           legendClassName="bottom-6 left-3 sm:left-auto sm:right-16"
           onViewChange={onViewChange}

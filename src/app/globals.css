@@ -118,13 +118,6 @@ h3 {
   contain-intrinsic-size: auto 112px;
 }
 
-/* Dim the light basemap in dark mode instead of shipping a second style. */
-@media (prefers-color-scheme: dark) {
-  .map-dark .maplibregl-canvas {
-    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.95);
-  }
-}
-
 @keyframes sheet-in {
   from {
     transform: translateY(24px);
