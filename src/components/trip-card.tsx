@@ -30,7 +30,7 @@ function TripCardImpl({ trip, stop, to, region, now, pinned, onSelect, onToggleP
 
   return (
     <li className="card-cv">
-      <div className="group flex rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(0,0,0,0.02)] transition hover:border-accent/50">
+      <div className="group flex rounded-2xl border border-line bg-surface shadow-card transition hover:border-accent/50 hover:shadow-lift">
         <button
           type="button"
           onClick={() => onSelect(trip.id)}

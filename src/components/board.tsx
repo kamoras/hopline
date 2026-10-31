@@ -29,9 +29,11 @@ import type { LatLon } from "@/lib/geo";
 import { describeIntent, describeLeg, parseIntent, type Route } from "@/lib/query";
 import { pinKey, searchTrips, type Filters, type Match } from "@/lib/search";
 import { BoardSwitcher } from "./board-switcher";
+import { Logo } from "./brand/logo";
 import type { MapView } from "./map/trip-map";
 import { ModeTabs } from "./mode-tabs";
 import { Commutes } from "./commutes";
+import { EmptyState } from "./empty-state";
 import { ArrivalsSheet } from "./arrivals-sheet";
 import { LineStatusSheet } from "./line-status-sheet";
 import { LineStatusStrip } from "./line-status-strip";
@@ -175,9 +177,7 @@ export function Board({ mode, region, href, boards, places: placesProp, initialF
       <header className="z-20 border-b border-line bg-bg/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <Link href="/" aria-label="Hopline home" className="grid h-8 w-8 place-items-center rounded-xl bg-accent text-lg font-black text-on-accent">
-              h
-            </Link>
+            <Logo showWordmark={false} />
             <h1 className="contents">
               <BoardSwitcher mode={mode} regionId={region.id} boards={boards} />
             </h1>
@@ -354,7 +354,7 @@ export function Board({ mode, region, href, boards, places: placesProp, initialF
                     </section>
                   ))
                 ) : (
-                  mine.length === 0 && <EmptyState vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
+                  mine.length === 0 && <BoardEmpty vocab={vocab} hasQuery={!!query} allDown={down.length === snapshot.providers.length} />
                 )}
                 </>
               )}
@@ -441,16 +441,14 @@ function Chip({ active, onClick, children }: { active: boolean; onClick(): void;
   );
 }
 
-function EmptyState({ vocab, hasQuery, allDown }: { vocab: ModeInfo; hasQuery: boolean; allDown: boolean }) {
+/** The board has nothing to list: say why in words, with a calm picture. */
+function BoardEmpty({ vocab, hasQuery, allDown }: { vocab: ModeInfo; hasQuery: boolean; allDown: boolean }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line p-8 text-center">
-      <p className="text-lg font-semibold">
-        {hasQuery ? `No ${vocab.nounPlural} match` : allDown ? "Live data is unavailable" : `No ${vocab.nounPlural} running right now`}
-      </p>
-      <p className="mt-1 text-sm text-muted">
-        {hasQuery ? vocab.searchHint : allDown ? "We'll keep retrying automatically." : "Service may be between schedules. Check back soon."}
-      </p>
-    </div>
+    <EmptyState
+      art={hasQuery ? "search" : allDown ? "offline" : "quiet"}
+      title={hasQuery ? `No ${vocab.nounPlural} match` : allDown ? "Live data is unavailable" : `No ${vocab.nounPlural} running right now`}
+      body={hasQuery ? vocab.searchHint : allDown ? "We'll keep retrying automatically." : "Service may be between schedules. Check back soon."}
+    />
   );
 }
 

@@ -2,6 +2,7 @@ import { normalizeName, type Place } from "@/domain/place";
 import type { ModeInfo } from "@/domain/modes";
 import type { RouteSummary } from "@/server/routes";
 import { readableTextColor } from "@/lib/color";
+import { EmptyState } from "./empty-state";
 import { LineBadge } from "./line-badge";
 
 const MAX_RESULTS = 40;
@@ -40,14 +41,11 @@ export function StationList({
 
   if (!q && matches.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-line px-6 py-10 text-center">
-        <p className="text-lg font-semibold tracking-tight">Find your {vocab.stopNoun}</p>
-        <p className="mx-auto mt-1.5 max-w-xs text-sm text-muted">{vocab.searchHint} Or tap a {vocab.stopNoun} on the map.</p>
-      </div>
+      <EmptyState art="search" title={`Find your ${vocab.stopNoun}`} body={`${vocab.searchHint} Or tap a ${vocab.stopNoun} on the map.`} />
     );
   }
   if (matches.length === 0 && routes.length === 0) {
-    return <p className="px-1 text-sm text-muted">No {vocab.stopNoun} matches “{query}”.</p>;
+    return <EmptyState art="lost" title={`No ${vocab.stopNoun} matches`} body={`Nothing called “${query}”. Check the spelling, or try part of the name.`} />;
   }
   return (
     <>

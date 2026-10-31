@@ -28,8 +28,11 @@ export async function getConnections(board: Board, place: Place): Promise<Connec
   const found = await Promise.all(
     nearby.map(async (other) => {
       const places = await getPlaces(other);
-      return nearestPlaces(places, place, MAX_PER_BOARD)
-        .filter((n) => n.miles <= MAX_MILES)
+      // Bus stops come in pairs and clusters with the same name; one chip per name is enough.
+      const seen = new Set<string>();
+      return nearestPlaces(places, place, MAX_PER_BOARD * 3)
+        .filter((n) => n.miles <= MAX_MILES && !seen.has(n.place.name) && seen.add(n.place.name))
+        .slice(0, MAX_PER_BOARD)
         .map(({ place: p }): Connection => ({ mode: other.mode, regionId: other.region.id, placeId: p.id, name: p.name, href: placeHref(boardHref(other.mode, other.region.id), p.id) }));
     }),
   );

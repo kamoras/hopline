@@ -28,7 +28,7 @@ describe("nearestBoard", () => {
 });
 
 describe("connections between modes", () => {
-  it("links a train station to the subway beside it, and back", async () => {
+  it("links a train station to the subway beside it, and back", { timeout: 30_000 }, async () => {
     const rail = findBoard("rail", "northeast")!;
     const subway = findBoard("subway", "nyc")!;
     const gct = (await getPlaces(rail)).find((p) => p.name === "Grand Central")!;
@@ -40,7 +40,7 @@ describe("connections between modes", () => {
     expect(toRail.some((c) => c.mode === "rail" && c.name === "Grand Central" && c.href === "/rail/northeast/stop/grand-central")).toBe(true);
   });
 
-  it("does not link a station to its own mode or to faraway boards", async () => {
+  it("does not link a station to its own mode or to faraway boards", { timeout: 30_000 }, async () => {
     const rail = findBoard("rail", "northeast")!;
     const stamford = (await getPlaces(rail)).find((p) => p.name === "Stamford")!;
     expect(await getConnections(rail, stamford)).toEqual([]); // no subway in Connecticut

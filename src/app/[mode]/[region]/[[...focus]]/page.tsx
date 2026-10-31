@@ -20,7 +20,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { mode, region } = await params;
   const board = findBoard(mode, region);
-  return board ? { title: `${MODES[board.mode].label} · ${board.region.name} — Hopline` } : {};
+  return board ? { title: `${MODES[board.mode].label} · ${board.region.name}` } : {};
 }
 
 /**
