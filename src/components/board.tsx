@@ -70,7 +70,7 @@ interface Props {
 export function Board({ mode, region, href, boards, places: placesProp, initialFocus, initial }: Props) {
   const vocab = MODES[mode];
   const stationsFirst = vocab.browse === "stations";
-  const status = useLineStatus(mode, region.id, stationsFirst && !vocab.viewport);
+  const status = useLineStatus(mode, region.id, stationsFirst);
   const [statusRoute, setStatusRoute] = useState<string>();
   const boardKey = href.slice(1);
   const viewportScoped = vocab.viewport;

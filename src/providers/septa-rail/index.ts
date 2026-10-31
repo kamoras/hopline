@@ -21,5 +21,6 @@ export const septaRailProvider = createRealtimeRailProvider({
   feeds: {
     tripUpdates: process.env.SEPTA_RAIL_TRIP_UPDATES_URL || `${BASE}/Trip/rtTripUpdates.pb`,
     vehicles: process.env.SEPTA_RAIL_VEHICLE_POSITIONS_URL || `${BASE}/Vehicle/rtVehiclePosition.pb`,
+    alerts: process.env.SEPTA_RAIL_ALERTS_URL || `${BASE}/Service/rtServiceAlerts.pb`,
   },
 });
