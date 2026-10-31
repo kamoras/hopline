@@ -21,12 +21,61 @@ function trackOf(raw: string | undefined): string {
   return t.toUpperCase() === "BUS" ? "" : t;
 }
 
-/** `url` is where the feed is downloaded from; agencies without one need `--zip`. */
-const AGENCIES: Record<string, { url?: string }> = {
+interface Agency {
+  /** Where the feed is downloaded from; agencies without one need `--zip`. */
+  url?: string;
+  /** Keep only these route ids (for a feed shared by several operators). */
+  routes?: string[];
+  /** Replace the feed's route name/color on every kept route. */
+  style?: { name?: string; color?: string };
+  /** Strip this from train numbers ("CTrail 4462" -> "4462"). */
+  numberPrefix?: RegExp;
+  /** Strip this from headsigns ("Southbound to Hartford" -> "Hartford"). */
+  headsignPrefix?: RegExp;
+  /** Station names to use instead of the feed's, by stop id or tidied name, so a station matches the other operators'. */
+  stationNames?: Record<string, string>;
+  /** A shape with a gap longer than this (meters) is not real track and is rebuilt from stations. Default 600. */
+  coarseGapM?: number;
+  /** Route ids whose track to use for trips that have no geometry of their own. */
+  trackFrom?: string[];
+  /** Keep only track geometry (no trips or stations), for operators whose trips come from a live feed. */
+  linesOnly?: boolean;
+}
+
+const AGENCIES: Record<string, Agency> = {
   mnr: { url: process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip" },
-  "shoreline-east": { url: process.env.SHORELINE_EAST_GTFS_URL },
-  "hartford-line": { url: process.env.HARTFORD_LINE_GTFS_URL },
+  // Both live in other feeds: Shore Line East is route 42948 of Amtrak's GTFS, the Hartford Line has CT DOT's own.
+  "shoreline-east": {
+    url: process.env.SHORELINE_EAST_GTFS_URL,
+    routes: ["42948"],
+    style: { name: "Shore Line East", color: "#1b7f4b" },
+    stationNames: { STS: "New Haven-State St" },
+    // This feed has no geometry for it, but it runs on the Northeast Corridor: borrow Northeast Regional and Acela track.
+    trackFrom: ["88", "40751"],
+  },
+  "hartford-line": {
+    url: process.env.HARTFORD_LINE_GTFS_URL,
+    numberPrefix: /^CTrail\s+/i,
+    headsignPrefix: /^(north|south)bound to /i,
+    stationNames: { "New Haven Union Station": "New Haven", "State Street Station": "New Haven-State St" },
+  },
+  // Track for Amtrak's Northeast trains (Amtraker supplies the trips): Northeast Regional, Acela, Keystone,
+  // Hartford Line, Vermonter, Empire Service, Adirondack.
+  amtrak: {
+    url: process.env.AMTRAK_GTFS_URL ?? "https://content.amtrak.com/content/gtfs/GTFS.zip",
+    routes: ["88", "40751", "94", "41042", "90", "36921", "95"],
+    style: { color: "#4a6fa5" },
+    // Amtrak shapes are sparse on straight stretches; they are still the real alignment, so keep them.
+    coarseGapM: 20_000,
+    linesOnly: true,
+  },
 };
+
+/** "NEW HAVEN UNION STATION" -> "New Haven Union Station"; names already in mixed case are left alone. */
+function tidyName(name: string): string {
+  const n = name.trim().replace(/\s+Amtrak Station$/i, "");
+  return n === n.toUpperCase() ? n.toLowerCase().replace(/(^|[\s-])([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase()) : n;
+}
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 type Row = Record<string, string>;
@@ -201,9 +250,23 @@ async function main() {
   const shapeIndexById = new Map<string, number>();
   const coarse = new Set<number>(); // shapes with no real track geometry
 
+  // Track borrowed from other routes of the same feed, for trips with no geometry.
+  const borrowed: Polyline[] = [];
+  const borrowedIds = new Set(read("trips.txt").filter((t) => agency.trackFrom?.includes(t.route_id!)).map((t) => t.shape_id!));
+  for (const id of borrowedIds) {
+    const raw = (rawShapes.get(id) ?? []).sort((a, b) => a[0] - b[0]).map(([, la, lo]) => [la, lo] as [number, number]);
+    const flat = simplify(raw, 8).flatMap(([la, lo]) => [la, lo]);
+    if (flat.length >= 4) borrowed.push(createPolyline(flat));
+  }
+
   // trip_id -> [trainNumber, routeId, headsign, direction, stopTimes, serviceIndex, shapeIndex]
   const trips: Record<string, [string, string, string, number, string, number, number]> = {};
+  const tidyHeadsign = (h: string) => {
+    const name = tidyName(h.replace(agency.headsignPrefix ?? "", ""));
+    return agency.stationNames?.[name] ?? name;
+  };
   for (const t of read("trips.txt")) {
+    if (agency.routes && !agency.routes.includes(t.route_id!)) continue;
     const dates = datesByService.get(t.service_id!);
     if (!dates?.size) continue;
     let idx = serviceIndex.get(t.service_id!);
@@ -214,7 +277,7 @@ async function main() {
     let shape = shapeIndexById.get(t.shape_id!);
     if (shape === undefined) {
       const raw = (rawShapes.get(t.shape_id!) ?? []).sort((a, b) => a[0] - b[0]).map(([, la, lo]) => [la, lo] as [number, number]);
-      if (raw.length >= 2 && maxGapMeters(raw) > COARSE_GAP_M) {
+      if ((raw.length >= 2 && maxGapMeters(raw) > (agency.coarseGapM ?? COARSE_GAP_M)) || (raw.length < 2 && agency.trackFrom)) {
         // Not real track geometry: build this line from the trip's own station sequence once stop times are read.
         shape = shapes.push({ routeId: t.route_id!, pts: [], coarse: true }) - 1;
         coarse.add(shape);
@@ -227,7 +290,7 @@ async function main() {
       }
       shapeIndexById.set(t.shape_id!, shape);
     }
-    trips[t.trip_id!] = [t.trip_short_name!, t.route_id!, t.trip_headsign!, Number(t.direction_id), "", idx, shape];
+    trips[t.trip_id!] = [t.trip_short_name!.replace(agency.numberPrefix ?? "", ""), t.route_id!, tidyHeadsign(t.trip_headsign!), Number(t.direction_id), "", idx, shape];
   }
 
   const byTrip = new Map<string, { seq: number; stop: string; arr: number; dep: number; track: string }[]>();
@@ -253,13 +316,18 @@ async function main() {
   for (const id of Object.keys(trips)) if (!trips[id]![4]) delete trips[id];
 
   const stops: Record<string, [string, number, number]> = {};
-  for (const s of read("stops.txt")) stops[s.stop_id!] = [s.stop_name!, Number(s.stop_lat), Number(s.stop_lon)];
+  const served = new Set([...byTrip.values()].flatMap((list) => list.map((s) => s.stop)));
+  for (const s of read("stops.txt")) {
+    if (agency.routes && !served.has(s.stop_id!)) continue; // a shared feed lists every operator's stations
+    const name = tidyName(s.stop_name!);
+    stops[s.stop_id!] = [agency.stationNames?.[s.stop_id!] ?? agency.stationNames?.[name] ?? name, Number(s.stop_lat), Number(s.stop_lon)];
+  }
 
   // Coarse shapes have no real geometry. Rebuild them from the stations the longest trip on them serves,
   // but follow real track wherever it exists: a branch shares its trunk's rails (Waterbury trains leave
   // Bridgeport on the New Haven Line), so each hop between two stations is cut from a detailed shape that
   // passes through both. Only stretches no detailed shape covers fall back to a straight segment.
-  const detailed: Polyline[] = shapes.filter((s) => !s.coarse && s.pts.length >= 4).map((s) => createPolyline(s.pts));
+  const detailed: Polyline[] = [...shapes.filter((s) => !s.coarse && s.pts.length >= 4).map((s) => createPolyline(s.pts)), ...borrowed];
   const SNAP_M = 150;
   const hop = (a: { lat: number; lon: number }, b: { lat: number; lon: number }): number[] => {
     let best: { cost: number; piece: number[] } | undefined;
@@ -299,21 +367,25 @@ async function main() {
 
   const routes: Record<string, { name: string; color: string }> = {};
   for (const r of read("routes.txt")) {
-    routes[r.route_id!] = { name: r.route_long_name || r.route_short_name!, color: `#${r.route_color || "0b5ea8"}` };
+    if (agency.routes && !agency.routes.includes(r.route_id!)) continue;
+    routes[r.route_id!] = {
+      name: agency.style?.name ?? (r.route_long_name || r.route_short_name!),
+      color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
+    };
   }
 
   mkdirSync(OUT_DIR, { recursive: true });
   const write = (name: string, data: unknown) => writeFileSync(join(OUT_DIR, name), JSON.stringify(data) + "\n");
-  write("stops.json", stops);
+  write("stops.json", agency.linesOnly ? {} : stops);
   write("routes.json", routes);
-  write("trips.json", trips);
-  write("services.json", services);
+  write("trips.json", agency.linesOnly ? {} : trips);
+  write("services.json", agency.linesOnly ? [] : services);
   write("shapes.json", shapes);
   write("meta.json", {
     source: agency.url ?? arg(args, "--zip") ?? "local file",
     generatedOn: ymd(today),
     horizon: { from, to },
-    tripCount: Object.keys(trips).length,
+    tripCount: agency.linesOnly ? 0 : Object.keys(trips).length,
   });
   console.log(`Wrote ${Object.keys(trips).length} trips, ${Object.keys(stops).length} stops to ${OUT_DIR}`);
 }

@@ -54,3 +54,18 @@ export function inBounds(region: Region, lat: number, lon: number): boolean {
   const [w, s, e, n] = region.bounds;
   return lon >= w && lon <= e && lat >= s && lat <= n;
 }
+
+/** The parts of a [lon, lat] path that lie inside the region (a path can leave and re-enter it). */
+export function clipToRegion(region: Region, coords: readonly [number, number][]): [number, number][][] {
+  const runs: [number, number][][] = [];
+  let run: [number, number][] = [];
+  for (const point of coords) {
+    if (inBounds(region, point[1], point[0])) run.push(point);
+    else if (run.length) {
+      runs.push(run);
+      run = [];
+    }
+  }
+  if (run.length) runs.push(run);
+  return runs.filter((r) => r.length >= 2);
+}

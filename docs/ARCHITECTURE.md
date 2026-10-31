@@ -87,9 +87,14 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
   position code (`providers/gtfs/`) with Metro-North, and `scripts/build-rail-gtfs.ts` builds each agency's data
-  (`calendar.txt` and `calendar_dates.txt` both supported). Their `data/<agency>/` files ship empty; download
-  the agency's GTFS zip and run `npm run data:shoreline-east -- --zip feed.zip` to fill them. Adding real-time
-  later means swapping that provider's `fetchTrips`.
+  (`calendar.txt` and `calendar_dates.txt` both supported). Shore Line East is one route of Amtrak's GTFS (no
+  shapes of its own, so it borrows the Northeast Regional and Acela track); the Hartford Line uses CT DOT's feed.
+  Adding real-time later means swapping that provider's `fetchTrips`. These files are not in the weekly refresh
+  yet (their download URLs are not confirmed): rerun the `data:*` scripts with fresh zips when timetables change.
+- **Amtrak track.** Amtrak's trips come live from Amtraker, which has no geometry, so the track comes from Amtrak's
+  GTFS shapes (`npm run data:amtrak`, lines only) and is cut to each region (`clipToRegion`). It lets Penn Station
+  and the other Amtrak-only stations sit on a drawn line, and lets reported Amtrak positions snap to the rails.
+  Where operators share track, the first registered provider is drawn on top (`server/lines.ts`).
 - **Trains stay on the rails.** Metro-North positions are estimated along schedule track geometry. Schedule shapes
   that are really straight chords are rebuilt from the trip's stations, but each hop between two stations is cut
   from real track wherever a detailed shape covers both (a branch shares its trunk's rails), so only stretches

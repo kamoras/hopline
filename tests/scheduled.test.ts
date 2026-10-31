@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NORTHEAST } from "@/domain/region";
+import { clipToRegion, NORTHEAST } from "@/domain/region";
 import { serviceDayStart } from "@/lib/time";
 import { buildScheduledTrips } from "@/providers/gtfs/scheduled";
 import { createStaticData } from "@/providers/gtfs/static";
@@ -44,5 +44,18 @@ describe("scheduled trips", () => {
   it("lists a trip shortly before it departs and drops it after it ends", () => {
     expect(build(at(480 - 60)).map((t) => t.number)).toEqual(["1"]);
     expect(build(at(540 + 30))).toEqual([]);
+  });
+});
+
+describe("clipToRegion", () => {
+  it("keeps the parts of a path inside the region and splits where it leaves", () => {
+    const [w, s, e, n] = NORTHEAST.bounds;
+    const inside = (k: number): [number, number] => [w + (e - w) / 2 + k * 0.01, s + (n - s) / 2];
+    const outside: [number, number] = [w - 1, s];
+    expect(clipToRegion(NORTHEAST, [inside(0), inside(1), outside, inside(2), inside(3), inside(4)])).toEqual([
+      [inside(0), inside(1)],
+      [inside(2), inside(3), inside(4)],
+    ]);
+    expect(clipToRegion(NORTHEAST, [outside, inside(0), outside])).toEqual([]); // a lone point is not a line
   });
 });
