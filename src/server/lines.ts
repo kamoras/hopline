@@ -1,7 +1,9 @@
 import type { Board } from "@/domain/board";
 import type { Line } from "@/domain/line";
-import { createPolyline, type Polyline } from "@/lib/polyline";
+import { createPolyline } from "@/lib/polyline";
+import type { TrackIndex } from "@/lib/track-index";
 import { providersFor } from "@/providers/registry";
+import { indexTrack } from "./snap";
 
 /**
  * Track geometry from every provider that has it. Providers without geometry simply contribute none.
@@ -16,14 +18,14 @@ export async function getLines(board: Board, now = Date.now()): Promise<Line[]> 
   return lists.reverse().flat();
 }
 
-const trackCache = new Map<string, Promise<Polyline[]>>();
+const trackCache = new Map<string, Promise<TrackIndex>>();
 
-/** The board's track as polylines, built once per server instance (it is static data). */
-export function getTrack(board: Board): Promise<Polyline[]> {
+/** The board's track as a spatial index, built once per server instance (it is static data). */
+export function getTrack(board: Board): Promise<TrackIndex> {
   const key = `${board.mode}/${board.region.id}`;
   let hit = trackCache.get(key);
   if (!hit) {
-    hit = getLines(board).then((lines) => lines.map((l) => createPolyline(l.coords.flatMap(([lon, lat]) => [lat, lon]))));
+    hit = getLines(board).then((lines) => indexTrack(lines.map((l) => createPolyline(l.coords.flatMap(([lon, lat]) => [lat, lon])))));
     trackCache.set(key, hit);
     hit.catch(() => trackCache.delete(key));
   }

@@ -152,6 +152,40 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   `app/layout.tsx`): anonymous, cookieless page-view counts. Note that paths such as `/stop/...` and
   `/trip/...` are recorded as page views, so aggregate station popularity is visible, never who looked.
 
+## Scaling
+
+Hopline is built so that adding places adds cost only where people are looking. The rules, and what
+enforces them:
+
+- **Nothing scans the whole network per request.** Snapping GPS fixes to track uses `TrackIndex`
+  (`lib/track-index.ts`): a grid over every track segment, built once per board, so a lookup reads the
+  few segments in its cell. It replaced a loop over every point of every line (324 ms for 150 trains
+  became 2 ms; 1,500 trains went from 3.4 s to 17 ms). `pointAlong` is a binary search, and marker
+  stacking buckets markers into a grid (20,000 markers: 1 s to 46 ms).
+- **Fast versions must match the simple ones.** Each of those has a randomized test against the
+  straightforward brute-force version it replaced (`tests/track-index.test.ts`, `tests/stacking.test.ts`,
+  `tests/polyline.test.ts`) plus a generous time budget, so a regression to quadratic fails CI.
+- **Data loads when its board is used.** An agency's bundled schedule and track are separate lazy chunks
+  (`providers/gtfs/dataset.ts`: `lazyStaticData`, `loadDataFile`), so a server instance only reads and keeps
+  the agencies whose boards are requested (Boston's subway alone: +10 MB; the Northeast rail data: +60 MB).
+  Never import `data/**/*.json` at module level in a provider.
+- **The schedule is scanned once per date**, and schedule-only providers decide from a trip's first and
+  last times before building its stops, so only trips near "now" are built out.
+- **The map only moves what is on screen.** Each frame moves and draws trains inside the viewport plus a
+  margin (and the selected train); panning or zooming re-evaluates. The cost follows the screen, not the
+  size of the network.
+- **Static data is cached long, live data briefly**: lines for a day at the CDN, places for an hour, trips
+  for 5 s, so traffic costs a handful of upstream fetches however many people look.
+
+Known limits on the way to a national network, in the order they will bite:
+1. A board is `mode + region` and returns every trip in the region. Regions should stay city- or
+   corridor-sized; the Northeast rail board (Boston to Norfolk) is already about as large as is comfortable.
+   Beyond that, split regions or add a bounding-box query to `/api/trips`.
+2. `/api/lines` ships every line of a board as JSON (about 1 MB for the Northeast). Fine behind a day-long
+   CDN cache; compress (encoded polylines) or simplify by zoom before adding much more track.
+3. Schedule-only providers still decode every trip active on a date once; a per-date index by start and end
+   time would avoid that for very large agencies.
+
 ## Extending Hopline
 
 ### Add an operator (e.g. NJ Transit, SEPTA)
@@ -159,7 +193,9 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
    `mode`, `regionIds`, `fetchTrips`, `fetchPlaces`). `attribution` is required: read the source's terms
    and credit it as asked; the footer renders it automatically. Map raw data to `Trip`; call `finalizeTrip` for derived fields.
 2. Register it in `src/providers/registry.ts` and add its display name in `src/domain/operators.ts`.
-3. Add fixture-based tests in `tests/`.
+3. Load bundled data lazily: build it with `scripts/build-rail-gtfs.ts` and use `lazyStaticData("<id>", brand)`
+   (or `loadDataFile` for custom data) instead of importing the JSON. See "Scaling".
+4. Add fixture-based tests in `tests/`.
 
 ### Add a region (a city, a network, or a single airport)
 Add a `Region` to `src/domain/region.ts` (bounds, center, zoom, time zone) and list its id in

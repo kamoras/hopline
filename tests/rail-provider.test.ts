@@ -36,7 +36,7 @@ describe("realtime rail provider", () => {
     realtime: { id: "test-rail", name: "Test Rail" },
     attribution: { label: "Test", url: "https://test", notice: "n" },
     regionIds: ["northeast"],
-    staticData: () => staticData,
+    staticData: () => Promise.resolve(staticData),
     feeds: { tripUpdates: "https://rt.test/tu", vehicles: "https://rt.test/vp" },
     apiKey: { value: "secret", header: "x-api-key" },
   });

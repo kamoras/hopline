@@ -30,3 +30,22 @@ describe("polyline", () => {
     expect(pointAlong(line, 1e9).lon).toBeCloseTo(-72.884, 4);
   });
 });
+
+describe("pointAlong on a long line", () => {
+  it("finds the same point as a linear scan", () => {
+    const flat = Array.from({ length: 5000 }, (_, i) => (i % 2 === 0 ? 40 + (i / 2) * 0.0003 : -74 + ((i - 1) / 2) * 0.0002 + Math.sin(i / 50) * 0.001));
+    const line = createPolyline(flat);
+    for (const s of [0, 1, 123.4, 5000, polylineLength(line) / 2, polylineLength(line) - 0.5, polylineLength(line), polylineLength(line) + 10]) {
+      const clamped = Math.max(0, Math.min(polylineLength(line), s));
+      let i = 1;
+      while (i < line.pts.length - 1 && line.cum[i]! < clamped) i++;
+      const a = line.pts[i - 1]!;
+      const b = line.pts[i]!;
+      const seg = line.cum[i]! - line.cum[i - 1]!;
+      const t = seg ? (clamped - line.cum[i - 1]!) / seg : 0;
+      const got = pointAlong(line, s);
+      expect(got.lat).toBeCloseTo(a.lat + (b.lat - a.lat) * t, 9);
+      expect(got.lon).toBeCloseTo(a.lon + (b.lon - a.lon) * t, 9);
+    }
+  });
+});

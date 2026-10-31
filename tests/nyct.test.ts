@@ -1,5 +1,5 @@
 import { transit_realtime as rt } from "gtfs-realtime-bindings";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { NYC } from "@/domain/region";
 import { buildNyctArrivals, buildNyctTrips } from "@/providers/nyct/normalize";
 import { createNyctStatic, loadNyctStatic, type RawSubway } from "@/providers/nyct/static";
@@ -101,7 +101,10 @@ describe("buildNyctArrivals", () => {
 });
 
 describe("real subway data", () => {
-  const real = loadNyctStatic();
+  let real: Awaited<ReturnType<typeof loadNyctStatic>>;
+  beforeAll(async () => {
+    real = await loadNyctStatic();
+  });
   it("merges a complex's stations and platforms under one name", () => {
     const times = real.stations.filter((s) => s.name === "Times Sq-42 St");
     expect(times).toHaveLength(1);

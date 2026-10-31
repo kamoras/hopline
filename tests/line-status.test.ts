@@ -6,7 +6,7 @@ import { loadNyctStatic } from "@/providers/nyct/static";
 const { Effect } = rt.Alert;
 const NOW = 1_800_000_000_000;
 const sec = (ms: number) => Math.floor(ms / 1000);
-const data = loadNyctStatic();
+const data = await loadNyctStatic();
 
 const alert = (id: string, routes: string[], effect: rt.Alert.Effect, headline: string, extra: Partial<rt.IAlert> = {}): rt.IFeedEntity => ({
   id,

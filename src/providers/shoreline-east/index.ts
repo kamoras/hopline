@@ -1,17 +1,7 @@
-import { createStaticData, type GtfsStaticData, type RawTrips } from "../gtfs/static";
+import { lazyStaticData } from "../gtfs/dataset";
 import { createScheduledProvider } from "../gtfs/scheduled";
-import routes from "../../../data/shoreline-east/routes.json";
-import services from "../../../data/shoreline-east/services.json";
-import shapes from "../../../data/shoreline-east/shapes.json";
-import stops from "../../../data/shoreline-east/stops.json";
-import trips from "../../../data/shoreline-east/trips.json";
 
-let loaded: GtfsStaticData | undefined;
-const staticData = () =>
-  (loaded ??= createStaticData(
-    { stops: stops as unknown as Record<string, [string, number, number]>, routes, trips: trips as unknown as RawTrips, services, shapes },
-    { id: "shoreline-east", name: "Shore Line East" },
-  ));
+const staticData = lazyStaticData("shoreline-east", { id: "shoreline-east", name: "Shore Line East" });
 
 /** Shore Line East (CTrail) from the bundled timetable; there is no public real-time feed yet. */
 export const shorelineEastProvider = createScheduledProvider({

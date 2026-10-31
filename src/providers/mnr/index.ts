@@ -21,7 +21,7 @@ export const mnrProvider: TransitProvider = {
   async fetchTrips({ region, signal, now, diag }: FetchContext): Promise<Trip[]> {
     const [realtime, alertFeed] = await Promise.all([fetchRealtime(signal), fetchAlerts(signal)]);
     return buildMnrTrips({
-      staticData: loadStaticData(),
+      staticData: await loadStaticData(),
       realtime,
       alerts: indexAlerts(alertFeed, now),
       region,

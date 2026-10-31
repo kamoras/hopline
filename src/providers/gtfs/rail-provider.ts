@@ -10,7 +10,8 @@ export interface RealtimeRailProviderConfig {
   realtime: RealtimeConfig;
   attribution: Attribution;
   regionIds: readonly string[];
-  staticData(): GtfsStaticData;
+  /** Loads the bundled schedule on first use (see `lazyStaticData`). */
+  staticData(): Promise<GtfsStaticData>;
   /** Trip updates and vehicle positions are separate GTFS-RT feeds; alerts are optional. */
   feeds: { tripUpdates: string; vehicles: string; alerts?: string };
   /** An optional key an operator accepts for a higher rate limit, sent in `header`. */
@@ -45,7 +46,7 @@ export function createRealtimeRailProvider({ realtime, attribution, regionIds, s
     regionIds,
 
     async fetchTrips({ region, signal, now, diag }: FetchContext): Promise<Trip[]> {
-      const data = staticData();
+      const data = await staticData();
       const [feed, alertFeed] = await Promise.all([
         fetchMerged(signal, data),
         feeds.alerts ? fetchGtfsRt(feeds.alerts, signal, { headers: headers(), ttlMs: ALERTS_TTL_MS }).catch(() => undefined) : undefined,

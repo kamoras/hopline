@@ -40,11 +40,11 @@ export const mbtaSubwayProvider: TransitProvider = {
 
   async fetchTrips({ signal, now, diag }: FetchContext): Promise<Trip[]> {
     const [tripUpdates, vehicles] = await Promise.all([fetchFeed(FEEDS.trips, signal, now), fetchFeed(FEEDS.vehicles, signal, now)]);
-    return buildMbtaSubwayTrips({ staticData: loadMbtaSubwayStatic(), tripUpdates, vehicles, now, diag });
+    return buildMbtaSubwayTrips({ staticData: await loadMbtaSubwayStatic(), tripUpdates, vehicles, now, diag });
   },
 
   async fetchPlaces({ region }) {
-    return loadMbtaSubwayStatic().stations.map((s): Omit<Place, "id"> & { id: string } => ({
+    return (await loadMbtaSubwayStatic()).stations.map((s): Omit<Place, "id"> & { id: string } => ({
       id: placeSlug(s.name),
       name: s.name,
       lat: s.lat,
@@ -57,17 +57,17 @@ export const mbtaSubwayProvider: TransitProvider = {
 
   async fetchArrivals({ signal, now }, place) {
     const tripUpdates = await fetchFeed(FEEDS.trips, signal, now);
-    return buildMbtaSubwayArrivals({ staticData: loadMbtaSubwayStatic(), tripUpdates, platforms: place.codes ?? [], now });
+    return buildMbtaSubwayArrivals({ staticData: await loadMbtaSubwayStatic(), tripUpdates, platforms: place.codes ?? [], now });
   },
 
   async fetchLineStatus({ signal, now }) {
-    const { lines } = loadMbtaSubwayStatic();
+    const { lines } = await loadMbtaSubwayStatic();
     const style = new Map(Object.values(lines).map((l) => [l.short, { color: l.color, text: "#FFFFFF" }]));
     const feed = await fetchFeed(FEEDS.alerts, signal, now, ALERTS_TTL_MS); // a failure means status is unknown, not good
     return summarizeLineStatus({ feed, now, order: LINE_ORDER, lineOf: (routeId) => lines[routeId]?.short, style });
   },
 
   async fetchLines() {
-    return loadMbtaSubwayStatic().data.lines();
+    return (await loadMbtaSubwayStatic()).data.lines();
   },
 };
