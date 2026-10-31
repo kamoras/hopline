@@ -140,7 +140,10 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
   (region `philadelphia`) is the same provider with another feed: SEPTA's vehicles often report a position but no
   trip, so the shared builder joins them to the trip update that names the same vehicle id. Its static feed is a zip of
   zips, so the build script reads `google_bus.zip` inside it (`innerZip`). Route badges choose black or white text by
-  contrast (`readableTextColor`), since the colors differ by operator.
+  contrast (`readableTextColor`), since the colors differ by operator. `providers/wmata-bus` (Metrobus, region
+  `washington`) is the third: the same provider again, using Metrorail's key and feed helpers
+  (`providers/wmata/feeds.ts`); the key is read on the server only and the build script's `--zip` path takes the
+  downloaded static feed.
 - **Timetable-only rail providers.** Shore Line East and the Hartford Line have no public real-time feed, so
   `providers/gtfs/scheduled.ts` builds their trips from the bundled timetable alone: where each train should be
   now, with delay status "unknown" (nothing is claimed about lateness). They share the schedule decoding and
