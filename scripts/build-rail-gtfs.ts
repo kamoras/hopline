@@ -42,6 +42,10 @@ interface Agency {
   coarseGapM?: number;
   /** Route ids whose track to use for trips that have no geometry of their own. */
   trackFrom?: string[];
+  /** Short public names by route id (a line badge: "RL"), kept in routes.json. */
+  routeShort?: Record<string, string>;
+  /** Keep stations, routes and track but not the schedule, for operators whose trips come entirely from live feeds. */
+  realtimeOnly?: boolean;
   /** Keep only track geometry (no trips or stations), for operators whose trips come from a live feed. */
   linesOnly?: boolean;
 }
@@ -78,6 +82,15 @@ const AGENCIES: Record<string, Agency> = {
       Kingston: "Kingston MA",
     },
     coarseGapM: 5_000,
+  },
+  // The T's subway: every trip is live (GPS), so only stations, lines and track are kept.
+  "mbta-subway": {
+    url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
+    routeTypes: ["0", "1"],
+    platformStops: true,
+    coarseGapM: 5_000,
+    realtimeOnly: true,
+    routeShort: { Red: "RL", Orange: "OL", Blue: "BL", Mattapan: "M", "Green-B": "B", "Green-C": "C", "Green-D": "D", "Green-E": "E" },
   },
   // Track for Amtrak's Northeast trains (Amtraker supplies the trips): Northeast Regional, Acela, Keystone,
   // Hartford Line, Vermonter, Empire Service, Adirondack.
@@ -412,11 +425,12 @@ async function main() {
     shapes[idx]!.pts = simplify(pts, 8).flatMap(([la, lo]) => [Math.round(la * 1e5) / 1e5, Math.round(lo * 1e5) / 1e5]);
   }
 
-  const routes: Record<string, { name: string; color: string }> = {};
+  const routes: Record<string, { name: string; color: string; short?: string }> = {};
   for (const r of routeRows) {
     routes[r.route_id!] = {
       name: agency.style?.name ?? (r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? `#${r.route_color || "0b5ea8"}`,
+      ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
     };
   }
 
@@ -424,14 +438,14 @@ async function main() {
   const write = (name: string, data: unknown) => writeFileSync(join(OUT_DIR, name), JSON.stringify(data) + "\n");
   write("stops.json", agency.linesOnly ? {} : stops);
   write("routes.json", routes);
-  write("trips.json", agency.linesOnly ? {} : trips);
-  write("services.json", agency.linesOnly ? [] : services);
+  write("trips.json", agency.linesOnly || agency.realtimeOnly ? {} : trips);
+  write("services.json", agency.linesOnly || agency.realtimeOnly ? [] : services);
   write("shapes.json", shapes);
   write("meta.json", {
     source: agency.url ?? arg(args, "--zip") ?? "local file",
     generatedOn: ymd(today),
     horizon: { from, to },
-    tripCount: agency.linesOnly ? 0 : Object.keys(trips).length,
+    tripCount: agency.linesOnly || agency.realtimeOnly ? 0 : Object.keys(trips).length,
   });
   console.log(`Wrote ${Object.keys(trips).length} trips, ${Object.keys(stops).length} stops to ${OUT_DIR}`);
 }

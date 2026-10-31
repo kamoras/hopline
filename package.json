@@ -21,6 +21,7 @@
     "test:watch": "vitest",
     "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
     "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",
+    "data:mbta-subway": "tsx scripts/build-rail-gtfs.ts mbta-subway",
     "data:mbta-cr": "tsx scripts/build-rail-gtfs.ts mbta-cr",
     "data:amtrak": "tsx scripts/build-rail-gtfs.ts amtrak",
     "data:hartford-line": "tsx scripts/build-rail-gtfs.ts hartford-line",

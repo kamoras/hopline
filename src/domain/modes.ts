@@ -49,8 +49,8 @@ export const MODES = {
     reportsDelay: false,
     browse: "stations",
     platformNoun: "Platform",
-    searchPlaceholder: "Station or line (A, 7, L)…",
-    searchHint: "Try a station like Times Sq, or a line like L.",
+    searchPlaceholder: "Station or line…",
+    searchHint: "Try a station name, or a line like L or Red.",
   },
 } as const satisfies Record<string, ModeInfo>;
 
