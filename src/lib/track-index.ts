@@ -50,6 +50,16 @@ export class TrackIndex {
     });
   }
 
+  /** Every line (by its position in `lines`) with track within the search radius of the point. */
+  nearbyLines(p: LatLon): Set<number> {
+    const found = new Set<number>();
+    for (const packed of this.cells.get(cellKey(Math.floor(p.lon / CELL_DEG), Math.floor(p.lat / CELL_DEG))) ?? []) {
+      const l = Math.floor(packed / TrackIndex.SEG_STRIDE);
+      if (!found.has(l) && projectSegment(this.lines[l]!, packed % TrackIndex.SEG_STRIDE, p).offMeters <= this.maxMeters) found.add(l);
+    }
+    return found;
+  }
+
   /** The closest track within the search radius, or nothing. */
   nearest(p: LatLon): TrackHit | undefined {
     const cell = this.cells.get(cellKey(Math.floor(p.lon / CELL_DEG), Math.floor(p.lat / CELL_DEG)));
