@@ -162,8 +162,11 @@ normalized name), `searchTrips` (number, station, route),
   position code (`providers/gtfs/`) with Metro-North, and `scripts/build-rail-gtfs.ts` builds each agency's data
   (`calendar.txt` and `calendar_dates.txt` both supported). Shore Line East is one route of Amtrak's GTFS (no
   shapes of its own, so it borrows the Northeast Regional and Acela track); the Hartford Line uses CT DOT's feed.
-  Adding real-time later means swapping that provider's `fetchTrips`. These files are not in the weekly refresh
-  yet (their download URLs are not confirmed): rerun the `data:*` scripts with fresh zips when timetables change.
+  Adding real-time later means swapping that provider's `fetchTrips`. These two have no public download, so they are
+  the only bundled schedules outside the weekly refresh: rerun their `data:*` scripts with fresh zips when timetables change.
+  Every other bundled schedule is regenerated weekly by `npm run data:refresh` (`scripts/refresh-data.ts`, run by the
+  `refresh-schedules` workflow): one feed failing never stops the others (its old data is kept), and the sources that
+  need a key are skipped when it is not set.
 - **Amtrak track.** Amtrak's trips come live from Amtraker, which has no geometry, so the track comes from Amtrak's
   GTFS shapes (`npm run data:amtrak`, lines only) and is cut to each region (`clipToRegion`). It lets Penn Station
   and the other Amtrak-only stations sit on a drawn line, and lets reported Amtrak positions snap to the rails.

@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { Place } from "@/domain/place";
 import { PHILADELPHIA } from "@/domain/region";
+import meta from "../data/septa-metro/meta.json";
 import { septaMetroProvider as metro } from "@/providers/septa-metro";
 
-// A Monday morning (10:00 in Philadelphia) inside the bundled timetable.
-const NOW = Date.UTC(2026, 10, 2, 15, 0, 0);
+// A weekday morning (10:00 in Philadelphia) inside the bundled timetable. The schedule is refreshed weekly, so the day is
+// taken from what is bundled: the first weekday at least a week into it.
+const horizonFrom = (meta as { horizon: { from: string } }).horizon.from;
+const day = new Date(Date.UTC(+horizonFrom.slice(0, 4), +horizonFrom.slice(4, 6) - 1, +horizonFrom.slice(6, 8) + 7));
+while ([0, 6].includes(day.getUTCDay())) day.setUTCDate(day.getUTCDate() + 1);
+const NOW = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), 15, 0, 0);
 const ctx = { region: PHILADELPHIA, signal: AbortSignal.timeout(5000), now: NOW, diag: {} };
 
 describe("SEPTA Metro (timetable only)", () => {

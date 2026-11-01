@@ -18,15 +18,16 @@ repo settings, so they can't live in code. Do them once:
    token for this repo with *Contents* and *Pull requests* read/write. Needed because PRs opened
    by the default `GITHUB_TOKEN` (the weekly Metro-North schedule refresh) don't trigger CI,
    so the required check would never run and the PR would sit unmerged. Dependabot PRs don't need it.
-5. **Settings → Actions → General:** allow GitHub Actions to create pull requests.
-6. **Settings → General → Pull Requests:** enable **Automatically delete head branches**. The
+5. **Optional secret `WMATA_API_KEY`:** lets the weekly schedule refresh include Washington Metrorail and Metrobus (their downloads need the key). Without it those two are skipped and keep their old data.
+6. **Settings → Actions → General:** allow GitHub Actions to create pull requests.
+7. **Settings → General → Pull Requests:** enable **Automatically delete head branches**. The
    `delete-merged-branch` workflow is a backstop that does the same, so merged branches never linger.
 
 ## Merge policy
 | PR | Auto-merges when |
 | --- | --- |
 | Any Dependabot PR (patch, minor, major, security) | The `verify` and `lighthouse` jobs pass (the merge job runs after them in `ci.yml`) |
-| Metro-North schedule refresh | Its own test run passes |
+| Weekly schedule refresh (every bundled timetable) | Its own test run passes |
 
 A major bump that breaks lint, types, tests or the build fails `verify` and stays open for a
 human; it is never merged. Because the merge step is chained after `verify`, this holds even

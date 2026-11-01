@@ -1,7 +1,8 @@
-name: Refresh Metro-North and LIRR schedules
+name: Refresh schedules
 
-# Metro-North and the LIRR publish new timetables every few weeks. This regenerates
-# data/mnr and data/lirr from the official GTFS feeds and opens a PR if anything changed.
+# Operators publish new timetables every few weeks. This regenerates every bundled schedule (data/*) from the official
+# GTFS feeds and opens a PR if anything changed. Add WMATA_API_KEY as a repository secret to include Washington.
+# One feed failing never stops the others; its old data is kept (see the log).
 on:
   schedule:
     - cron: "17 9 * * 1"
@@ -21,9 +22,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run data:mnr
-      - run: npm run data:lirr
-      - run: npm run data:subway
+      - run: npm run data:refresh
+        env:
+          WMATA_API_KEY: ${{ secrets.WMATA_API_KEY }}
       # Fail before opening a PR if the new data breaks anything.
       - run: npm test
       - id: pr
@@ -33,11 +34,11 @@ jobs:
           # checks would never report and auto-merge would stall. Set AUTOMERGE_TOKEN
           # (a fine-grained PAT with contents + pull-requests write) to fix that.
           token: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
-          branch: chore/refresh-mnr-schedule
+          branch: chore/refresh-schedules
           delete-branch: true
-          commit-message: "chore: refresh Metro-North schedule data"
-          title: "chore: refresh Metro-North schedule data"
-          body: "Automated regeneration of `data/mnr` and `data/lirr` from the MTA GTFS feeds (`npm run data:mnr`, `npm run data:lirr`)."
+          commit-message: "chore: refresh bundled schedules"
+          title: "chore: refresh bundled schedules"
+          body: "Automated regeneration of the bundled timetables in `data/*` from the operators' GTFS feeds (`npm run data:refresh`). See the workflow run for any feed that could not be refreshed."
       - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-number
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
