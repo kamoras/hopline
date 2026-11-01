@@ -20,6 +20,7 @@
     "a11y": "HOPLINE_DEMO=1 NEXT_PUBLIC_MAP_STYLE_URL=http://localhost:3123/ci-map-style.json next build && HOPLINE_DEMO=1 lhci autorun --config=lighthouserc.json && HOPLINE_DEMO=1 lhci autorun --config=lighthouserc.desktop.json",
     "test:watch": "vitest",
     "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
+    "data:lirr": "tsx scripts/build-rail-gtfs.ts lirr",
     "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",
     "data:mbta-subway": "tsx scripts/build-rail-gtfs.ts mbta-subway",
     "data:wmata": "tsx scripts/build-rail-gtfs.ts wmata",

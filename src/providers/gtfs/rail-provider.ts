@@ -12,8 +12,8 @@ export interface RealtimeRailProviderConfig {
   regionIds: readonly string[];
   /** Loads the bundled schedule on first use (see `lazyStaticData`). */
   staticData(): Promise<GtfsStaticData>;
-  /** Trip updates and vehicle positions are separate GTFS-RT feeds; alerts are optional. */
-  feeds: { tripUpdates: string; vehicles: string; alerts?: string };
+  /** Trip updates and vehicle positions are usually separate GTFS-RT feeds (leave `vehicles` out when one feed carries both, as the LIRR's does); alerts are optional. */
+  feeds: { tripUpdates: string; vehicles?: string; alerts?: string };
   /** An optional key an operator accepts for a higher rate limit, sent in `header`. */
   apiKey?: { value: string | undefined; header: string };
 }
@@ -32,10 +32,10 @@ export function createRealtimeRailProvider({ realtime, attribution, regionIds, s
   async function fetchMerged(signal: AbortSignal, data: GtfsStaticData): Promise<FeedMessage> {
     const [tripUpdates, vehicles] = await Promise.all([
       fetchGtfsRt(feeds.tripUpdates, signal, { headers: headers(), ttlMs: FEED_TTL_MS }),
-      fetchGtfsRt(feeds.vehicles, signal, { headers: headers(), ttlMs: FEED_TTL_MS }),
+      feeds.vehicles ? fetchGtfsRt(feeds.vehicles, signal, { headers: headers(), ttlMs: FEED_TTL_MS }) : undefined,
     ]);
     const ours = (e: FeedMessage["entity"][number]) => !!data.routes[e.tripUpdate?.trip.routeId ?? e.vehicle?.trip?.routeId ?? ""];
-    return { ...tripUpdates, entity: [...tripUpdates.entity, ...vehicles.entity].filter(ours) } as FeedMessage;
+    return { ...tripUpdates, entity: [...tripUpdates.entity, ...(vehicles?.entity ?? [])].filter(ours) } as FeedMessage;
   }
 
   return {

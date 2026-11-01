@@ -72,4 +72,22 @@ describe("realtime rail provider", () => {
     expect(trip!.delayMinutes).toBe(10);
     expect(trip!.delayStatus).toBe("minor");
   });
+  it("works from one feed that carries both trips and positions, without doubling the trips", async () => {
+    const one = encode([
+      { id: "1", tripUpdate: { trip: { tripId: "T1", routeId: "R1", startDate: DATE }, stopTimeUpdate: [{ stopId: "B", arrival: { time: NOW / 1000 + 45 * 60 } }] } },
+      { id: "v1", vehicle: { trip: { tripId: "T1", routeId: "R1", startDate: DATE }, position: { latitude: 39.1, longitude: -76.9 }, timestamp: NOW / 1000 } },
+    ]);
+    const fetchMock = vi.fn(async () => new Response(one as BodyInit));
+    vi.stubGlobal("fetch", fetchMock);
+    const single = createRealtimeRailProvider({
+      realtime: { id: "test-rail", name: "Test Rail" },
+      attribution: { label: "Test", url: "https://test", notice: "n" },
+      regionIds: ["northeast"],
+      staticData: () => Promise.resolve(staticData),
+      feeds: { tripUpdates: "https://rt3.test/one" },
+    });
+    const trips = await single.fetchTrips({ region: NORTHEAST, signal: AbortSignal.timeout(5000), now: NOW, diag: {} });
+    expect(trips).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

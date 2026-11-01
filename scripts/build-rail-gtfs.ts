@@ -73,6 +73,13 @@ interface Agency {
 
 const AGENCIES: Record<string, Agency> = {
   mnr: { url: process.env.MNR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip" },
+  // Long Island Rail Road: its own GTFS; live trips and positions are one MTA feed.
+  lirr: {
+    url: process.env.LIRR_GTFS_URL ?? "https://rrgtfsfeeds.s3.amazonaws.com/gtfslirr.zip",
+    routeTextColor: true,
+    // The name Amtrak uses for the same station, so each is listed once.
+    stationNames: { "Penn Station": "New York Penn" },
+  },
   // Both live in other feeds: Shore Line East is route 42948 of Amtrak's GTFS, the Hartford Line has CT DOT's own.
   "shoreline-east": {
     url: process.env.SHORELINE_EAST_GTFS_URL,
@@ -382,7 +389,8 @@ async function main() {
     for (let at = text.indexOf("\n") + 1; at > 0 && at < text.length; ) {
       const end = text.indexOf("\n", at);
       const line = text.slice(at, end < 0 ? text.length : end);
-      if (keep.has(line.slice(0, line.indexOf(",")))) out.push(line);
+      const first = line.slice(0, line.indexOf(","));
+      if (keep.has(first.startsWith('"') ? first.slice(1, -1) : first)) out.push(line); // some feeds quote every field (LIRR)
       at = end < 0 ? text.length : end + 1;
     }
     return parseCsv(out.join("\n"));
