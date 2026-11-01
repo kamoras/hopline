@@ -187,6 +187,79 @@ const AGENCIES: Record<string, Agency> = {
     routeTextColor: true,
     coarseGapM: 1e9,
   },
+  // Mid-Atlantic systems with public live feeds. Every trip is live (GPS), so only stops, routes and track are kept.
+  "prt-bus": {
+    url: process.env.PRT_GTFS_URL ?? "https://www.portauthority.org/developerresources/GTFS.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "prt-rail": {
+    url: process.env.PRT_GTFS_URL ?? "https://www.portauthority.org/developerresources/GTFS.zip",
+    routeTypes: ["1", "7"], // the T (Blue, Red, Silver lines) and the two inclines,
+    realtimeOnly: true,
+    shortFromFeed: true,
+    platformStops: true,
+    routeTextColor: true,
+    coarseGapM: 5_000,
+  },
+  "fairfax-connector": {
+    url: process.env.FAIRFAX_CONNECTOR_GTFS_URL ?? "https://www.fairfaxcounty.gov/connector/sites/connector/files/Assets/connector_gtfs.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "dash": {
+    url: process.env.DASH_GTFS_URL ?? "https://www.dashbus.com/google_transit.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "lanta": {
+    url: process.env.LANTA_GTFS_URL ?? "https://realtimelanta.availtec.com/InfoPoint/gtfs-zip.ashx",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "barta": {
+    url: process.env.BARTA_GTFS_URL ?? "https://busfinder.bartabus.com/InfoPoint/gtfs-zip.ashx",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "red-rose": {
+    url: process.env.RED_ROSE_GTFS_URL ?? "https://busfinder.redrosetransit.com/Infopoint/gtfs-zip.ashx",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  "rabbittransit": {
+    url: process.env.RABBITTRANSIT_GTFS_URL ?? "https://realtime.rabbittransit.org/InfoPoint/GTFS-Zip.ashx",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
   // NYC Ferry: live vessel positions and trip updates are public, so only landings, routes and track are kept. The
   // Rockaway shuttle buses in the same feed (route type 3) are not ferries.
   "nyc-ferry": {

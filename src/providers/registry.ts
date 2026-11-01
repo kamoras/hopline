@@ -15,6 +15,14 @@ import { cttransitProvider } from "./cttransit";
 import { norwalkProvider } from "./norwalk";
 import { hartProvider } from "./hart";
 import { portlandMeProvider } from "./portland-me";
+import { prtBusProvider } from "./prt-bus";
+import { prtRailProvider } from "./prt-rail";
+import { fairfaxConnectorProvider } from "./fairfax-connector";
+import { dashProvider } from "./dash";
+import { lantaProvider } from "./lanta";
+import { bartaProvider } from "./barta";
+import { redRoseProvider } from "./red-rose";
+import { rabbittransitProvider } from "./rabbittransit";
 import { mbtaCommuterRailProvider } from "./mbta-cr";
 import { mbtaFerryProvider } from "./mbta-ferry";
 import { mbtaSubwayProvider } from "./mbta-subway";
@@ -40,7 +48,7 @@ import { wmataBusProvider } from "./wmata-bus";
 export const PROVIDERS: readonly TransitProvider[] =
   process.env.HOPLINE_DEMO === "1"
     ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
-    : [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, cttransitProvider, norwalkProvider, hartProvider, portlandMeProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
+    : [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, cttransitProvider, norwalkProvider, hartProvider, portlandMeProvider, prtBusProvider, prtRailProvider, fairfaxConnectorProvider, dashProvider, lantaProvider, bartaProvider, redRoseProvider, rabbittransitProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {
