@@ -7,13 +7,17 @@ import type { Place } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
 import { normalizeName } from "@/domain/place";
 import { operatorName } from "@/domain/operators";
+import { aliasesOfAll } from "@/lib/aliases";
+import { describeLeg, parseIntent, type Route } from "@/lib/query";
+import { searchTrips } from "@/lib/search";
 import { searchVehicles } from "@/lib/vehicle-search";
 import { parseWorldPlaceId } from "@/lib/world";
 import { readableTextColor } from "@/lib/color";
 import type { CatalogHit } from "@/server/catalog";
 import type { RouteSummary } from "@/server/routes";
 import { LineBadge } from "../line-badge";
-import { destinationPhrase } from "../trip-parts";
+import { destinationPhrase, StopTime } from "../trip-parts";
+import { getRegion, NORTHEAST } from "@/domain/region";
 import type { PlaceTarget } from "./model-home";
 
 /** What a search finds, in one list: vehicles running now, then stations and airports. Choosing one opens its drawer. */
@@ -22,6 +26,10 @@ export function SearchDrawer({
   trips,
   places,
   boards,
+  now,
+  boardOfTrip,
+  isSaved,
+  onToggleCommute,
   onOpenTrip,
   onOpenPlace,
   onOpenRoute,
@@ -31,6 +39,11 @@ export function SearchDrawer({
   places: readonly Place[];
   /** Every board, so routes of the big networks (buses) can be found even where they are not on the map. */
   boards: readonly BoardLink[];
+  now: number;
+  /** The `mode/region` a trip belongs to. */
+  boardOfTrip(tripId: string): string | undefined;
+  isSaved(board: string, route: Route): boolean;
+  onToggleCommute(board: string, routes: readonly Route[]): void;
   onOpenTrip(id: string): void;
   onOpenPlace(place: PlaceTarget): void;
   onOpenRoute(board: BoardLink, route: RouteSummary): void;
@@ -91,14 +104,58 @@ export function SearchDrawer({
     return [...fromMap.slice(0, 6), ...fromCatalog].slice(0, 8);
   }, [places, hits, q]);
 
-  const nothing = vehicles.length === 0 && stations.length === 0 && routes.length === 0;
+  // "Stamford to Grand Central": trains that call at one and then the other (and a round trip lists both ways).
+  const intent = useMemo(() => parseIntent(q), [q]);
+  const journeys = useMemo(() => (intent.legs.length ? searchTrips(trips, { query: q, operator: "all", delayedOnly: false }, { aliases: aliasesOfAll(), now }).slice(0, 8) : []), [intent.legs.length, trips, q, now]);
+  const journeyBoard = journeys[0] && boardOfTrip(journeys[0].trip.id);
+  const saved = !!journeyBoard && intent.legs.every((l) => isSaved(journeyBoard, l));
+
+  const nothing = journeys.length === 0 && vehicles.length === 0 && stations.length === 0 && routes.length === 0;
   return (
     <div className="space-y-5">
       <h2 tabIndex={-1} className="text-lg font-bold tracking-tight">
         {q ? `Results for “${q}”` : "Search"}
       </h2>
-      {!q && <p className="text-sm text-muted">Try a train number, a flight like DAL1283, a line, a station or an airport.</p>}
       {q && nothing && <p className="text-sm text-muted">Nothing running or nearby matches yet. Zoom the map to where it is, or try another name.</p>}
+
+      {intent.legs.length > 0 && (
+        <section aria-label="Journeys">
+          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">{intent.legs.map(describeLeg).join(" · ")}</h3>
+          {journeys.length === 0 && <p className="text-sm text-muted">No train is running between these right now.</p>}
+          <ul className="space-y-2">
+            {journeys.map(({ trip, stop, to }) => {
+              const region = getRegion(boardOfTrip(trip.id)?.split("/")[1] ?? "") ?? NORTHEAST;
+              return (
+                <li key={`${trip.id}/${stop?.id}`}>
+                  <button type="button" onClick={() => onOpenTrip(trip.id)} className="press flex w-full items-center gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:bg-surface-2">
+                    <span className="h-8 w-1.5 shrink-0 rounded-full" style={{ background: trip.routeColor }} aria-hidden />
+                    <span className="min-w-0 flex-1 truncate">
+                      <span className="tabular font-semibold">{trip.number}</span> <span className="text-muted">{destinationPhrase(trip)}</span>
+                    </span>
+                    {stop && to && (
+                      <span className="tabular shrink-0 text-sm">
+                        <StopTime stop={stop} region={region} emphasize={false} showScheduled={false} />
+                        {" → "}
+                        <StopTime stop={to} region={region} emphasize={false} showScheduled={false} />
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {journeyBoard && (
+            <button
+              type="button"
+              onClick={() => onToggleCommute(journeyBoard, intent.legs)}
+              aria-pressed={saved}
+              className={`press mt-3 w-full rounded-xl px-4 py-2.5 text-sm font-semibold ${saved ? "bg-accent text-on-accent" : "border border-line hover:bg-surface-2"}`}
+            >
+              {saved ? "⇄ Saved to My commutes" : intent.roundTrip ? "⇄ Save this round trip" : "⇄ Save this commute"}
+            </button>
+          )}
+        </section>
+      )}
 
       {vehicles.length > 0 && (
         <section aria-label="Vehicles running now">
