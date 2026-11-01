@@ -4,28 +4,41 @@ import type { FetchContext, TransitProvider } from "../types";
 import { NORTHEAST_AIRPORTS } from "./airports";
 import { buildAirportStatus, FAA_STATUS_URL } from "./faa";
 import { warmRoutes } from "./routes";
+import { mergeAircraft } from "./merge";
 import { ADSB_ID, buildFlightArrivals, buildFlights, type Aircraft } from "./normalize";
 
 /** Live aircraft near a point, from adsb.lol's community ADS-B network (no key; asks for fair use). */
 const ADSB_URL = process.env.ADSB_API_URL || "https://api.adsb.lol/v2";
-/** One query covering the airports: centered between New York and Philadelphia, 150 nautical miles out. */
-const CENTER = { lat: 40.55, lon: -74.4 };
-const RADIUS_NM = 150;
+/**
+ * The sky over the whole Northeast is two queries of adsb.lol's widest circle (250 nautical miles): one over the
+ * Mid-Atlantic (Pittsburgh to the Jersey shore, Virginia to upstate New York), one over New England and the Hudson
+ * valley (Boston to Maine to Albany). They overlap, so an aircraft seen by both is kept once.
+ */
+const CIRCLES = [
+  { lat: 40.2, lon: -77.0, nm: 250 },
+  { lat: 43.6, lon: -71.0, nm: 250 },
+] as const;
 
 const REGION_IDS = ["northeast-air"];
 
 /** One shared fetch for trips and arrivals within a moment, so they cost one upstream request. */
 let recent: { at: number; aircraft: Promise<Aircraft[]> } | undefined;
-const TTL_MS = 4_000;
+/** Shared by trips and arrivals, and long enough that the two circles are not asked for more than about every 8 seconds. */
+const TTL_MS = 8_000;
 
 function fetchAircraft(signal: AbortSignal, now: number): Promise<Aircraft[]> {
   if (recent && now - recent.at < TTL_MS) return recent.aircraft;
   const aircraft = (async () => {
-    const res = await fetch(`${ADSB_URL}/point/${CENTER.lat}/${CENTER.lon}/${RADIUS_NM}`, { signal, cache: "no-store" });
-    if (!res.ok) throw new Error(`adsb.lol responded ${res.status}`);
-    const body = (await res.json()) as { ac?: Aircraft[] };
-    if (!Array.isArray(body.ac)) throw new Error("adsb.lol returned an unexpected payload");
-    return body.ac;
+    const lists = await Promise.all(
+      CIRCLES.map(async ({ lat, lon, nm }) => {
+        const res = await fetch(`${ADSB_URL}/point/${lat}/${lon}/${nm}`, { signal, cache: "no-store" });
+        if (!res.ok) throw new Error(`adsb.lol responded ${res.status}`);
+        const body = (await res.json()) as { ac?: Aircraft[] };
+        if (!Array.isArray(body.ac)) throw new Error("adsb.lol returned an unexpected payload");
+        return body.ac;
+      }),
+    );
+    return mergeAircraft(lists);
   })();
   recent = { at: now, aircraft };
   aircraft.catch(() => {

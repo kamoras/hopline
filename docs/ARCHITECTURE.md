@@ -126,8 +126,9 @@ normalized name), `searchTrips` (number, station, route),
   Yellow, Orange and Silver badges use dark text, so the build keeps each route's text color (`routeTextColor`) and
   arrivals carry it. Region `washington` covers DC and its Maryland and Virginia suburbs out to Ashburn.
 - **Flights (a station-first mode with real positions).** `mode: "flights"` is `browse: "stations"`: the board lists
-  airports, with live aircraft on the map. `providers/adsb` reads adsb.lol's ADS-B feed (one query around the
-  airports, shared by trips and arrivals for a few seconds) and the FAA's airport status. ADS-B carries no route or
+  airports, with live aircraft on the map. `providers/adsb` reads adsb.lol's ADS-B feed (two overlapping 250-nautical-mile circles that
+  together cover Maine to Virginia and Pittsburgh, merged by aircraft and shared by trips and arrivals for 8 seconds, so the
+  community API is asked about every 8 seconds however many people look; 29 airports in `adsb/airports.ts`) and the FAA's airport status. ADS-B carries no route or
   schedule, so no lateness is claimed (delay status is "unknown", `reportsDelay: false`) and a flight's destination
   is only known when it is descending into a covered airport; `classify` infers arriving, departing or
   overflying from altitude, climb rate and heading, and refuses an airport the plane is too high to land at

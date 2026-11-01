@@ -143,13 +143,13 @@ export const YORK: Region = {
   timeZone: "America/New_York",
 };
 
-/** The airports around New York, Philadelphia and Hartford (a flights board covers the sky above them). */
+/** The airports of the whole Northeast, Maine to Virginia and Pittsburgh (a flights board covers the sky above them). */
 export const NORTHEAST_AIR: Region = {
   id: "northeast-air",
-  name: "NYC · Philadelphia · Hartford airports",
-  bounds: [-76.4, 39.2, -71.9, 42.1],
-  center: [-74.2, 40.7],
-  zoom: 7.2,
+  name: "Northeast airports",
+  bounds: [-81.0, 36.5, -67.0, 47.0],
+  center: [-74.5, 41.5],
+  zoom: 5.4,
   timeZone: "America/New_York",
 };
 
