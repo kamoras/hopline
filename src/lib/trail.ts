@@ -5,23 +5,29 @@ export interface Sample extends LatLon {
   at: number;
 }
 
-/** How often a point is kept, and how many (so a trail covers about two minutes). */
+/** How often a point is kept, how many at most, and how long a point lives (a trail is a short memory, never a history). */
 export const TRAIL_STEP_MS = 3_000;
 export const TRAIL_POINTS = 40;
+export const TRAIL_TTL_MS = 60_000;
 
-/** Adds `p` to a vehicle's history when enough time has passed since the last kept point. Returns the new history. */
-export function extendTrail(history: readonly Sample[] | undefined, p: LatLon, now: number, max = TRAIL_POINTS): Sample[] {
-  const h = history ?? [];
-  const last = h[h.length - 1];
-  if (last && now - last.at < TRAIL_STEP_MS) return h as Sample[];
-  return [...h, { lat: p.lat, lon: p.lon, at: now }].slice(-max);
+/**
+ * Adds `p` to a vehicle's history when enough time has passed since the last kept point, and forgets points older than
+ * `ttlMs`. Returns the new history. A vehicle that stops adds nothing, so its trail fades away.
+ */
+export function extendTrail(history: readonly Sample[] | undefined, p: LatLon, now: number, max = TRAIL_POINTS, ttlMs = TRAIL_TTL_MS): Sample[] {
+  const fresh = (history ?? []).filter((s) => now - s.at < ttlMs);
+  const last = fresh[fresh.length - 1];
+  if (last && now - last.at < TRAIL_STEP_MS) return fresh;
+  return [...fresh, { lat: p.lat, lon: p.lon, at: now }].slice(-max);
 }
 
-/** The trail as short segments that fade toward the tail, ending at the vehicle's current position. */
-export function trailSegments(history: readonly Sample[], head: LatLon): { from: LatLon; to: LatLon; a: number }[] {
-  const pts: LatLon[] = [...history, head];
-  const n = pts.length - 1;
-  return pts.slice(0, -1).map((from, i) => ({ from, to: pts[i + 1]!, a: (i + 1) / Math.max(1, n) }));
+/**
+ * The trail as short segments ending at the vehicle's current position. Each fades with its age, from solid at the
+ * vehicle to nothing at `ttlMs`, so a trail dies away on its own, and a vehicle that stands still leaves none.
+ */
+export function trailSegments(history: readonly Sample[], head: LatLon, now: number, ttlMs = TRAIL_TTL_MS): { from: LatLon; to: LatLon; a: number }[] {
+  const pts: (LatLon & { at: number })[] = [...history.filter((s) => now - s.at < ttlMs), { ...head, at: now }];
+  return pts.slice(0, -1).map((from, i) => ({ from, to: pts[i + 1]!, a: Math.max(0, 1 - (now - pts[i + 1]!.at) / ttlMs) }));
 }
 
 /** A heading line stops this far from the plane: past that it is a direction to look, not a path across the country. */

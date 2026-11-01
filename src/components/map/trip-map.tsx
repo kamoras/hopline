@@ -14,7 +14,9 @@ import { placeImportance } from "@/lib/importance";
 import { newArrivals, type Arrival } from "@/lib/ripples";
 import { nightFactor, sunAltitudeDeg } from "@/lib/sun";
 import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from "@/lib/motion";
-import { project } from "@/lib/polyline";
+import { createPolyline, project } from "@/lib/polyline";
+import { glideOnTrack } from "@/lib/track-glide";
+import { TrackIndex } from "@/lib/track-index";
 import { BaseMap, prefersDark } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
 import { installTrainIcons, vehicleIconId } from "./train-icon";
@@ -40,9 +42,9 @@ const STACK_RADIUS_PX = 26;
 /** Zoom at which trains switch from tiny dots to oriented train glyphs, and get number labels. */
 const GLYPH_MIN_ZOOM = 9;
 const LABEL_MIN_ZOOM = 11.5;
-/** Trains and buses (living model only) show a short wake from this zoom; a wake keeps this many points (about 36 s). */
+/** Trains and buses (living model only) show a short wake from this zoom; a wake lasts about 30 s. */
 const WAKE_MIN_ZOOM = 9;
-const WAKE_POINTS = 12;
+const WAKE_MS = 30_000;
 
 /**
  * Trains that are fine wear their line's color and stay quiet; problems take a status color and a
@@ -83,6 +85,16 @@ interface Props {
   controlsPosition?: "top-right" | "bottom-right";
   selectedTripId?: string;
   selectedPlaceId?: string;
+  /**
+   * Lock the camera onto this vehicle and follow it as it moves. Panning or zooming by hand lets go (`onFollowEnd`);
+   * setting it again locks on again.
+   */
+  followTripId?: string;
+  onFollowEnd?(): void;
+  /** Look here (a station, a search result): changes with `key`, not on every render. */
+  focus?: { lat: number; lon: number; zoom: number; key: string };
+  /** Room taken by a panel over the map, so what is looked at stays centered in what is left. */
+  padding?: { top: number; right: number; bottom: number; left: number };
   onSelectTrip(id: string): void;
   onSelectPlace(id: string): void;
 }
@@ -129,6 +141,9 @@ export interface MapView {
 /** Aircraft are drawn larger than trains: they are few, fast and easy to lose against the map. */
 const PLANE_SCALE = 1.5;
 
+/** There are many buses, so each is drawn small (their boxy shape still tells them from trains). */
+const BUS_SCALE = 0.7;
+
 const empty: FeatureCollection = { type: "FeatureCollection", features: [] };
 const byZoom = (a: number, b: number, c: number, z = [6, 9, 12]): ExpressionSpecification => ["interpolate", ["linear"], ["zoom"], z[0]!, a, z[1]!, b, z[2]!, c];
 
@@ -150,7 +165,7 @@ function tripFeatures(trips: readonly Trip[], at: Map<string, Placed>, stacked: 
         color,
         icon: vehicleIconId(t.mode, color, problem),
         heading: p.heading,
-        scale: (problem ? 1.25 : 0.95) * (t.mode === "flights" ? PLANE_SCALE : 1),
+        scale: (problem ? 1.25 : 0.95) * (t.mode === "flights" ? PLANE_SCALE : t.mode === "bus" ? BUS_SCALE : 1),
         pulse: problem ? pulse : 0,
       },
     });
@@ -213,6 +228,16 @@ function placeFeatures(places: readonly Place[], detail: ReadonlyMap<string, num
   };
 }
 
+/** The grid over the drawn lines, rebuilt only when the set of lines changes (not each time their data is re-delivered). */
+function indexOfLines(cache: { current: { key: string; index: TrackIndex } | undefined }, lines: readonly Line[]): TrackIndex | undefined {
+  if (lines.length === 0) return undefined;
+  const key = lines.map((l) => `${l.id}:${l.coords.length}`).join("|");
+  if (cache.current?.key !== key) {
+    cache.current = { key, index: new TrackIndex(lines.map((l) => createPolyline(l.coords.flatMap(([lon, lat]) => [lat!, lon!]))), 80) };
+  }
+  return cache.current.index;
+}
+
 /** Quiet the basemap so the network is the focus, like a transit diagram. Runs before our layers are added. */
 function mutedBasemap(map: MapLibreMap, calm: boolean) {
   for (const layer of map.getStyle().layers) {
@@ -229,7 +254,7 @@ function mutedBasemap(map: MapLibreMap, calm: boolean) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, followTripId, onFollowEnd, focus, padding, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -244,19 +269,25 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
   const hadRipples = useRef(false);
   /** Where each aircraft has been (kept in memory only), for its trail. */
   const history = useRef(new Map<string, Sample[]>());
+  const trackCache = useRef<{ key: string; index: TrackIndex }>(undefined);
   const lastTrail = useRef(0);
   const airport = useMemo(() => {
     const byCode = new Map<string, LatLon>();
     for (const p of places) for (const c of [p.id, ...(p.codes ?? [])]) byCode.set(c, p);
     return byCode;
   }, [places]);
-  const handlers = useRef({ onSelectTrip, onSelectPlace });
+  const handlers = useRef({ onSelectTrip, onSelectPlace, onFollowEnd });
+  /** The camera is locked onto the followed vehicle (after the move to it has finished). */
+  const locked = useRef(false);
+  const lastRefresh = useRef(0);
+  const lastReport = useRef(0);
+  const followRef = useRef<string | undefined>(undefined);
   const locate = useLocate(map);
 
   useEffect(() => {
-    handlers.current = { onSelectTrip, onSelectPlace };
+    handlers.current = { onSelectTrip, onSelectPlace, onFollowEnd };
     selectedRef.current = selectedTripId;
-  }, [onSelectTrip, onSelectPlace, selectedTripId]);
+  }, [onSelectTrip, onSelectPlace, onFollowEnd, selectedTripId]);
 
   const setup = useCallback((m: MapLibreMap) => {
     const dark = prefersDark();
@@ -522,6 +553,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     let wakeFeatures: Feature[] = [];
     const t = Date.now();
     const next = new Map<string, Motion>();
+    const trackIndex = () => indexOfLines(trackCache, lines);
     for (const trip of trips) {
       if (!trip.position) continue;
       const prev = shown.current.get(trip.id);
@@ -539,7 +571,10 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
         }
         next.set(trip.id, { legs, from: at, to: at, start: t, duration: 0, shift, shiftAt: t, heading });
       } else {
-        next.set(trip.id, { from: prev ?? at, to: at, start: t, duration: REFRESH_MS, shift: 0, shiftAt: t, heading });
+        // A train reported by GPS glides along its track to its new fix (not straight across the bend); a bus has no track.
+        const along = trip.mode === "bus" ? undefined : glideOnTrack(trackIndex(), prev ?? at, at, t, REFRESH_MS);
+        if (along) next.set(trip.id, { legs: compileLegs([along]), from: at, to: at, start: t, duration: 0, shift: 0, shiftAt: t, heading });
+        else next.set(trip.id, { from: prev ?? at, to: at, start: t, duration: REFRESH_MS, shift: 0, shiftAt: t, heading });
       }
     }
     motions.current = next;
@@ -592,6 +627,8 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
         if (id === selectedRef.current || view.contains([m.to.lon, m.to.lat])) placed.set(id, motionPosition(m, now));
       }
       shown.current = placed;
+      const followed = followRef.current && locked.current ? placed.get(followRef.current) : undefined;
+      if (followed) map.jumpTo({ center: [followed.lon, followed.lat] }, { follow: true });
       tripsSource.setData(tripFeatures(trips, placed, stacked.current, (Math.sin(now / 450) + 1) / 2));
       stacksSource.setData(stackFeatures(stacks.current, placed));
       if (planes.length || wakers.length) drawPaths(now, placed);
@@ -612,9 +649,9 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
           for (const t of wakers) {
             const p = placed.get(t.id);
             if (!p || stacked.current.has(t.id)) continue;
-            const h = extendTrail(history.current.get(t.id), p, now, WAKE_POINTS);
+            const h = extendTrail(history.current.get(t.id), p, now, 12, WAKE_MS);
             history.current.set(t.id, h);
-            for (const s of trailSegments(h, p)) {
+            for (const s of trailSegments(h, p, now, WAKE_MS)) {
               wakeFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[s.from.lon, s.from.lat], [s.to.lon, s.to.lat]] }, properties: { a: s.a, color: tripColor(t) } });
             }
           }
@@ -626,7 +663,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
         if (!p) continue;
         const selected = t.id === selectedRef.current;
         if (keep) history.current.set(t.id, extendTrail(history.current.get(t.id), p, now));
-        for (const s of trailSegments(history.current.get(t.id) ?? [], p)) {
+        for (const s of trailSegments(history.current.get(t.id) ?? [], p, now)) {
           trail.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[s.from.lon, s.from.lat], [s.to.lon, s.to.lat]] }, properties: { a: selected ? Math.min(1, s.a + 0.3) : s.a } });
         }
         const to = leadEnd(p, t.destinationAt ?? (t.stops[0] && airport.get(t.stops[0].id)));
@@ -638,7 +675,10 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
 
     shown.current = new Map([...next].map(([id, m]) => [id, motionPosition(m, t)]));
     // Panning or zooming brings other trains into view and changes how they stack.
-    const refresh = () => {
+    const refresh = (e?: object) => {
+      // Following a vehicle moves the camera every frame; the heavy parts (stacking, what to fetch) run about once a second then.
+      if ((e as { follow?: boolean } | undefined)?.follow && Date.now() - lastRefresh.current < 1_000) return;
+      lastRefresh.current = Date.now();
       draw();
       regroup();
       draw();
@@ -660,7 +700,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     };
     raf.current = requestAnimationFrame(loop);
     return stop;
-  }, [map, trips, frameTrips, living, airport]);
+  }, [map, trips, frameTrips, living, airport, lines]);
 
   const fitted_ = useRef<string | undefined>(undefined);
   useEffect(() => {
@@ -673,7 +713,9 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
 
   useEffect(() => {
     if (!map || !onViewChange) return;
-    const report = () => {
+    const report = (e?: object) => {
+      if ((e as { follow?: boolean } | undefined)?.follow && Date.now() - lastReport.current < 1_000) return;
+      lastReport.current = Date.now();
       const b = map.getBounds();
       onViewChange({ center: { lat: map.getCenter().lat, lon: map.getCenter().lng }, bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: map.getZoom() });
     };
@@ -689,9 +731,46 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     if (!map) return;
     map.setFilter("selected-ring", ["==", ["get", "id"], selectedTripId ?? ""]);
     const pos = trips.find((t) => t.id === selectedTripId)?.position;
-    if (pos) map.easeTo({ center: [pos.lon, pos.lat], zoom: Math.max(map.getZoom(), 10), duration: 700 });
+    if (pos && !followTripId) map.easeTo({ center: [pos.lon, pos.lat], zoom: Math.max(map.getZoom(), 10), duration: 700 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, selectedTripId]);
+
+  // Lock onto a vehicle: move to it, then keep it in the middle as it goes. Letting go is the person's choice (a drag).
+  useEffect(() => {
+    followRef.current = followTripId;
+    locked.current = false;
+    if (!map || !followTripId) return;
+    const at = shown.current.get(followTripId) ?? trips.find((t) => t.id === followTripId)?.position;
+    if (!at) return;
+    map.easeTo({ center: [at.lon, at.lat], zoom: Math.max(map.getZoom(), 12.5), duration: 800 });
+    map.once("moveend", () => {
+      if (followRef.current === followTripId) locked.current = true;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, followTripId]);
+
+  useEffect(() => {
+    if (!map) return;
+    const letGo = (e: object) => {
+      if (!(e as { originalEvent?: unknown }).originalEvent || !followRef.current) return;
+      followRef.current = undefined;
+      locked.current = false;
+      handlers.current.onFollowEnd?.();
+    };
+    map.on("dragstart", letGo);
+    return () => {
+      map.off("dragstart", letGo);
+    };
+  }, [map]);
+
+  useEffect(() => {
+    if (map && padding) map.setPadding(padding);
+  }, [map, padding?.top, padding?.right, padding?.bottom, padding?.left]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (map && focus) map.easeTo({ center: [focus.lon, focus.lat], zoom: Math.max(map.getZoom(), focus.zoom), duration: 700 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, focus?.key]);
 
   useEffect(() => {
     const p = places.find((x) => x.id === selectedPlaceId);
