@@ -7,7 +7,7 @@ import type { Line } from "@/domain/line";
 import type { Mode } from "@/domain/modes";
 import type { Place } from "@/domain/place";
 import type { Snapshot, Trip } from "@/domain/trip";
-import { activeBoards, requestsFor, worldPlaceId, type WorldView } from "@/lib/world";
+import { activeBoards, requestsFor, sameBoard, worldPlaceId, type RouteFocus, type WorldView } from "@/lib/world";
 import { REFRESH_MS } from "./use-trips";
 
 const getJson = <T,>(url: string): Promise<T> => fetch(url).then((r) => (r.ok ? (r.json() as Promise<T>) : Promise.reject(new Error(`${url}: ${r.status}`))));
@@ -28,6 +28,8 @@ export interface World {
   trips: Trip[];
   places: Place[];
   lines: Line[];
+  /** The track of the followed route, when there is one: what the camera frames. */
+  routeLines: Line[];
   /** Which board a trip came from, to open its answer. */
   boardOfTrip: ReadonlyMap<string, BoardLink>;
   /** The boards currently shown. */
@@ -40,9 +42,9 @@ export interface World {
  * Every board in view, merged into one model of transit: its trips (live), track and stations. Boards that are
  * out of view, too far away to read, or switched off are not fetched at all.
  */
-export function useWorld(allBoards: readonly BoardLink[], view: WorldView | undefined, modes: ReadonlySet<Mode>): World {
-  const boards = useMemo(() => activeBoards(allBoards, view, modes), [allBoards, view, modes]);
-  const requests = useMemo(() => (view ? boards.map((b) => requestsFor(b, view)) : []), [boards, view]);
+export function useWorld(allBoards: readonly BoardLink[], view: WorldView | undefined, modes: ReadonlySet<Mode>, focus?: RouteFocus): World {
+  const boards = useMemo(() => activeBoards(allBoards, view, modes, focus), [allBoards, view, modes, focus]);
+  const requests = useMemo(() => (view ? boards.map((b) => requestsFor(b, view, focus && sameBoard(b, focus.board) ? focus.route : undefined)) : []), [boards, view, focus]);
 
   const tripData = useAll<Snapshot>(requests.map((r) => r.trips), REFRESH_MS);
   const lineData = useAll<Line[]>(requests.flatMap((r) => (r.lines ? [r.lines] : [])), undefined);
@@ -62,8 +64,9 @@ export function useWorld(allBoards: readonly BoardLink[], view: WorldView | unde
 
     const withLines = requests.filter((r) => r.lines);
     const lines = withLines.flatMap((r, i) => (lineData[i] ?? []).map((l) => ({ ...l, id: `${r.board.mode}-${r.board.regionId}-${l.id}` })));
+    const routeLines = focus ? withLines.flatMap((r, i) => (sameBoard(r.board, focus.board) ? (lineData[i] ?? []).map((l) => ({ ...l, id: `${r.board.mode}-${r.board.regionId}-${l.id}` })) : [])) : [];
     const withPlaces = requests.filter((r) => r.places);
     const places = withPlaces.flatMap((r, i) => (placeData[i] ?? []).map((p) => ({ ...p, id: worldPlaceId(r.board, p.id) })));
-    return { trips, places, lines, boardOfTrip, boards, counts };
-  }, [requests, tripData, lineData, placeData, boards]);
+    return { trips, places, lines, routeLines, boardOfTrip, boards, counts };
+  }, [requests, tripData, lineData, placeData, boards, focus]);
 }

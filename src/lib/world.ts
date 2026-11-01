@@ -20,10 +20,18 @@ export const STOP_MIN_ZOOM = 14;
 
 const intersects = ([w, s, e, n]: BBox, [w2, s2, e2, n2]: readonly [number, number, number, number]) => w <= e2 && e >= w2 && s <= n2 && n >= s2;
 
-/** The boards that are in view and close enough to be shown, for the modes that are switched on. */
-export function activeBoards(boards: readonly BoardLink[], view: WorldView | undefined, modes: ReadonlySet<Mode>): BoardLink[] {
+/** One route of a big network the person chose to follow: it is shown whole, at any zoom, and nothing else of that network is. */
+export interface RouteFocus {
+  board: BoardLink;
+  route: string;
+}
+
+const sameBoard = (a: Pick<BoardLink, "mode" | "regionId">, b: Pick<BoardLink, "mode" | "regionId">) => a.mode === b.mode && a.regionId === b.regionId;
+
+/** The boards that are in view and close enough to be shown, for the modes that are switched on (and a followed route's board, always). */
+export function activeBoards(boards: readonly BoardLink[], view: WorldView | undefined, modes: ReadonlySet<Mode>, focus?: RouteFocus): BoardLink[] {
   if (!view) return [];
-  return boards.filter((b) => modes.has(b.mode) && view.zoom >= MODE_MIN_ZOOM[b.mode] && intersects(view.bbox, b.bounds));
+  return boards.filter((b) => (focus && sameBoard(b, focus.board)) || (modes.has(b.mode) && view.zoom >= MODE_MIN_ZOOM[b.mode] && intersects(view.bbox, b.bounds)));
 }
 
 /** What to ask the server for one active board: its trips, track and stations (a big network by area only). */
@@ -34,8 +42,12 @@ export interface BoardRequests {
   places?: string;
 }
 
-export function requestsFor(board: BoardLink, view: WorldView): BoardRequests {
+export function requestsFor(board: BoardLink, view: WorldView, route?: string): BoardRequests {
   const base = `mode=${board.mode}&region=${board.regionId}`;
+  if (route) {
+    const r = encodeURIComponent(route);
+    return { board, trips: `/api/trips?${base}&route=${r}`, lines: `/api/lines?${base}&route=${r}` };
+  }
   if (!MODES[board.mode].viewport) {
     return { board, trips: `/api/trips?${base}`, lines: `/api/lines?${base}`, places: `/api/places?${base}` };
   }
@@ -45,6 +57,8 @@ export function requestsFor(board: BoardLink, view: WorldView): BoardRequests {
 }
 
 /** A station's id on the combined map, which holds every board's stations: the board key keeps equal ids apart. */
+export { sameBoard };
+
 export const worldPlaceId = (board: Pick<BoardLink, "mode" | "regionId">, placeId: string) => `${board.mode}~${board.regionId}~${placeId}`;
 
 export function parseWorldPlaceId(id: string): { mode: Mode; regionId: string; placeId: string } | undefined {

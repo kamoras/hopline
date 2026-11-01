@@ -244,7 +244,15 @@ over the map (a side panel on a wide screen, a bottom sheet on a phone):
   callsign, route or line, destination, or a station still ahead of it: `lib/vehicle-search.ts`), then stations and
   airports (those on the map, and the rest from the server's catalog, which carries each place's position so the map
   can fly there). Choosing a vehicle swaps to its drawer and locks the camera on.
-- **A station or airport** opens what is due there (`PlaceDrawer`) and the camera flies to it.
+- **A route of a big network** (a bus route) found by search opens its drawer (`RouteDrawer`): the whole route is
+  drawn and framed on the map, at any zoom, with the vehicles running on it listed (`RouteFocus` in `lib/world.ts`:
+  the followed route's board is always active and asked for that one route only, via `&route=`).
+- **A station or airport** opens what is due there (`PlaceDrawer`) and the camera flies to it; "Also here" lists the
+  same interchange on other boards (its metro, its trains) and opens them in place (connections carry a position).
+- **The address follows the drawer** (`lib/deeplink.ts`), so what is open can be shared or reloaded:
+  `/?trip=mnr:521&board=rail/northeast`, `/?place=subway/nyc/<station>`, `/?route=bus/boston/39`. The page reads it
+  once in the browser (so the page stays static), waits for what it names to load, and opens it; a trip that has
+  ended just leaves the map at its board. Nothing about the person is in it, only what they were looking at.
 - The map keeps its subject centered in what a drawer leaves uncovered (`padding` on `TripMap`).
 
 The boards (`/metro/nyc` and so on) still exist for deep links and are listed under the map for now; the aim is for

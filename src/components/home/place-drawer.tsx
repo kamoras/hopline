@@ -7,12 +7,25 @@ import type { Trip } from "@/domain/trip";
 import { useArrivals } from "@/hooks/use-arrivals";
 import { groupArrivals, minutesUntil } from "@/lib/arrivals";
 import { searchTrips } from "@/lib/search";
+import { Connections } from "../connections";
 import { LineBadge } from "../line-badge";
 import { destinationPhrase, PlatformTag, StopTime } from "../trip-parts";
 import type { PlaceTarget } from "./model-home";
 
 /** A station or airport: what is due there next, live. */
-export function PlaceDrawer({ place, trips, now, onOpenTrip }: { place: PlaceTarget; trips: readonly Trip[]; now: number; onOpenTrip(id: string): void }) {
+export function PlaceDrawer({
+  place,
+  trips,
+  now,
+  onOpenTrip,
+  onOpenPlace,
+}: {
+  place: PlaceTarget;
+  trips: readonly Trip[];
+  now: number;
+  onOpenTrip(id: string): void;
+  onOpenPlace(place: PlaceTarget): void;
+}) {
   const mode = MODES[place.mode];
   const stationsFirst = mode.browse === "stations";
   const { arrivals, isLoading, error } = useArrivals(place.mode, place.regionId, stationsFirst ? place.id : undefined);
@@ -27,6 +40,13 @@ export function PlaceDrawer({ place, trips, now, onOpenTrip }: { place: PlaceTar
         <div className="text-sm text-muted">{stationsFirst ? `Next ${mode.nounPlural} at` : `${mode.label} at`}</div>
         <h2 tabIndex={-1} className="text-2xl font-bold tracking-tight outline-none">{place.name}</h2>
       </div>
+
+      <Connections
+        mode={place.mode}
+        regionId={place.regionId}
+        placeId={place.id}
+        onOpen={(c) => onOpenPlace({ id: c.placeId, name: c.name, mode: c.mode, regionId: c.regionId, lat: c.lat, lon: c.lon })}
+      />
 
       {stationsFirst ? (
         <ul className="space-y-2" aria-label={`Next ${mode.nounPlural}`}>

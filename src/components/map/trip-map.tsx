@@ -70,6 +70,8 @@ interface Props {
   frameTrips?: boolean;
   /** When this changes, frame all the lines on screen (a route was just chosen). */
   fitLinesKey?: string;
+  /** Frame this track (a route was just chosen); changes with `key`, once its lines have arrived. */
+  fitTo?: { key: string; lines: readonly Line[] };
   /** Reports where the map is looking (after each pan or zoom): other modes open the same place, big networks load that part. */
   onViewChange?(view: MapView): void;
   /** Whether this mode reports lateness; if not, there is no late/on-time legend. */
@@ -254,7 +256,7 @@ function mutedBasemap(map: MapLibreMap, calm: boolean) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, fitLinesKey, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, followTripId, onFollowEnd, focus, padding, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, fitTo, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, followTripId, onFollowEnd, focus, padding, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -710,6 +712,15 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     for (const l of lines) for (const c of l.coords) b.extend(c);
     map.fitBounds(b, { padding: 64, maxZoom: 14, duration: 600 });
   }, [map, lines, fitLinesKey]);
+
+  const fittedTo = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!map || !fitTo || fitTo.lines.length === 0 || fittedTo.current === fitTo.key) return;
+    fittedTo.current = fitTo.key;
+    const b = new LngLatBounds();
+    for (const l of fitTo.lines) for (const c of l.coords) b.extend(c);
+    map.fitBounds(b, { padding: 48, maxZoom: 14, duration: 700 });
+  }, [map, fitTo]);
 
   useEffect(() => {
     if (!map || !onViewChange) return;

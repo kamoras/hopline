@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { BoardLink } from "@/domain/board";
 import { MODES } from "@/domain/modes";
 import type { Place } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
@@ -8,7 +9,10 @@ import { normalizeName } from "@/domain/place";
 import { operatorName } from "@/domain/operators";
 import { searchVehicles } from "@/lib/vehicle-search";
 import { parseWorldPlaceId } from "@/lib/world";
+import { readableTextColor } from "@/lib/color";
 import type { CatalogHit } from "@/server/catalog";
+import type { RouteSummary } from "@/server/routes";
+import { LineBadge } from "../line-badge";
 import { destinationPhrase } from "../trip-parts";
 import type { PlaceTarget } from "./model-home";
 
@@ -17,14 +21,19 @@ export function SearchDrawer({
   query,
   trips,
   places,
+  boards,
   onOpenTrip,
   onOpenPlace,
+  onOpenRoute,
 }: {
   query: string;
   trips: readonly Trip[];
   places: readonly Place[];
+  /** Every board, so routes of the big networks (buses) can be found even where they are not on the map. */
+  boards: readonly BoardLink[];
   onOpenTrip(id: string): void;
   onOpenPlace(place: PlaceTarget): void;
+  onOpenRoute(board: BoardLink, route: RouteSummary): void;
 }) {
   const [hits, setHits] = useState<{ query: string; found: CatalogHit[] }>();
   const q = query.trim();
@@ -45,6 +54,29 @@ export function SearchDrawer({
     };
   }, [q]);
 
+  // Routes of a big network (buses) are searched on the server, board by board.
+  const [routeHits, setRouteHits] = useState<{ query: string; found: { board: BoardLink; route: RouteSummary }[] }>();
+  useEffect(() => {
+    const viewport = boards.filter((b) => MODES[b.mode].viewport);
+    if (!q || viewport.length === 0) return;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => {
+      Promise.all(
+        viewport.map((board) =>
+          fetch(`/api/routes?mode=${board.mode}&region=${board.regionId}&q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+            .then((r) => (r.ok ? (r.json() as Promise<RouteSummary[]>) : []))
+            .then((routes) => routes.slice(0, 5).map((route) => ({ board, route })))
+            .catch(() => []),
+        ),
+      ).then((lists) => setRouteHits({ query: q, found: lists.flat().slice(0, 10) }));
+    }, 150);
+    return () => {
+      clearTimeout(t);
+      ctrl.abort();
+    };
+  }, [q, boards]);
+  const routes = routeHits?.query === q ? routeHits.found : [];
+
   const vehicles = useMemo(() => searchVehicles(trips, q), [trips, q]);
   const stations = useMemo<PlaceTarget[]>(() => {
     const norm = normalizeName(q);
@@ -59,7 +91,7 @@ export function SearchDrawer({
     return [...fromMap.slice(0, 6), ...fromCatalog].slice(0, 8);
   }, [places, hits, q]);
 
-  const nothing = vehicles.length === 0 && stations.length === 0;
+  const nothing = vehicles.length === 0 && stations.length === 0 && routes.length === 0;
   return (
     <div className="space-y-5">
       <h2 tabIndex={-1} className="text-lg font-bold tracking-tight">
@@ -82,6 +114,28 @@ export function SearchDrawer({
                     </span>
                     <span className="block truncate text-xs text-muted">
                       {MODES[t.mode].label} · {operatorName(t.operatorId)}
+                    </span>
+                  </span>
+                  <span aria-hidden className="text-muted">›</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {routes.length > 0 && (
+        <section aria-label="Routes">
+          <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">Routes</h3>
+          <ul className="space-y-2">
+            {routes.map(({ board, route }) => (
+              <li key={`${board.href}/${route.route}`}>
+                <button type="button" onClick={() => onOpenRoute(board, route)} className="press flex w-full items-center gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:bg-surface-2">
+                  <LineBadge route={route.route} color={route.color} textColor={readableTextColor(route.color)} size={28} label={`${MODES[board.mode].lineNoun} ${route.route}`} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{route.name}</span>
+                    <span className="block truncate text-xs text-muted">
+                      {MODES[board.mode].label} · {board.regionName}
                     </span>
                   </span>
                   <span aria-hidden className="text-muted">›</span>
