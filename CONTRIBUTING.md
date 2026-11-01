@@ -19,7 +19,7 @@ under "Scaling" in the same document.
 
 ## Automated PRs
 
-Dependabot (weekly) and the Metro-North schedule refresh open PRs that auto-merge once CI
+Dependabot (weekly) and the weekly schedule refresh (`npm run data:refresh`, every bundled timetable) open PRs that auto-merge once CI
 passes. That includes major bumps: if one breaks CI it stays open for a human. One-time repo setup is in [docs/REPO_SETUP.md](docs/REPO_SETUP.md).
 
 ## Dependency security

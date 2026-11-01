@@ -63,7 +63,7 @@ so upstream feeds see roughly one request per 10 s regardless of traffic.
 | [MBTA GTFS-Realtime](https://www.mbta.com/developers) (trip updates, vehicle positions, alerts) | Live Boston-area commuter rail, subway and buses: delays, GPS positions, next trains, alert-based reasons and line status | Keyless. `MBTA_API_KEY` is optional and raises the rate limit. |
 | [WMATA GTFS-Realtime](https://developer.wmata.com) (Metrorail and Metrobus trip updates, vehicle positions, alerts) | Live Washington metro and buses: GPS positions, next trains and buses, alert-based line status | Requires a free key, `WMATA_API_KEY`, sent as `api_key` from the server only. |
 | [MTA GTFS-Realtime](https://www.mta.info/developers) (Metro-North and Long Island Rail Road trip updates, vehicles, alerts) | Live Metro-North and LIRR delays and alert-based reasons | Currently keyless. If MTA requires a key, set `MTA_API_KEY`. |
-| MTA static GTFS | Station names, train numbers, schedules | Converted to JSON at build time, refreshed weekly by a GitHub Action. |
+| MTA static GTFS | Station names, train numbers, schedules | Converted to JSON at build time, refreshed weekly by a GitHub Action (`npm run data:refresh` rebuilds every bundled schedule). |
 | [Amtraker v3](https://amtraker.com) | Live Amtrak positions and delays, stations | Community API, no key. The author asks for credit on the site; Hopline shows it in every board footer. Override the URL with `AMTRAKER_BASE_URL`. |
 | [OpenFreeMap](https://openfreemap.org) + MapLibre GL | Base map | Free, keyless. Override with `NEXT_PUBLIC_MAP_STYLE_URL`. |
 
