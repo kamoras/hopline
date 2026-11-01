@@ -18,7 +18,7 @@ import { project } from "@/lib/polyline";
 import { BaseMap, prefersDark } from "./base-map";
 import { groupStacks, type Stack } from "./stacking";
 import { installTrainIcons, vehicleIconId } from "./train-icon";
-import { extendTrail, TRAIL_STEP_MS, trailSegments, type Sample } from "@/lib/trail";
+import { extendTrail, leadEnd, TRAIL_STEP_MS, trailSegments, type Sample } from "@/lib/trail";
 import { useLocate } from "./use-locate";
 
 /** Station names appear from this zoom, and only where they fit. */
@@ -40,6 +40,9 @@ const STACK_RADIUS_PX = 26;
 /** Zoom at which trains switch from tiny dots to oriented train glyphs, and get number labels. */
 const GLYPH_MIN_ZOOM = 9;
 const LABEL_MIN_ZOOM = 11.5;
+/** Trains and buses (living model only) show a short wake from this zoom; a wake keeps this many points (about 36 s). */
+const WAKE_MIN_ZOOM = 9;
+const WAKE_POINTS = 12;
 
 /**
  * Trains that are fine wear their line's color and stay quiet; problems take a status color and a
@@ -261,7 +264,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     const halo = dark ? "#0f1620" : "#ffffff";
     mutedBasemap(m, living);
     installTrainIcons(m);
-    for (const id of ["lines", "places", "trips", "stacks", "trails", "leads"]) m.addSource(id, { type: "geojson", data: empty });
+    for (const id of ["lines", "places", "trips", "stacks", "trails", "leads", "wakes"]) m.addSource(id, { type: "geojson", data: empty });
     if (living) {
       m.addSource("ripples", { type: "geojson", data: empty });
       // Night is a navy sheet over the basemap only (it sits under the network, so lines and trains stay bright).
@@ -351,6 +354,15 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       source: "trails",
       layout: { "line-cap": "round" },
       paint: { "line-color": "#cfe2ff", "line-width": byZoom(1.6, 2.6, 3.6), "line-opacity": ["*", 0.8, ["get", "a"]] },
+    });
+    // Trains and buses on the living model leave a short wake in their own color, from where they have just been.
+    m.addLayer({
+      id: "wake-lines",
+      type: "line",
+      source: "wakes",
+      minzoom: WAKE_MIN_ZOOM,
+      layout: { "line-cap": "round" },
+      paint: { "line-color": ["get", "color"], "line-width": byZoom(1.6, 2.4, 3.2, [9, 12, 15]), "line-opacity": ["*", 0.6, ["get", "a"]] },
     });
     m.addLayer({
       id: "plane-glow",
@@ -502,8 +514,12 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
     const trailsSource = map?.getSource("trails") as GeoJSONSource | undefined;
     const leadsSource = map?.getSource("leads") as GeoJSONSource | undefined;
     if (!map || !tripsSource || !stacksSource || !trailsSource || !leadsSource) return;
+    const wakesSource = map?.getSource("wakes") as GeoJSONSource | undefined;
     const planes = trips.filter((t) => t.mode === "flights");
-    for (const id of history.current.keys()) if (!planes.some((t) => t.id === id)) history.current.delete(id);
+    const wakers = living ? trips.filter((t) => t.mode !== "flights") : [];
+    const known = new Set(trips.map((t) => t.id));
+    for (const id of history.current.keys()) if (!known.has(id)) history.current.delete(id);
+    let wakeFeatures: Feature[] = [];
     const t = Date.now();
     const next = new Map<string, Motion>();
     for (const trip of trips) {
@@ -578,7 +594,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       shown.current = placed;
       tripsSource.setData(tripFeatures(trips, placed, stacked.current, (Math.sin(now / 450) + 1) / 2));
       stacksSource.setData(stackFeatures(stacks.current, placed));
-      if (planes.length) drawPaths(now, placed);
+      if (planes.length || wakers.length) drawPaths(now, placed);
       if (living) drawRipples(map, ripples, hadRipples, now);
     };
 
@@ -588,6 +604,23 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
       const lead: Feature[] = [];
       const keep = now - lastTrail.current >= TRAIL_STEP_MS;
       if (keep) lastTrail.current = now;
+      const wakesOn = wakesSource && wakers.length > 0 && map.getZoom() >= WAKE_MIN_ZOOM;
+      if (keep && wakesSource) {
+        // Wakes are rebuilt once per step (not every frame): there are many more trains than planes.
+        wakeFeatures = [];
+        if (wakesOn) {
+          for (const t of wakers) {
+            const p = placed.get(t.id);
+            if (!p || stacked.current.has(t.id)) continue;
+            const h = extendTrail(history.current.get(t.id), p, now, WAKE_POINTS);
+            history.current.set(t.id, h);
+            for (const s of trailSegments(h, p)) {
+              wakeFeatures.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[s.from.lon, s.from.lat], [s.to.lon, s.to.lat]] }, properties: { a: s.a, color: tripColor(t) } });
+            }
+          }
+        }
+        wakesSource.setData({ type: "FeatureCollection", features: wakeFeatures });
+      }
       for (const t of planes) {
         const p = placed.get(t.id);
         if (!p) continue;
@@ -596,7 +629,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fra
         for (const s of trailSegments(history.current.get(t.id) ?? [], p)) {
           trail.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[s.from.lon, s.from.lat], [s.to.lon, s.to.lat]] }, properties: { a: selected ? Math.min(1, s.a + 0.3) : s.a } });
         }
-        const to = t.stops[0] && airport.get(t.stops[0].id);
+        const to = leadEnd(p, t.destinationAt ?? (t.stops[0] && airport.get(t.stops[0].id)));
         if (to) lead.push({ type: "Feature", geometry: { type: "LineString", coordinates: [[p.lon, p.lat], [to.lon, to.lat]] }, properties: { a: selected ? 0.95 : 0.45 } });
       }
       trailsSource.setData({ type: "FeatureCollection", features: trail });

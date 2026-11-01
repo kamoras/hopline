@@ -17,6 +17,12 @@ describe("trail", () => {
     expect(h[h.length - 1]!.lat).toBe(TRAIL_POINTS * 2 - 1);
   });
 
+  it("can keep a shorter history", () => {
+    let h = extendTrail(undefined, { lat: 0, lon: 0 }, 0, 3);
+    for (let i = 1; i < 10; i++) h = extendTrail(h, { lat: i, lon: 0 }, i * TRAIL_STEP_MS, 3);
+    expect(h.map((s) => s.lat)).toEqual([7, 8, 9]);
+  });
+
   it("fades toward the tail and ends at the vehicle", () => {
     const h = extendTrail(extendTrail(undefined, { lat: 0, lon: 0 }, 0), { lat: 1, lon: 0 }, TRAIL_STEP_MS);
     const s = trailSegments(h, { lat: 2, lon: 0 });
