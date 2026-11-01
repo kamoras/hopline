@@ -6,6 +6,7 @@ describe("deep links", () => {
     { kind: "trip", key: "mnr:521", mode: "rail", regionId: "northeast" },
     { kind: "place", mode: "subway", regionId: "nyc", placeId: "times-sq-42-st" },
     { kind: "route", mode: "bus", regionId: "boston", route: "39" },
+    { kind: "board", mode: "subway", regionId: "nyc" },
   ];
 
   it("round-trips what is open through the address", () => {
@@ -18,6 +19,7 @@ describe("deep links", () => {
   it("writes readable addresses", () => {
     expect(linkHref(links[0])).toBe("/?trip=mnr:521&board=rail/northeast");
     expect(linkHref(links[2])).toBe("/?route=bus/boston/39");
+    expect(linkHref(links[3])).toBe("/?board=subway/nyc");
     expect(linkHref(undefined)).toBe("/");
   });
 

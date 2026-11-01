@@ -35,22 +35,15 @@ shows everything in a region. The unit of navigation is a **board**: one **mode*
   a rail network (`northeast`) or a single airport (`bdl`), so granularity follows the use case.
 - **Board** (`src/domain/board.ts`): derived from providers, never configured. A board exists
   only where a provider serves that (mode, region), so the UI cannot offer an empty one.
-- **URLs:** `/` is a chooser grouped by mode (it redirects straight to the board when only one
-  exists, keeping "where's my train" one step away); each board is `/{mode}/{region}`, e.g.
-  `/rail/northeast`.
-- **Naming.** Rapid transit is a mode called **Metro** (`MODES.subway`, slug `metro`, board `/metro/nyc`), because
-  cities do not agree on "subway"; the operator keeps the local name (NYC Subway, The T, Washington Metro). The
-  mode's internal id stays `subway`, which `getMode` still accepts, so the API and old `/subway/...` links keep
-  working (the board page redirects them to the canonical `/metro/...`).
-- **Moving between modes** needs no menu. Tabs for every mode available sit in the header (`ModeTabs`); the
-  area carries over: a tab opens the board of that mode for wherever the map is looking
-  (`nearestBoard` in `domain/board.ts`: the board whose area contains the point, else the closest), so Trains
-  at New York then Subway is the New York subway, not Boston's. They are real links (open in a new tab, work
-  without JavaScript). The title menu only chooses another *area* of the same mode.
-- **Interchanges.** A station sheet lists the other modes' stations beside it ("Also here: Subway Grand
-  Central-42 St"), each opening that station on its board. `server/connections.ts` finds them by distance
+- **URLs:** there is one page, `/`. What is open is in its query string (see "The model" below); the old
+  `/{mode}/{region}` board addresses redirect into it.
+- **Naming.** Rapid transit is a mode called **Metro** (`MODES.subway`, slug `metro`), because cities do not agree
+  on "subway"; the operator keeps the local name (NYC Subway, The T, Washington Metro). The mode's internal id stays
+  `subway`, which `getMode` still accepts, so the API and old `/subway/...` links keep working (they redirect).
+- **Interchanges.** A station drawer lists the other modes' stations beside it ("Also here: Subway Grand
+  Central-42 St"), each opening that station in place. `server/connections.ts` finds them by distance
   (about a three-minute walk) and only consults boards whose area contains the station, so it never loads a
-  faraway board's data; `/api/connections` is cached for an hour. A new mode gets its tab and its interchanges
+  faraway board's data; `/api/connections` is cached for an hour. A new mode gets its interchanges
   for free once it has a board and places.
 - **Isolation:** the API, aggregation and cache are all keyed by (mode, region), so an Atlanta
   flight board never loads, or even fetches, New York train data.
@@ -62,18 +55,17 @@ All state below lives in the URL or in the browser; none of it reaches a server.
 
 | Person | Fastest path |
 | --- | --- |
-| Daily commuter | **My commutes** (saved "A to B") sit at the top of the board with the next departures; **My trains** pin by number and survive across days. `/` offers "Continue" to the last board. |
-| Just looking, or in a hurry | The home page is a live model of everything moving: pan and zoom to browse, or search at the top; tap a vehicle or station for its answer card. |
-| Knows their train | Type the number. Or open the shareable deep link `/{mode}/{region}/trip/{operator}-{number}`. |
-| Thinks in sentences | Natural language works: `new haven to new york round trip`, `trains leaving stamford to grand central right now`, `nyc`. `src/lib/query.ts` turns text into an intent (legs, round trip, time window) and region `aliases` map city names to station names; anything unrecognized falls back to number/station search. |
-| Knows their station | Type it: autocomplete opens its departures (`/{mode}/{region}/stop/{place}`). Type `A to B` for trains that call at both, then save it as a commute. |
+| Daily commuter | Focus the search box: **My commutes** (saved "A to B") with the next trains, and **My vehicles** (pinned by number, which survive across days). |
+| Just looking, or in a hurry | The home page is a live model of everything moving: pan and zoom to browse, or search at the top; tap a vehicle or station and its drawer opens. |
+| Knows their train | Type the number or callsign. Or open the shareable link `/?trip={operator}:{number}&board={mode}/{region}`. |
+| Thinks in sentences | Natural language works: `new haven to new york round trip`, `trains leaving stamford to grand central right now`. `src/lib/query.ts` turns text into an intent (legs, round trip, time window) and region `aliases` map city names to station names; anything else falls back to number, route and station search. |
+| Knows their station | Type it; its drawer shows what is due. Type `A to B` for trains that call at both, then save it as a commute. |
 | Just arrived / unsure | **Near me** (on-device location) suggests the nearest stations; no typing. |
-| Changing from train to subway (or flights, later) | Tap the mode tab in the header; it opens the same area. Or tap "Also here" in a station sheet to jump to that interchange's other board. |
-| Explorer | Map: tap a station for departures, tap a train to follow it. On the home page (when there are several boards) each board is a tappable bubble. |
-| Visitor from a link | Deep links open straight to the trip or station; Back closes the sheet. |
+| Changing from train to metro (or flights) | "Also here" in a station drawer opens that interchange's other board in place. |
+| Visitor from a link | Deep links open straight to the vehicle, station or route; old board links redirect there. |
 
 Building blocks: `Place` (`src/domain/place.ts`, fetched per provider via `fetchPlaces`, merged by
-normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, station, route),
+normalized name), `searchTrips` (number, station, route),
 `/api/search` (universal search over boards and places), `BaseMap` (shared map setup).
 
 ## Key decisions
@@ -262,8 +254,9 @@ over the map (a side panel on a wide screen, a bottom sheet on a phone):
   ended just leaves the map at its board. Nothing about the person is in it, only what they were looking at.
 - The map keeps its subject centered in what a drawer leaves uncovered (`padding` on `TripMap`).
 
-The boards (`/metro/nyc` and so on) still exist for deep links and are listed under the map for now; the aim is for
-the home page to be all there is.
+The old board addresses (`/metro/nyc`, `/rail/northeast/trip/mnr-1384`, `/metro/nyc/stop/1-av`) are permanent redirects
+into the app (`/?board=`, `/?trip=`, `/?place=`), so old links and bookmarks keep working; the board pages and their UI
+no longer exist. The home page is all there is, with a plain list of the places Hopline covers under the map.
 
 - **One map, every board.** `useWorld` (`hooks/use-world.ts`) merges the boards in view into one set of trips, track
   and stations. `lib/world.ts` decides which boards those are: in view, switched on, and past their mode's zoom

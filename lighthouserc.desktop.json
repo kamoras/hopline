@@ -5,14 +5,11 @@
       "startServerReadyPattern": "Ready",
       "url": [
         "http://localhost:3123/",
-        "http://localhost:3123/rail/northeast",
-        "http://localhost:3123/rail/northeast/trip/mnr-1384",
-        "http://localhost:3123/metro/nyc",
-        "http://localhost:3123/metro/nyc/stop/1-av",
-        "http://localhost:3123/flights/northeast-air",
-        "http://localhost:3123/flights/northeast-air/stop/jfk",
-        "http://localhost:3123/bus/boston",
-        "http://localhost:3123/bus/boston/stop/2"
+        "http://localhost:3123/?trip=mnr:1384&board=rail/northeast",
+        "http://localhost:3123/?place=subway/nyc/1-av",
+        "http://localhost:3123/?place=flights/northeast-air/jfk",
+        "http://localhost:3123/?route=bus/boston/1",
+        "http://localhost:3123/rail/northeast"
       ],
       "numberOfRuns": 1,
       "settings": {

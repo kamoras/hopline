@@ -6,9 +6,11 @@ import { MODES } from "@/domain/modes";
  *  - `?trip=mnr:521&board=rail/northeast`   a vehicle (its operator and public number, which outlive a trip id)
  *  - `?place=subway/nyc/times-sq-42-st`     a station or airport
  *  - `?route=bus/boston/39`                 a route of a big network
+ *  - `?board=subway/nyc`                    just start the map over a board (what the old board pages now lead to)
  * Nothing about the person is in it, only what they were looking at.
  */
 export type Link =
+  | { kind: "board"; mode: Mode; regionId: string }
   | { kind: "trip"; key: string; mode: Mode; regionId: string }
   | { kind: "place"; mode: Mode; regionId: string; placeId: string }
   | { kind: "route"; mode: Mode; regionId: string; route: string };
@@ -33,14 +35,16 @@ export function parseLink(params: { trip?: string; board?: string; place?: strin
     const r = parseBoard(params.route);
     return r && r.rest.length ? { kind: "route", mode: r.mode, regionId: r.regionId, route: r.rest.join("/") } : undefined;
   }
-  return undefined;
+  const board = parseBoard(params.board);
+  return board && !board.rest.length ? { kind: "board", mode: board.mode, regionId: board.regionId } : undefined;
 }
 
 /** The address for what is open ("/" when nothing is). */
 export function linkHref(link: Link | undefined): string {
   if (!link) return "/";
   const q = new URLSearchParams();
-  if (link.kind === "trip") {
+  if (link.kind === "board") q.set("board", `${link.mode}/${link.regionId}`);
+  else if (link.kind === "trip") {
     q.set("trip", link.key);
     q.set("board", `${link.mode}/${link.regionId}`);
   } else if (link.kind === "place") q.set("place", `${link.mode}/${link.regionId}/${link.placeId}`);

@@ -28,7 +28,6 @@ import { RouteDrawer } from "./route-drawer";
 import { SearchBar } from "./search-bar";
 import { SearchDrawer } from "./search-drawer";
 import { TripDrawer } from "./trip-drawer";
-import { ResumeCard } from "./resume-card";
 
 const TripMap = dynamic(() => import("../map/trip-map"), {
   ssr: false,
@@ -321,7 +320,6 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
           <h1 className="text-2xl font-bold tracking-tight">{BRAND.name}: {BRAND.tagline}</h1>
           <p className="text-muted">{BRAND.coverage}</p>
         </header>
-        <ResumeCard boards={boards} />
         <BoardList boards={boards} />
       </section>
     </main>
@@ -338,7 +336,7 @@ function BoardList({ boards }: { boards: BoardLink[] }) {
           <ul className="grid gap-3 sm:grid-cols-2">
             {list?.map((b) => (
               <li key={b.href}>
-                <Link href={b.href} className="block rounded-2xl border border-line bg-surface p-4 font-semibold shadow-card hover:border-accent/50 hover:shadow-lift">
+                <Link href={linkHref({ kind: "board", mode: b.mode, regionId: b.regionId })} className="block rounded-2xl border border-line bg-surface p-4 font-semibold shadow-card hover:border-accent/50 hover:shadow-lift">
                   {b.regionName}
                 </Link>
               </li>
