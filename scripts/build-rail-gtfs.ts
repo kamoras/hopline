@@ -151,6 +151,42 @@ const AGENCIES: Record<string, Agency> = {
     },
     coarseGapM: 5_000,
   },
+  // New England buses with public live feeds. Every trip is live (GPS), so only stops, routes and track are kept.
+  cttransit: {
+    url: process.env.CTTRANSIT_GTFS_URL ?? "https://www.cttransit.com/sites/default/files/gtfs/googlect_transit.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  norwalk: {
+    url: process.env.NORWALK_GTFS_URL ?? "https://mystop.norwalktransit.com/InfoPoint/gtfs-zip.ashx",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  hart: {
+    url: process.env.HART_GTFS_URL ?? "https://passio3.com/hart/passioTransit/gtfs/google_transit.zip",
+    routeTypes: ["3"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    scanStops: true,
+    routeTextColor: true,
+    coarseGapM: 1e9, // bus shapes are dense; never rebuild one from stops
+  },
+  // Portland's feed names a vehicle's trip but not its route, so trips are kept to look the route up.
+  "portland-me": {
+    url: process.env.PORTLAND_ME_GTFS_URL ?? "https://gtfs.gptd.cadavl.com/GPTD/GTFS/GTFS_GPTD.zip",
+    routeTypes: ["3"],
+    shortFromFeed: true,
+    routeTextColor: true,
+    coarseGapM: 1e9,
+  },
   // NYC Ferry: live vessel positions and trip updates are public, so only landings, routes and track are kept. The
   // Rockaway shuttle buses in the same feed (route type 3) are not ferries.
   "nyc-ferry": {
@@ -284,7 +320,8 @@ const AGENCIES: Record<string, Agency> = {
   // Hartford Line, Vermonter, Empire Service, Adirondack, Carolinian, Palmetto.
   amtrak: {
     url: process.env.AMTRAK_GTFS_URL ?? "https://content.amtrak.com/content/gtfs/GTFS.zip",
-    routes: ["88", "40751", "94", "41042", "90", "36921", "95", "85", "69"],
+    // Every train that runs in the Northeast: the corridor, New England, upstate New York, the Pennsylvanian, and the long-distance trains through Virginia.
+    routes: ["88", "40751", "94", "41042", "41044", "90", "36921", "95", "85", "69", "31849", "68", "81", "61", "64", "58", "36949", "42947", "42994", "36923", "77"],
     style: { color: "#4a6fa5" },
     // Amtrak shapes are sparse on straight stretches; they are still the real alignment, so keep them.
     coarseGapM: 20_000,
