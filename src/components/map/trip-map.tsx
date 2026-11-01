@@ -145,6 +145,8 @@ const PLANE_SCALE = 1.5;
 
 /** There are many buses, so each is drawn small (their boxy shape still tells them from trains). */
 const BUS_SCALE = 0.7;
+/** Boats are few and slow, and the water around them is empty, so they are drawn a little larger. */
+const FERRY_SCALE = 1.15;
 
 const empty: FeatureCollection = { type: "FeatureCollection", features: [] };
 const byZoom = (a: number, b: number, c: number, z = [6, 9, 12]): ExpressionSpecification => ["interpolate", ["linear"], ["zoom"], z[0]!, a, z[1]!, b, z[2]!, c];
@@ -167,7 +169,7 @@ function tripFeatures(trips: readonly Trip[], at: Map<string, Placed>, stacked: 
         color,
         icon: vehicleIconId(t.mode, color, problem),
         heading: p.heading,
-        scale: (problem ? 1.25 : 0.95) * (t.mode === "flights" ? PLANE_SCALE : t.mode === "bus" ? BUS_SCALE : 1),
+        scale: (problem ? 1.25 : 0.95) * (t.mode === "flights" ? PLANE_SCALE : t.mode === "bus" ? BUS_SCALE : t.mode === "ferry" ? FERRY_SCALE : 1),
         pulse: problem ? pulse : 0,
       },
     });
@@ -240,10 +242,30 @@ function indexOfLines(cache: { current: { key: string; index: TrackIndex } | und
   return cache.current.index;
 }
 
+/** The dark basemap: land, water and parkland told apart at a glance. */
+const DARK_LAND = "#23272e";
+const DARK_WATER = "#0a1a2e";
+const DARK_GREEN = "#26332b";
+
 /** Quiet the basemap so the network is the focus, like a transit diagram. Runs before our layers are added. */
-function mutedBasemap(map: MapLibreMap, calm: boolean) {
+function mutedBasemap(map: MapLibreMap, calm: boolean, dark: boolean) {
   for (const layer of map.getStyle().layers) {
     try {
+      // The dark style's land and water are almost the same black, so where the land ends is hard to see (and boats on the
+      // water need that edge). Give the land a lifted charcoal and the water a deep blue, and leave them at full strength.
+      if (dark && layer.id === "background") {
+        map.setPaintProperty(layer.id, "background-color", DARK_LAND);
+        continue;
+      }
+      if (dark && layer.id === "water" && layer.type === "fill") {
+        map.setPaintProperty(layer.id, "fill-color", DARK_WATER);
+        map.setPaintProperty(layer.id, "fill-opacity", 1);
+        continue;
+      }
+      if (dark && (layer.id === "landuse_park" || layer.id === "landcover_wood") && layer.type === "fill") {
+        map.setPaintProperty(layer.id, "fill-color", DARK_GREEN);
+        continue;
+      }
       if (layer.type === "fill") map.setPaintProperty(layer.id, "fill-opacity", calm ? 0.45 : 0.55);
       else if (layer.type === "line") map.setPaintProperty(layer.id, "line-opacity", calm ? 0.3 : 0.45);
       else if (layer.type === "symbol") {
@@ -295,7 +317,7 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fit
     const dark = prefersDark();
     const ink = dark ? "#f2f5fa" : "#1b2a41"; // labels on the map: light on the dark basemap
     const halo = dark ? "#0f1620" : "#ffffff";
-    mutedBasemap(m, living);
+    mutedBasemap(m, living, dark);
     installTrainIcons(m);
     for (const id of ["lines", "places", "trips", "stacks", "trails", "leads", "wakes"]) m.addSource(id, { type: "geojson", data: empty });
     if (living) {

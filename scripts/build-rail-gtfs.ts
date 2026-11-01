@@ -151,6 +151,37 @@ const AGENCIES: Record<string, Agency> = {
     },
     coarseGapM: 5_000,
   },
+  // NYC Ferry: live vessel positions and trip updates are public, so only landings, routes and track are kept. The
+  // Rockaway shuttle buses in the same feed (route type 3) are not ferries.
+  "nyc-ferry": {
+    url: process.env.NYC_FERRY_GTFS_URL ?? "https://nycferry.connexionz.net/rtt/public/resource/gtfs.zip",
+    routeTypes: ["4"],
+    coarseGapM: 1e9, // the operator's own route lines; never redrawn as straight lines between landings (those cross land)
+    // Its live feeds name a trip but not its route, so the schedule's trips are kept to look the route up.
+    shortFromFeed: true,
+    routeTextColor: true,
+  },
+  // The Staten Island Ferry (NYC DOT): no live feed, so the timetable is kept and boats are placed by it.
+  "nyc-sif": {
+    url: process.env.SI_FERRY_GTFS_URL ?? "https://data.cityofnewyork.us/download/b57i-ri22/application%2Fx-zip-compressed",
+    routeTypes: ["4"],
+    routeShort: { SIF: "SI" },
+    routeTextColor: true,
+    coarseGapM: 1e9, // the route is one crossing; the feed's own shapes are its track
+  },
+  // Boston Harbor ferries (route type 4 of the MBTA's all-modes feed), live from the MBTA's feeds.
+  "mbta-ferry": {
+    url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
+    routeTypes: ["4"],
+    realtimeOnly: true,
+    shortFromFeed: true,
+    routeTextColor: true,
+    coarseGapM: 1e9,
+    // The feed gives every ferry one color and long names; a map needs them apart (each reads 4.5:1 with white text).
+    routeShort: { "Boat-F1": "HI", "Boat-F2H": "HU", "Boat-F4": "CH", "Boat-EastBoston": "EB", "Boat-Lynn": "LY", "Boat-F6": "WI", "Boat-F7": "QU", "Boat-F8": "WQ", "Boat-F10": "HL" },
+    routeColors: { "Boat-F1": "#00778b", "Boat-F2H": "#1d4e89", "Boat-F4": "#6d4c9f", "Boat-EastBoston": "#0b7a5a", "Boat-Lynn": "#a12d2d", "Boat-F6": "#b45309", "Boat-F7": "#2f7d32", "Boat-F8": "#b3306a", "Boat-F10": "#5f6b7a" },
+    stationClean: [[/ - Gate \d\w?$/, ""]], // Long Wharf (North) has a gate per route, but it is one landing
+  },
   // The T's buses: every trip is live (GPS), so only stops, routes and track are kept.
   "mbta-bus": {
     url: process.env.MBTA_GTFS_URL ?? "https://cdn.mbta.com/MBTA_GTFS.zip",
@@ -589,8 +620,8 @@ async function main() {
     routes[r.route_id!] = {
       name: agency.style?.name ?? agency.routeNames?.[r.route_id!] ?? tidyName(r.route_long_name || r.route_short_name!),
       color: agency.style?.color ?? agency.routeColors?.[r.route_id!] ?? `#${r.route_color || "0b5ea8"}`,
-      ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}),
       ...(agency.shortFromFeed ? { short: r.route_short_name || (r.route_long_name ?? "").split(/[ -]/)[0] || r.route_id! } : {}),
+      ...(agency.routeShort?.[r.route_id!] ? { short: agency.routeShort[r.route_id!] } : {}), // a chosen badge beats the feed's
       ...(agency.routeTextColor && r.route_text_color ? { text: `#${r.route_text_color}` } : {}),
     };
   }

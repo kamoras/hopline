@@ -57,7 +57,7 @@ export function buildScheduledTrips({ id, name, staticData, region, now, mode = 
           id: `${id}:${scheduleId}`,
           operatorId: id,
           mode,
-          number: trip.number,
+          number: trip.number || (route as { short?: string } | undefined)?.short || trip.routeId, // a timetable with no train numbers (a ferry): the route stands in
           routeName: route?.name ?? name,
           routeColor: route?.color ?? "#0b5ea8",
           origin: first.name,
@@ -147,7 +147,7 @@ export function buildScheduledArrivals({
       for (const st of trip.stopTimes) {
         if (!wanted.has(st.stopId)) continue;
         const at = dayStart + st.departureMin * MIN;
-        if (at >= now && at - now <= ARRIVALS_HORIZON_MS) out.push({ tripId: id, ...line, headsign: trip.headsign, at, platform: st.stopId });
+        if (at >= now && at - now <= ARRIVALS_HORIZON_MS) out.push({ tripId: id, ...line, headsign: trip.headsign || staticData.stops[trip.stopTimes.at(-1)!.stopId]?.name || "", at, platform: st.stopId });
       }
     }
   }
