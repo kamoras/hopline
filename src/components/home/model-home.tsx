@@ -16,6 +16,7 @@ import { MODES, type Mode } from "@/domain/modes";
 import { NORTHEAST, type Region } from "@/domain/region";
 import { useNow } from "@/hooks/use-now";
 import { useWorld } from "@/hooks/use-world";
+import { TRAFFIC_MIN_ZOOM } from "@/lib/traffic";
 import { linkHref, parseLink, type Link as DeepLink } from "@/lib/deeplink";
 import { pinKey } from "@/lib/search";
 import { boundsOfBoards, parseWorldPlaceId, sameBoard, worldPlaceId, type WorldView } from "@/lib/world";
@@ -58,7 +59,7 @@ interface Followed {
  * and zoom. Tap a vehicle and a drawer opens with everything about it and its route while the camera follows it; search
  * opens a drawer of results; a station opens what is due there. Nothing sends you to another page.
  */
-export function ModelHome({ boards }: { boards: BoardLink[] }) {
+export function ModelHome({ boards, trafficAvailable = false }: { boards: BoardLink[]; trafficAvailable?: boolean }) {
   // What the address asked to open (a shared link): read once, in the browser. Nothing is stored or sent.
   const [initial] = useState<DeepLink | undefined>(() => {
     if (typeof window === "undefined") return undefined;
@@ -69,6 +70,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
   const [modes, setModes] = useState<ReadonlySet<Mode>>(() => new Set(boards.map((b) => b.mode)));
   const [drawn, setDrawn] = useState<Drawn>();
   const [following, setFollowing] = useState(false);
+  const [traffic, setTraffic] = useState(true);
   const [query, setQuery] = useState("");
   const [focus, setFocus] = useState<{ lat: number; lon: number; zoom: number; key: string }>();
   const [routeFollowed, setRouteFollowed] = useState<Followed>();
@@ -217,6 +219,8 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
           places={world.places}
           lines={world.lines}
           frameTrips={false}
+          trafficAvailable={trafficAvailable}
+          traffic={traffic}
           living
           controlsPosition="bottom-right"
           legendClassName={`bottom-6 left-3 sm:left-auto ${open ? "lg:right-[464px] sm:right-16" : "sm:right-16"}`}
@@ -254,12 +258,26 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
                 {modes.has(m) && world.counts[m] ? <span className="tabular ml-1.5 font-medium">{world.counts[m]}</span> : null}
               </button>
             ))}
+            {trafficAvailable && (
+              <button
+                type="button"
+                aria-pressed={traffic}
+                onClick={() => setTraffic((t) => !t)}
+                title={traffic ? "Road traffic on: green flowing, red slow (data from TomTom)" : "Show road traffic"}
+                className={`press rounded-full border px-3.5 py-1.5 text-sm font-semibold shadow-card backdrop-blur ${traffic ? "border-accent bg-accent text-on-accent" : "border-line bg-surface/95 text-muted"}`}
+              >
+                Traffic
+              </button>
+            )}
             <span role="status" className="tabular ml-auto rounded-full border border-line bg-surface/95 px-3 py-1.5 text-sm text-muted shadow-card backdrop-blur">
               {moving > 0 ? `${moving.toLocaleString("en-US")} moving right now` : "Zoom in to see more"}
             </span>
           </div>
           {zoomedOutBuses && (
             <p className="pointer-events-none mx-auto max-w-3xl text-center text-xs text-muted">Buses appear when you zoom in to a neighborhood.</p>
+          )}
+          {!zoomedOutBuses && trafficAvailable && traffic && view && view.zoom < TRAFFIC_MIN_ZOOM && (
+            <p className="pointer-events-none mx-auto max-w-3xl text-center text-xs text-muted">Road traffic appears when you zoom in to a city.</p>
           )}
         </div>
 
