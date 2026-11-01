@@ -33,3 +33,28 @@ export function useCommutes(boardKey: string) {
   );
   return { commutes, isSaved, toggle };
 }
+
+/** Every saved commute on this device, with the board each belongs to (for the home app, which spans all boards). */
+export function useAllCommutes() {
+  const [raw, setRaw] = useLocalStore(KEY);
+  const all = useMemo<(Route & { board: string })[]>(() => {
+    try {
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((c) => c && typeof c.from === "string" && typeof c.to === "string" && typeof c.board === "string") : [];
+    } catch {
+      return [];
+    }
+  }, [raw]);
+  const isSaved = useCallback((board: string, r: Route) => all.some((c) => c.board === board && routeKey(c) === routeKey(r)), [all]);
+  /** Save the routes on a board, or remove them all if every one is already saved. */
+  const toggle = useCallback(
+    (board: string, routes: readonly Route[]) => {
+      const keys = new Set(routes.map(routeKey));
+      const saved = routes.every((r) => isSaved(board, r));
+      const next = saved ? all.filter((c) => !(c.board === board && keys.has(routeKey(c)))) : [...all, ...routes.filter((r) => !isSaved(board, r)).map((r) => ({ from: r.from, to: r.to, board }))];
+      setRaw(JSON.stringify(next));
+    },
+    [all, isSaved, setRaw],
+  );
+  return { all, isSaved, toggle };
+}

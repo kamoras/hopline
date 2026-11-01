@@ -244,6 +244,13 @@ over the map (a side panel on a wide screen, a bottom sheet on a phone):
   callsign, route or line, destination, or a station still ahead of it: `lib/vehicle-search.ts`), then stations and
   airports (those on the map, and the rest from the server's catalog, which carries each place's position so the map
   can fly there). Choosing a vehicle swaps to its drawer and locks the camera on.
+- **The search box before anything is typed** opens "Your places" (`HomeDrawer`): stations near the person (their
+  location is asked for on a tap, used in memory, and never leaves the device), their saved commutes with the next
+  trains each (`lib/commute.ts`), and their pinned vehicles. Pins and commutes live in the browser's local storage
+  only (`usePinned`, `useAllCommutes`), as they always have.
+- **"A to B" in the search box** ("Stamford to Grand Central", "round trip") lists the trains that call at one and
+  then the other, with the time at each end, and a button to save it as a commute (the region aliases of every
+  board apply, `lib/aliases.ts`).
 - **A route of a big network** (a bus route) found by search opens its drawer (`RouteDrawer`): the whole route is
   drawn and framed on the map, at any zoom, with the vehicles running on it listed (`RouteFocus` in `lib/world.ts`:
   the followed route's board is always active and asked for that one route only, via `&route=`).

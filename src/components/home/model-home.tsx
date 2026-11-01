@@ -7,7 +7,11 @@ import { BRAND } from "@/brand";
 import type { BoardLink } from "@/domain/board";
 import type { Trip } from "@/domain/trip";
 import type { RouteSummary } from "@/server/routes";
+import { useAllCommutes } from "@/hooks/use-commutes";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { usePinned } from "@/hooks/use-pinned";
+import { nearestPlaces } from "@/domain/place";
 import { MODES, type Mode } from "@/domain/modes";
 import { NORTHEAST, type Region } from "@/domain/region";
 import { useNow } from "@/hooks/use-now";
@@ -18,6 +22,7 @@ import { boundsOfBoards, parseWorldPlaceId, sameBoard, worldPlaceId, type WorldV
 import { Logo } from "../brand/logo";
 import type { MapView } from "../map/trip-map";
 import { Drawer, drawerPadding } from "./drawer";
+import { HomeDrawer } from "./home-drawer";
 import { PlaceDrawer } from "./place-drawer";
 import { RouteDrawer } from "./route-drawer";
 import { SearchBar } from "./search-bar";
@@ -72,6 +77,13 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
   const world = useWorld(boards, view, modes, routeFocus);
   const now = useNow(0);
   const wide = useMediaQuery("(min-width: 1024px)");
+  const { pinned, toggle: togglePin } = usePinned();
+  const commutes = useAllCommutes();
+  const geo = useGeolocation();
+  const boardKeyOf = useCallback((tripId: string) => {
+    const b = world.boardOfTrip.get(tripId);
+    return b && `${b.mode}/${b.regionId}`;
+  }, [world.boardOfTrip]);
 
   // The first view holds the networks that are small enough to show whole (trains, metros, flights); after that the person is in charge.
   const region = useMemo<Region>(() => {
@@ -116,12 +128,16 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
   }, []);
   const onQuery = useCallback((q: string) => {
     setQuery(q);
-    setDrawn((d) => (q.trim() ? { kind: "search" } : d?.kind === "search" ? undefined : d));
+    setDrawn((d) => (q.trim() ? { kind: "search" } : d));
     if (q.trim()) {
       setFollowing(false);
       setRouteFollowed(undefined);
     }
   }, []);
+  const openHome = useCallback(() => setDrawn((d) => d ?? { kind: "search" }), []);
+  const nearMe = useCallback(() => {
+    geo.request((at) => setFocus({ lat: at.lat, lon: at.lon, zoom: 13, key: `near/${Date.now()}` }));
+  }, [geo]);
   const onFollowEnd = useCallback(() => setFollowing(false), []);
 
   // The vehicle in the drawer. If it leaves the feed (its run ended), the drawer keeps what it last knew.
@@ -223,7 +239,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
               <Logo size={30} />
             </div>
             <div className="min-w-0 flex-1">
-              <SearchBar value={query} onChange={onQuery} placeholder="Where's my train, bus or flight? Station, route, airport…" />
+              <SearchBar value={query} onChange={onQuery} onFocus={openHome} placeholder="Where's my train, bus or flight? Station, route, airport…" />
             </div>
           </div>
           <div className="pointer-events-auto mx-auto flex max-w-3xl flex-wrap items-center gap-2" role="group" aria-label="Show on the map">
@@ -249,8 +265,38 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
         </div>
 
         {drawn?.kind === "search" && (
-          <Drawer label="Search results" onClose={close}>
-            <SearchDrawer query={query} trips={world.trips} places={world.places} boards={boards} onOpenTrip={openTrip} onOpenPlace={openPlace} onOpenRoute={openRoute} />
+          <Drawer label={query.trim() ? "Search results" : "Your places"} onClose={close}>
+            {query.trim() ? (
+              <SearchDrawer
+                query={query}
+                trips={world.trips}
+                places={world.places}
+                boards={boards}
+                now={now}
+                boardOfTrip={boardKeyOf}
+                isSaved={commutes.isSaved}
+                onToggleCommute={commutes.toggle}
+                onOpenTrip={openTrip}
+                onOpenPlace={openPlace}
+                onOpenRoute={openRoute}
+              />
+            ) : (
+              <HomeDrawer
+                trips={world.trips}
+                pinned={pinned}
+                commutes={commutes.all}
+                boardOfTrip={boardKeyOf}
+                near={geo.state.status}
+                nearPlaces={geo.state.status === "ready" ? nearestPlaces(world.places, geo.state.at, 5).map((n) => n.place) : []}
+                now={now}
+                onNearMe={nearMe}
+                onOpenTrip={openTrip}
+                onOpenPlace={openPlace}
+                onUnpin={togglePin}
+                onRemoveCommute={(c) => commutes.toggle(c.board, [c])}
+                onOpenCommute={(c) => onQuery(`${c.from} to ${c.to}`)}
+              />
+            )}
           </Drawer>
         )}
         {shownTrip && (

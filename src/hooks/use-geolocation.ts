@@ -11,11 +11,15 @@ type State = { status: "idle" | "asking" | "denied" } | { status: "ready"; at: L
  */
 export function useGeolocation() {
   const [state, setState] = useState<State>({ status: "idle" });
-  const request = useCallback(() => {
+  const request = useCallback((onReady?: (at: LatLon) => void) => {
     if (!("geolocation" in navigator)) return setState({ status: "denied" });
     setState({ status: "asking" });
     navigator.geolocation.getCurrentPosition(
-      (p) => setState({ status: "ready", at: { lat: p.coords.latitude, lon: p.coords.longitude } }),
+      (p) => {
+        const at = { lat: p.coords.latitude, lon: p.coords.longitude };
+        setState({ status: "ready", at });
+        onReady?.(at);
+      },
       () => setState({ status: "denied" }),
       { maximumAge: 60_000, timeout: 10_000 },
     );

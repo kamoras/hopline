@@ -241,7 +241,7 @@ export function Board({ mode, region, href, boards, places: placesProp, initialF
                     Delayed{delayedCount ? ` · ${delayedCount}` : ""}
                   </Chip>
                 )}
-                <Chip active={geo.state.status === "ready"} onClick={geo.request}>
+                <Chip active={geo.state.status === "ready"} onClick={() => geo.request()}>
                   {geo.state.status === "asking" ? "Locating…" : geo.state.status === "denied" ? "Location unavailable" : `◎ Near me`}
                 </Chip>
               </div>
