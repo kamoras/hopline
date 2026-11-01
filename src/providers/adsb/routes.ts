@@ -16,11 +16,11 @@ export type KnownRoute = readonly RouteAirport[];
 
 const ROUTES_URL = process.env.ADSB_ROUTES_URL || "https://vrs-standing-data.adsb.lol/routes";
 const KEEP_MS = 6 * 60 * 60_000;
-/** Callsigns asked about per refresh (a busy sky is about 150 airline flights), so one refresh can name nearly all of them. */
-const PER_REFRESH = 150;
+/** Callsigns asked about per refresh (a busy sky is a few hundred airline flights), so one refresh can name nearly all of them. */
+const PER_REFRESH = 250;
 const FETCH_TIMEOUT_MS = 4_000;
 /** How long a refresh waits for lookups before showing what it has; the rest finish for the next one. */
-const WAIT_MS = 2_500;
+const WAIT_MS = 3_000;
 
 const cache = new Map<string, { at: number; route: KnownRoute | null }>();
 const inflight = new Set<string>();
