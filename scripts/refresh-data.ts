@@ -32,6 +32,9 @@ const SOURCES: Source[] = [
   { id: "septa-metro", script: "data:septa-metro" },
   { id: "septa-bus", script: "data:septa-bus" },
   { id: "mta-bus", script: "data:mta-bus" },
+  { id: "nyc-ferry", script: "data:nyc-ferry" },
+  { id: "nyc-sif", script: "data:nyc-sif" },
+  { id: "mbta-ferry", script: "data:mbta-ferry" },
   { id: "wmata", script: "data:wmata", needs: "WMATA_API_KEY" },
   { id: "wmata-bus", script: "data:wmata-bus", needs: "WMATA_API_KEY" },
 ];

@@ -281,6 +281,13 @@ no longer exist. The home page is all there is, with a plain list of the places 
   NOAA equations, no network, no stored location; skipped when the device is already in a dark theme). When a vehicle
   newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
   reduced-motion turns them off).
+- **Ferries** are a mode of their own (`MODES.ferry`: "Ferries", landings, docks), drawn with a boat glyph and the same
+  wake as trains. Three providers: NYC Ferry (live GPS and trip updates, keyless; its feeds name a trip but not its
+  route, so the schedule's trips are kept to look the route up, and the operator's own route lines are used as given
+  because redrawing them as straight lines between landings would cross land), the MBTA's Boston Harbor ferries
+  (live, from the same feeds as its trains and buses, with a distinct color and badge per route), and the Staten Island
+  Ferry (timetable only: no live feed exists, so boats are placed by the schedule like Philadelphia's Metro). All three
+  are station-first boards (a landing lists the next boats) built from the shared builders in `providers/gtfs/`.
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
   (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
@@ -293,7 +300,8 @@ no longer exist. The home page is all there is, with a plain list of the places 
   findable on any basemap.
 - **Dark mode is a real dark basemap** (OpenFreeMap `dark`), not an inverted light one, so our own colors (white
   plane bodies, station rings, trails) keep their meaning. `BaseMap` picks the style from the device's appearance;
-  `NEXT_PUBLIC_MAP_STYLE_URL` overrides both. Map labels switch to light text with a dark halo.
+  `NEXT_PUBLIC_MAP_STYLE_URL` overrides both. Map labels switch to light text with a dark halo. The style's own land and water are nearly the same black, so in dark mode the land is lifted to charcoal and the water
+  set to a deep blue at full strength (parkland a muted green): the shoreline reads at a glance, which ferries depend on.
 
 ## Brand and design system
 

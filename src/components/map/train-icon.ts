@@ -3,6 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 const PREFIX = "train:";
 const PLANE_PREFIX = "plane:";
 const BUS_PREFIX = "bus:";
+const BOAT_PREFIX = "boat:";
 
 /**
  * The sprite id for a train. Features reference it; it is drawn on first use.
@@ -17,9 +18,12 @@ export const planeIconId = (color: string, solid: boolean) => `${PLANE_PREFIX}${
 /** The same, for a bus: a boxy, filled body with a row of windows, so it is never mistaken for a train. */
 export const busIconId = (color: string, solid: boolean) => `${BUS_PREFIX}${solid ? "solid" : "quiet"}:${color}`;
 
+/** The same, for a ferry: a hull with a pointed bow and a white cabin. */
+export const boatIconId = (color: string, solid: boolean) => `${BOAT_PREFIX}${solid ? "solid" : "quiet"}:${color}`;
+
 /** The sprite for a trip of this mode. */
 export const vehicleIconId = (mode: string, color: string, solid: boolean) =>
-  mode === "flights" ? planeIconId(color, solid) : mode === "bus" ? busIconId(color, solid) : trainIconId(color, solid);
+  mode === "flights" ? planeIconId(color, solid) : mode === "bus" ? busIconId(color, solid) : mode === "ferry" ? boatIconId(color, solid) : trainIconId(color, solid);
 
 /**
  * A small train glyph pointing right (east): a rounded body with a pointed nose and a white outline so it
@@ -81,6 +85,36 @@ function drawBus(color: string, solid: boolean): ImageData | undefined {
   return ctx.getImageData(0, 0, w, h);
 }
 
+/** A small ferry pointing right (east): a filled hull curving to a pointed bow, a white cabin and a funnel stripe. */
+function drawBoat(color: string, solid: boolean): ImageData | undefined {
+  const w = 48;
+  const h = 26;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return undefined;
+  ctx.beginPath();
+  ctx.moveTo(4, 6);
+  ctx.lineTo(30, 6);
+  ctx.quadraticCurveTo(42, 8, 45, 13); // the bow
+  ctx.quadraticCurveTo(42, 18, 30, 20);
+  ctx.lineTo(4, 20);
+  ctx.quadraticCurveTo(2, 13, 4, 6);
+  ctx.closePath();
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#ffffff";
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.fillRect(10, 9, 16, 8); // the cabin
+  ctx.fillStyle = solid ? "rgba(255,255,255,0.9)" : color;
+  ctx.fillRect(15, 10.5, 6, 5); // the funnel
+  return ctx.getImageData(0, 0, w, h);
+}
+
 /** A small airplane pointing right (east): fuselage, swept wings and tailplane, outlined so it reads over any basemap. */
 function drawPlane(color: string, solid: boolean): ImageData | undefined {
   const w = 48;
@@ -123,9 +157,10 @@ export function installTrainIcons(map: MapLibreMap) {
   map.on("styleimagemissing", (e) => {
     const plane = e.id.startsWith(PLANE_PREFIX);
     const bus = e.id.startsWith(BUS_PREFIX);
-    if ((!plane && !bus && !e.id.startsWith(PREFIX)) || map.hasImage(e.id)) return;
-    const [, style, color] = e.id.split(plane ? /^plane:(solid|quiet):/ : bus ? /^bus:(solid|quiet):/ : /^train:(solid|quiet):/);
-    const image = style && color ? (plane ? drawPlane : bus ? drawBus : draw)(color, style === "solid") : undefined;
+    const boat = e.id.startsWith(BOAT_PREFIX);
+    if ((!plane && !bus && !boat && !e.id.startsWith(PREFIX)) || map.hasImage(e.id)) return;
+    const [, style, color] = e.id.split(plane ? /^plane:(solid|quiet):/ : bus ? /^bus:(solid|quiet):/ : boat ? /^boat:(solid|quiet):/ : /^train:(solid|quiet):/);
+    const image = style && color ? (plane ? drawPlane : bus ? drawBus : boat ? drawBoat : draw)(color, style === "solid") : undefined;
     if (image) map.addImage(e.id, image, { pixelRatio: 2 });
   });
 }

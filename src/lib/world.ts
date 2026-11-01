@@ -14,7 +14,7 @@ export interface WorldView {
  * and planes are sparse, so they run from the start; a city's metro waits for the city; buses wait for the
  * neighborhood (and are fetched only for what is on screen).
  */
-export const MODE_MIN_ZOOM: Record<Mode, number> = { rail: 5, flights: 6, subway: 8, bus: 12 };
+export const MODE_MIN_ZOOM: Record<Mode, number> = { rail: 5, flights: 6, subway: 8, ferry: 8, bus: 12 };
 /** Stations of a big network are loaded only this close. */
 export const STOP_MIN_ZOOM = 14;
 

@@ -95,6 +95,21 @@ export const MODES = {
     lineNoun: "route",
     viewport: true,
   },
+  ferry: {
+    slug: "ferries",
+    label: "Ferries",
+    noun: "ferry",
+    nounPlural: "ferries",
+    numberLabel: "Route",
+    stopNoun: "landing",
+    reportsDelay: false,
+    browse: "stations",
+    platformNoun: "Dock",
+    searchPlaceholder: "Landing or route…",
+    searchHint: "Try a landing like Wall St or Hingham, or a route like East River.",
+    lineNoun: "route",
+    viewport: false,
+  },
 } as const satisfies Record<string, ModeInfo>;
 
 export type Mode = keyof typeof MODES;
