@@ -230,17 +230,36 @@ normalized name), `useFocus` (URL-synced selection), `searchTrips` (number, stat
 
 ## The model: Hopline's home page
 
-Hopline opens on a live scale model of transit, not a list: everything that is moving, drawn as a calm diagram
-you can pan and zoom, so people can drop in just to look, or get an answer fast. The answer to "where's my train,
-bus or flight" is always one step away: a search bar floats on top of the map, and tapping any vehicle or station
-opens an answer card (next stop and time, status, the next arrivals at a station) with one button for the full
-board. The boards are still listed below the map, so nothing depends on the canvas.
+Hopline opens on a live scale model of transit, and the model is the whole app: everything that is moving, drawn as
+a calm diagram you can pan and zoom. Nothing sends you to another page for detail; what you ask opens in a drawer
+over the map (a side panel on a wide screen, a bottom sheet on a phone):
+
+- **Tap a vehicle** and its drawer opens with everything about it and its route: status and why it is late, alerts on
+  its line, and every stop with times (`TripDrawer`, built on the same `TripDetailBody` the board sheet uses). The
+  camera moves to it and then locks on, following it as it moves while you read (`followTripId` on `TripMap`). A
+  drag lets go (the drawer says "Follow on the map" to lock on again); zooming while following keeps the lock.
+  Following moves the camera every frame, so the heavier work (stacking, what to fetch for the view) runs about
+  once a second then. If the vehicle's run ends, the drawer keeps what it last knew.
+- **Search** (one box over the map) opens a drawer of results (`SearchDrawer`): vehicles running now (by number or
+  callsign, route or line, destination, or a station still ahead of it: `lib/vehicle-search.ts`), then stations and
+  airports (those on the map, and the rest from the server's catalog, which carries each place's position so the map
+  can fly there). Choosing a vehicle swaps to its drawer and locks the camera on.
+- **A station or airport** opens what is due there (`PlaceDrawer`) and the camera flies to it.
+- The map keeps its subject centered in what a drawer leaves uncovered (`padding` on `TripMap`).
+
+The boards (`/metro/nyc` and so on) still exist for deep links and are listed under the map for now; the aim is for
+the home page to be all there is.
 
 - **One map, every board.** `useWorld` (`hooks/use-world.ts`) merges the boards in view into one set of trips, track
   and stations. `lib/world.ts` decides which boards those are: in view, switched on, and past their mode's zoom
   (`MODE_MIN_ZOOM`: trains 5, flights 6, metro 8, buses 12), so a board nobody can read is never fetched. Small
   boards load whole once; a big network (buses) is asked for the visible area, rounded outward. A station's id on
   the combined map carries its board (`worldPlaceId`) so equal ids on different boards stay apart.
+- **Trains stay on their track, buses look like buses.** A train reported by GPS glides to each new fix along the
+  track it is on (`lib/track-glide.ts`, using the same grid index as the server's snapping) rather than straight
+  across the bend; a vehicle with no track under it, or one that changed track, still glides in a line. Buses have
+  their own glyph (a boxy, route-colored body with a row of windows, drawn small because there are so many) so they are never mistaken for a
+  train (a white body with a pointed nose).
 - **The same drawing as a board.** The map is the board map (`TripMap`): schematic lines, stations thinned by
   importance as you zoom, vehicles gliding between refreshes, delays that pop, stacks for crowds. Mode switches (Trains,
   Metro, Flights, Buses) turn layers on and off and show how many vehicles each has moving right now.
@@ -252,13 +271,13 @@ board. The boards are still listed below the map, so nothing depends on the canv
   newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
   reduced-motion turns them off).
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
-  (`lib/trail.ts`, about two minutes, never sent anywhere), and where it is headed, a dashed line to its airport
+  (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
   flight's route is looked up by callsign in adsb.lol's public route files (`providers/adsb/routes.ts`: keyless,
   kept six hours, a callsign with no route remembered as such, a few dozen new lookups per refresh so a busy sky
   fills in over a few refreshes). The end its track points at is the destination (`Trip.destinationAt`, so the map
   can point toward an airport off the board, like Orlando); the heading line is cut off 120 miles out, a direction
-  to look rather than a path across the country. On the living model trains, metros and buses leave a short wake in their own color (about 36 s,
+  to look rather than a path across the country. On the living model trains, metros and buses leave a short wake in their own color (about 30 s,
   from zoom 9, rebuilt once per step rather than every frame, never for vehicles inside a counted stack). Planes are drawn 1.5x larger with a soft halo so they stay
   findable on any basemap.
 - **Dark mode is a real dark basemap** (OpenFreeMap `dark`), not an inverted light one, so our own colors (white

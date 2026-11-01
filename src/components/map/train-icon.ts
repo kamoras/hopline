@@ -2,6 +2,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 
 const PREFIX = "train:";
 const PLANE_PREFIX = "plane:";
+const BUS_PREFIX = "bus:";
 
 /**
  * The sprite id for a train. Features reference it; it is drawn on first use.
@@ -13,8 +14,12 @@ export const trainIconId = (color: string, solid: boolean) => `${PREFIX}${solid 
 /** The same, for an aircraft: a small airplane silhouette. */
 export const planeIconId = (color: string, solid: boolean) => `${PLANE_PREFIX}${solid ? "solid" : "quiet"}:${color}`;
 
+/** The same, for a bus: a boxy, filled body with a row of windows, so it is never mistaken for a train. */
+export const busIconId = (color: string, solid: boolean) => `${BUS_PREFIX}${solid ? "solid" : "quiet"}:${color}`;
+
 /** The sprite for a trip of this mode. */
-export const vehicleIconId = (mode: string, color: string, solid: boolean) => (mode === "flights" ? planeIconId(color, solid) : trainIconId(color, solid));
+export const vehicleIconId = (mode: string, color: string, solid: boolean) =>
+  mode === "flights" ? planeIconId(color, solid) : mode === "bus" ? busIconId(color, solid) : trainIconId(color, solid);
 
 /**
  * A small train glyph pointing right (east): a rounded body with a pointed nose and a white outline so it
@@ -47,6 +52,32 @@ function draw(color: string, solid: boolean): ImageData | undefined {
   ctx.beginPath();
   ctx.arc(37, 14, 2.6, 0, Math.PI * 2);
   ctx.fill();
+  return ctx.getImageData(0, 0, w, h);
+}
+
+/**
+ * A small bus pointing right (east): a squared-off body filled with its route's color (a train is a white body with a
+ * pointed nose), a row of white windows and a bright windshield at the front.
+ */
+function drawBus(color: string, solid: boolean): ImageData | undefined {
+  const w = 44;
+  const h = 24;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return undefined;
+  ctx.beginPath();
+  ctx.roundRect(3, 4, 38, 16, 4);
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#ffffff";
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = solid ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.95)";
+  for (const x of [8, 16, 24]) ctx.fillRect(x, 8, 5, 6); // side windows
+  ctx.fillRect(33, 7, 5, 10); // windshield
   return ctx.getImageData(0, 0, w, h);
 }
 
@@ -91,9 +122,10 @@ function drawPlane(color: string, solid: boolean): ImageData | undefined {
 export function installTrainIcons(map: MapLibreMap) {
   map.on("styleimagemissing", (e) => {
     const plane = e.id.startsWith(PLANE_PREFIX);
-    if ((!plane && !e.id.startsWith(PREFIX)) || map.hasImage(e.id)) return;
-    const [, style, color] = e.id.split(plane ? /^plane:(solid|quiet):/ : /^train:(solid|quiet):/);
-    const image = style && color ? (plane ? drawPlane : draw)(color, style === "solid") : undefined;
+    const bus = e.id.startsWith(BUS_PREFIX);
+    if ((!plane && !bus && !e.id.startsWith(PREFIX)) || map.hasImage(e.id)) return;
+    const [, style, color] = e.id.split(plane ? /^plane:(solid|quiet):/ : bus ? /^bus:(solid|quiet):/ : /^train:(solid|quiet):/);
+    const image = style && color ? (plane ? drawPlane : bus ? drawBus : draw)(color, style === "solid") : undefined;
     if (image) map.addImage(e.id, image, { pixelRatio: 2 });
   });
 }
