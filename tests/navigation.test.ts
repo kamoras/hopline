@@ -43,7 +43,9 @@ describe("connections between modes", () => {
   it("does not link a station to its own mode or to faraway boards", { timeout: 30_000 }, async () => {
     const rail = findBoard("rail", "northeast")!;
     const stamford = (await getPlaces(rail)).find((p) => p.name === "Stamford")!;
-    expect(await getConnections(rail, stamford)).toEqual([]); // no subway in Connecticut
+    const found = await getConnections(rail, stamford);
+    expect(found.some((c) => c.mode === "subway" || c.mode === "rail")).toBe(false); // no subway in Connecticut, and never its own mode
+    expect(found.every((c) => c.mode === "bus")).toBe(true); // its CTtransit bus stops are the only thing beside it
   });
 });
 

@@ -170,7 +170,10 @@ normalized name), `searchTrips` (number, station, route),
 - **Amtrak track.** Amtrak's trips come live from Amtraker, which has no geometry, so the track comes from Amtrak's
   GTFS shapes (`npm run data:amtrak`, lines only) and is cut to each region (`clipToRegion`). It lets Penn Station
   and the other Amtrak-only stations sit on a drawn line, and lets reported Amtrak positions snap to the rails.
-  Where operators share track, the first registered provider is drawn on top (`server/lines.ts`).
+  Where operators share track, the first registered provider is drawn on top (`server/lines.ts`). The build keeps every Amtrak train that runs in the Northeast (the corridor, New England, upstate New York, the
+  Pennsylvanian, and the long-distance trains through Virginia), and a test fails if one of them has no track: a train
+  with no line under it floats free on the map. Amtrak's own shapes for a few long routes are very sparse (the Lake Shore
+  Limited between Boston and Albany has none finer than a station-to-station chord), so those trains sit near, not on, a line.
 - **Accessibility is gated.** The `lighthouse` CI job (also required by the branch ruleset) audits the board, a
   trip sheet and a station sheet at a perfect accessibility score, on mobile in the light theme and on desktop in the
   dark theme (`lighthouserc*.json`, run locally with `npm run a11y`). It uses demo data and a blank map style so it is
@@ -289,14 +292,19 @@ no longer exist. The home page is all there is, with a plain list of the places 
   SeaStreak, the Statue of Liberty ferries, the Staten Island Ferry and the Roosevelt Island Tram are timetable-only.
   The shared builder finds a vessel's route from its trip when a feed names only the trip, and joins a vessel that names
   no trip to its trip update by vehicle id.
+- **New England buses** (Connecticut: CTtransit statewide, Norwalk, HART; Portland, Maine: Greater Portland METRO) are
+  `createLiveProvider` configs on two new regions (`connecticut`, `portland-me`). Portland's feed names a vehicle's trip
+  but not its route, so its trips are kept to look the route up. Not yet covered because the live data is not usable
+  here: RIPTA (Rhode Island: its feed is on a nonstandard port), PVTA (Springfield) and Middletown (their live feeds use
+  route ids that do not match their published schedules); Swiftly-hosted agencies need a key.
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
   (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
   flight's route is looked up by callsign in adsb.lol's public route files (`providers/adsb/routes.ts`: keyless,
-  kept six hours, a callsign with no route remembered as such, a few dozen new lookups per refresh so a busy sky
-  fills in over a few refreshes). The end its track points at is the destination (`Trip.destinationAt`, so the map
+  kept six hours, a callsign with no route remembered as such, up to 150 new lookups per refresh, so one refresh names nearly the whole
+  sky). The route gives both ends: the one its track points at is the destination (`Trip.destinationAt`, so the map
   can point toward an airport off the board, like Orlando); the heading line is cut off 120 miles out, a direction
-  to look rather than a path across the country. On the living model trains, metros and buses leave a short wake in their own color (about 30 s,
+  to look rather than a path across the country, and the other end is where it came from ("from Reykjavík (KEF)" in its drawer). Private and charter flights (NetJets and the like) have no published route, so they show neither. On the living model trains, metros and buses leave a short wake in their own color (about 30 s,
   from zoom 9, rebuilt once per step rather than every frame, never for vehicles inside a counted stack). Planes are drawn 1.5x larger with a soft halo so they stay
   findable on any basemap.
 - **Dark mode is a real dark basemap** (OpenFreeMap `dark`), not an inverted light one, so our own colors (white
