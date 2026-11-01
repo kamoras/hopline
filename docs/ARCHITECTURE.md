@@ -297,6 +297,12 @@ no longer exist. The home page is all there is, with a plain list of the places 
   but not its route, so its trips are kept to look the route up. Not yet covered because the live data is not usable
   here: RIPTA (Rhode Island: its feed is on a nonstandard port), PVTA (Springfield) and Middletown (their live feeds use
   route ids that do not match their published schedules); Swiftly-hosted agencies need a key.
+- **Mid-Atlantic** (Pittsburgh: PRT buses and the T and inclines, on a new `pittsburgh` region; the Washington suburbs:
+  Fairfax Connector and DASH on the existing `washington` board beside Metrobus; Pennsylvania: LANTA, BARTA, Red Rose
+  and rabbittransit on `allentown`, `reading`, `lancaster` and `york` regions) are all `createLiveProvider` configs on
+  keyless feeds. Not covered because there is no usable keyless live data: Baltimore and the rest of Maryland (Swiftly,
+  needs a key), Delaware's DART, Arlington's ART (feed unreachable from here) and Harrisburg's CAT (no vehicles
+  reporting when checked).
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
   (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
