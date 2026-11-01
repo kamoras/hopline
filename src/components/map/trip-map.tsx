@@ -15,7 +15,6 @@ import { newArrivals, type Arrival } from "@/lib/ripples";
 import { nightFactor, sunAltitudeDeg } from "@/lib/sun";
 import { compileLegs, locate as locateOnLeg, positionAt, type CompiledLeg } from "@/lib/motion";
 import { createPolyline, project } from "@/lib/polyline";
-import { TRAFFIC_MAX_ZOOM, TRAFFIC_MIN_ZOOM, trafficTilePath } from "@/lib/traffic";
 import { glideOnTrack } from "@/lib/track-glide";
 import { TrackIndex } from "@/lib/track-index";
 import { BaseMap, prefersDark } from "./base-map";
@@ -71,9 +70,6 @@ interface Props {
   frameTrips?: boolean;
   /** When this changes, frame all the lines on screen (a route was just chosen). */
   fitLinesKey?: string;
-  /** The server has a traffic key, so the overlay exists (see lib/traffic.ts), and whether it is switched on. */
-  trafficAvailable?: boolean;
-  traffic?: boolean;
   /** Frame this track (a route was just chosen); changes with `key`, once its lines have arrived. */
   fitTo?: { key: string; lines: readonly Line[] };
   /** Reports where the map is looking (after each pan or zoom): other modes open the same place, big networks load that part. */
@@ -282,7 +278,7 @@ function mutedBasemap(map: MapLibreMap, calm: boolean, dark: boolean) {
   }
 }
 
-export default function TripMap({ region, trips, places, lines, fitLinesKey, fitTo, trafficAvailable = false, traffic = false, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, followTripId, onFollowEnd, focus, padding, onSelectTrip, onSelectPlace }: Props) {
+export default function TripMap({ region, trips, places, lines, fitLinesKey, fitTo, frameTrips = true, onViewChange, showDelays = true, legendClassName = "top-3 left-3", controlsPosition, living = false, selectedTripId, selectedPlaceId, followTripId, onFollowEnd, focus, padding, onSelectTrip, onSelectPlace }: Props) {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const shown = useRef(new Map<string, Placed>());
   const motions = useRef(new Map<string, Motion>());
@@ -328,12 +324,6 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fit
       m.addSource("ripples", { type: "geojson", data: empty });
       // Night is a navy sheet over the basemap only (it sits under the network, so lines and trains stay bright).
       m.addLayer({ id: "night", type: "background", paint: { "background-color": "#0a1830", "background-opacity": 0 } });
-    }
-
-    // Road congestion, under the network so the lines and vehicles stay on top.
-    if (trafficAvailable) {
-      m.addSource("traffic", { type: "raster", tiles: [trafficTilePath(window.location.origin)], tileSize: 256, minzoom: TRAFFIC_MIN_ZOOM, maxzoom: TRAFFIC_MAX_ZOOM, attribution: "Traffic © TomTom" });
-      m.addLayer({ id: "traffic", type: "raster", source: "traffic", minzoom: TRAFFIC_MIN_ZOOM, layout: { visibility: "none" }, paint: { "raster-opacity": 0.85, "raster-fade-duration": 300 } });
     }
 
     // The network: a white casing under a thick colored line, like a transit diagram.
@@ -529,13 +519,9 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fit
     });
     interactive(["stack-dots", "stack-labels"], (e) => m.easeTo({ center: e.lngLat, zoom: Math.min(m.getZoom() + 1.8, 13), duration: 600 }));
     setMap(m);
-  }, [living, trafficAvailable]);
+  }, [living]);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
-
-  useEffect(() => {
-    if (map?.getLayer("traffic")) map.setLayoutProperty("traffic", "visibility", traffic ? "visible" : "none");
-  }, [map, traffic]);
 
   // Night follows the real sun where the map is looking (and is skipped in the dark theme, which already dims the map).
   useEffect(() => {
