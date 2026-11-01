@@ -21,3 +21,7 @@ under "Scaling" in the same document.
 
 Dependabot (weekly) and the Metro-North schedule refresh open PRs that auto-merge once CI
 passes. That includes major bumps: if one breaks CI it stays open for a human. One-time repo setup is in [docs/REPO_SETUP.md](docs/REPO_SETUP.md).
+
+## Dependency security
+
+`npm audit --omit=dev` must report nothing: that is what ships. `package.json` has an `overrides` block that pins patched versions of transitive dependencies (`minimatch`, `tmp`, `uuid`, `basic-ftp`, and `zod` and `glob` inside the Lighthouse and protobuf tooling); keep it, and drop an entry once the packages that needed it publish fixes. The one known remaining finding is `extract-zip` (inside `@lhci/cli`, our accessibility gate), which has no patched release and only unpacks a browser download we never use (we point Lighthouse at the installed Chrome), so its alerts are tooling-only.
