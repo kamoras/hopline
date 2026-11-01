@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode, type Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import type { Region } from "@/domain/region";
 import type { Trip } from "@/domain/trip";
 import { isDelayed } from "@/domain/delay";
@@ -10,30 +10,18 @@ import { formatAgo } from "@/lib/format";
 import { StopTimeline } from "./stop-timeline";
 import { destinationPhrase, OperatorLine } from "./trip-parts";
 
-interface Props {
-  trip: Trip;
-  region: Region;
-  now: number;
-  pinned: boolean;
-  showMapButton: boolean;
-  onClose(): void;
-  onTogglePin(): void;
-  onShowOnMap(): void;
-}
-
 const REASON_SOURCE = {
   "operator-reported": "Reported by the railroad",
   inferred: "Worked out from stop times",
 } as const;
 
-/** Everything about one trip below its header: status, why it is late, pin, and the stops. Shared by the board's sheet and the home drawer. */
+/** Everything about one trip below its header: status, why it is late, pin, and the stops. Used by the vehicle drawer. */
 export function TripDetailBody({
   trip,
   region,
   now,
   pinned,
   onTogglePin,
-  onShowOnMap,
   extra,
 }: {
   trip: Trip;
@@ -41,7 +29,6 @@ export function TripDetailBody({
   now: number;
   pinned: boolean;
   onTogglePin(): void;
-  onShowOnMap?: () => void;
   /** More about the route this trip is on (alerts), placed above the stops. */
   extra?: ReactNode;
 }) {
@@ -86,42 +73,9 @@ export function TripDetailBody({
         >
           {pinned ? `★ In My ${mode.nounPlural}` : `☆ Add to My ${mode.nounPlural}`}
         </button>
-        {onShowOnMap && trip.position && (
-          <button type="button" onClick={onShowOnMap} className="flex-1 rounded-xl border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2">
-            Show on map
-          </button>
-        )}
       </div>
 
       <StopTimeline stops={trip.stops} routeColor={trip.routeColor} region={region} platformNoun={mode.platformNoun} now={now} />
-    </div>
-  );
-}
-
-export function TripDetail({ trip, region, now, pinned, showMapButton, onClose, onTogglePin, onShowOnMap }: Props) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  const mode = MODES[trip.mode];
-
-  return (
-    <div className="fixed inset-0 z-30 flex items-end lg:items-stretch lg:justify-end" role="dialog" aria-modal="true" aria-label={`${mode.numberLabel} ${trip.number}`}>
-      <button type="button" className="absolute inset-0 bg-black/40 lg:bg-transparent" aria-label="Close" onClick={onClose} />
-      <div className="sheet-in relative flex max-h-[88dvh] w-full flex-col rounded-t-3xl border border-line bg-surface shadow-2xl lg:max-h-none lg:w-[420px] lg:rounded-none lg:rounded-l-3xl">
-        <div className="flex items-start justify-between gap-3 p-5 pb-3">
-          <TripHeader trip={trip} />
-          <button type="button" onClick={onClose} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-xl text-muted hover:bg-surface-2" aria-label="Close">
-            ×
-          </button>
-        </div>
-
-        <div className="overflow-y-auto px-5 pb-5">
-          <TripDetailBody trip={trip} region={region} now={now} pinned={pinned} onTogglePin={onTogglePin} onShowOnMap={showMapButton ? onShowOnMap : undefined} />
-        </div>
-      </div>
     </div>
   );
 }
