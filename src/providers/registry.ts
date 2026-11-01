@@ -18,6 +18,10 @@ import { mnrProvider } from "./mnr";
 import { mtaBusProvider } from "./mta-bus";
 import { nyctProvider } from "./nyct";
 import { nycFerryProvider } from "./nyc-ferry";
+import { nyWaterwayProvider } from "./nywaterway";
+import { rooseveltTramProvider } from "./roosevelt-tram";
+import { seastreakProvider } from "./seastreak";
+import { statueFerriesProvider } from "./statue-ferries";
 import { siFerryProvider } from "./nyc-sif";
 import { septaBusProvider } from "./septa-bus";
 import { septaMetroProvider } from "./septa-metro";
@@ -32,7 +36,7 @@ import { wmataBusProvider } from "./wmata-bus";
 export const PROVIDERS: readonly TransitProvider[] =
   process.env.HOPLINE_DEMO === "1"
     ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
-    : [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, nycFerryProvider, siFerryProvider, mbtaFerryProvider, adsbProvider];
+    : [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {

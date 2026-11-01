@@ -161,6 +161,26 @@ const AGENCIES: Record<string, Agency> = {
     shortFromFeed: true,
     routeTextColor: true,
   },
+  // NY Waterway (Hudson River ferries, NJ to Manhattan): the same public feeds as NYC Ferry, whose vessels name no trip, so
+  // trips (and so routes) are kept to join on.
+  nywaterway: {
+    url: process.env.NY_WATERWAY_GTFS_URL ?? "https://nywaterway.connexionz.net/rtt/public/resource/gtfs.zip",
+    routeTypes: ["4"],
+    coarseGapM: 1e9,
+    routeTextColor: true,
+    shortFromFeed: true,
+  },
+  // Timetable-only boats: SeaStreak (NYC, New Jersey and the Hamptons) and the Statue of Liberty ferries.
+  seastreak: { url: process.env.SEASTREAK_GTFS_URL ?? "https://seastreak.com/api/transit/google_transit.zip", coarseGapM: 1e9, routeTextColor: true, shortFromFeed: true },
+  "statue-ferries": { url: process.env.STATUE_FERRIES_GTFS_URL ?? "https://www.nps.gov/external-resources/gtfs/stli/statue-of-liberty-ferries.zip", coarseGapM: 1e9, routeTextColor: true, shortFromFeed: true },
+  // The Roosevelt Island Tram: no live feed, so the timetable is kept and cars are placed by it.
+  "roosevelt-tram": {
+    url: process.env.ROOSEVELT_TRAM_GTFS_URL ?? "https://data.trilliumtransit.com/gtfs/rooseveltisland-ny-us/rooseveltisland-ny-us.zip",
+    routes: ["10092"], // the tram; the island's shuttle buses are not part of this
+    coarseGapM: 1e9,
+    routeTextColor: true,
+    shortFromFeed: true,
+  },
   // The Staten Island Ferry (NYC DOT): no live feed, so the timetable is kept and boats are placed by it.
   "nyc-sif": {
     url: process.env.SI_FERRY_GTFS_URL ?? "https://data.cityofnewyork.us/download/b57i-ri22/application%2Fx-zip-compressed",
