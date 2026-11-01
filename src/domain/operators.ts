@@ -1,6 +1,7 @@
 /** Display names for operator ids. Add an entry when you add a provider. */
 const NAMES: Record<string, string> = {
   mnr: "Metro-North",
+  lirr: "Long Island Rail Road",
   amtrak: "Amtrak",
   "mbta-cr": "MBTA Commuter Rail",
   adsb: "Flights",
