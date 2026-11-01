@@ -27,6 +27,16 @@ describe("which boards the model shows", () => {
     expect(activeBoards(boards, nyc(13), new Set(["subway"])).map((b) => b.mode)).toEqual(["subway"]);
   });
 
+  it("shows a followed route's board at any zoom, and only that route of it", () => {
+    const bus = boards[4]!;
+    expect(activeBoards(boards, nyc(5), all).map((b) => b.mode)).not.toContain("bus");
+    expect(activeBoards(boards, nyc(5), all, { board: bus, route: "M15" }).map((b) => b.mode)).toContain("bus");
+    const r = requestsFor(bus, nyc(5), "M15+SBS");
+    expect(r.trips).toBe("/api/trips?mode=bus&region=nyc&route=M15%2BSBS");
+    expect(r.lines).toBe("/api/lines?mode=bus&region=nyc&route=M15%2BSBS");
+    expect(r.places).toBeUndefined();
+  });
+
   it("keeps every mode's start zoom in step with how dense it is", () => {
     expect(MODE_MIN_ZOOM.rail).toBeLessThan(MODE_MIN_ZOOM.subway);
     expect(MODE_MIN_ZOOM.subway).toBeLessThan(MODE_MIN_ZOOM.bus);

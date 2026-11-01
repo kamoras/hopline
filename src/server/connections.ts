@@ -11,6 +11,8 @@ export interface Connection {
   regionId: string;
   placeId: string;
   name: string;
+  lat: number;
+  lon: number;
   /** Opens that station on its own board. */
   href: string;
 }
@@ -33,7 +35,7 @@ export async function getConnections(board: Board, place: Place): Promise<Connec
       return nearestPlaces(places, place, MAX_PER_BOARD * 3)
         .filter((n) => n.miles <= MAX_MILES && !seen.has(n.place.name) && seen.add(n.place.name))
         .slice(0, MAX_PER_BOARD)
-        .map(({ place: p }): Connection => ({ mode: other.mode, regionId: other.region.id, placeId: p.id, name: p.name, href: placeHref(boardHref(other.mode, other.region.id), p.id) }));
+        .map(({ place: p }): Connection => ({ mode: other.mode, regionId: other.region.id, placeId: p.id, name: p.name, lat: p.lat, lon: p.lon, href: placeHref(boardHref(other.mode, other.region.id), p.id) }));
     }),
   );
   return found.flat();

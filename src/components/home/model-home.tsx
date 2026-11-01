@@ -2,20 +2,24 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BRAND } from "@/brand";
 import type { BoardLink } from "@/domain/board";
 import type { Trip } from "@/domain/trip";
+import type { RouteSummary } from "@/server/routes";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { MODES, type Mode } from "@/domain/modes";
 import { NORTHEAST, type Region } from "@/domain/region";
 import { useNow } from "@/hooks/use-now";
 import { useWorld } from "@/hooks/use-world";
-import { boundsOfBoards, parseWorldPlaceId, worldPlaceId, type WorldView } from "@/lib/world";
+import { linkHref, parseLink, type Link as DeepLink } from "@/lib/deeplink";
+import { pinKey } from "@/lib/search";
+import { boundsOfBoards, parseWorldPlaceId, sameBoard, worldPlaceId, type WorldView } from "@/lib/world";
 import { Logo } from "../brand/logo";
 import type { MapView } from "../map/trip-map";
 import { Drawer, drawerPadding } from "./drawer";
 import { PlaceDrawer } from "./place-drawer";
+import { RouteDrawer } from "./route-drawer";
 import { SearchBar } from "./search-bar";
 import { SearchDrawer } from "./search-drawer";
 import { TripDrawer } from "./trip-drawer";
@@ -37,7 +41,13 @@ export interface PlaceTarget {
   lon: number;
 }
 
-type Drawn = { kind: "search" } | { kind: "trip"; id: string } | { kind: "place"; place: PlaceTarget };
+type Drawn = { kind: "search" } | { kind: "trip"; id: string } | { kind: "place"; place: PlaceTarget } | { kind: "route" };
+
+/** A route of a big network the person is following: all of it is on the map. */
+interface Followed {
+  board: BoardLink;
+  route: RouteSummary;
+}
 
 /**
  * Home: one live model of transit, and the whole app. Everything that is moving, drawn as a calm diagram you can pan
@@ -45,18 +55,31 @@ type Drawn = { kind: "search" } | { kind: "trip"; id: string } | { kind: "place"
  * opens a drawer of results; a station opens what is due there. Nothing sends you to another page.
  */
 export function ModelHome({ boards }: { boards: BoardLink[] }) {
+  // What the address asked to open (a shared link): read once, in the browser. Nothing is stored or sent.
+  const [initial] = useState<DeepLink | undefined>(() => {
+    if (typeof window === "undefined") return undefined;
+    const q = new URLSearchParams(window.location.search);
+    return parseLink({ trip: q.get("trip") ?? undefined, board: q.get("board") ?? undefined, place: q.get("place") ?? undefined, route: q.get("route") ?? undefined });
+  });
   const [view, setView] = useState<WorldView>();
   const [modes, setModes] = useState<ReadonlySet<Mode>>(() => new Set(boards.map((b) => b.mode)));
   const [drawn, setDrawn] = useState<Drawn>();
   const [following, setFollowing] = useState(false);
   const [query, setQuery] = useState("");
   const [focus, setFocus] = useState<{ lat: number; lon: number; zoom: number; key: string }>();
-  const world = useWorld(boards, view, modes);
+  const [routeFollowed, setRouteFollowed] = useState<Followed>();
+  const routeFocus = useMemo(() => routeFollowed && { board: routeFollowed.board, route: routeFollowed.route.route }, [routeFollowed]);
+  const world = useWorld(boards, view, modes, routeFocus);
   const now = useNow(0);
   const wide = useMediaQuery("(min-width: 1024px)");
 
   // The first view holds the networks that are small enough to show whole (trains, metros, flights); after that the person is in charge.
-  const region = useMemo<Region>(() => ({ ...NORTHEAST, id: "world", name: "Everywhere", bounds: [...boundsOfBoards(boards.some((b) => !MODES[b.mode].viewport) ? boards.filter((b) => !MODES[b.mode].viewport) : boards)] as Region["bounds"], zoom: 5 }), [boards]);
+  const region = useMemo<Region>(() => {
+    // A shared link starts at its board; otherwise everything small enough to see whole.
+    const linked = initial && boards.find((b) => b.mode === initial.mode && b.regionId === initial.regionId);
+    const shown = linked ? [linked] : boards.some((b) => !MODES[b.mode].viewport) ? boards.filter((b) => !MODES[b.mode].viewport) : boards;
+    return { ...NORTHEAST, id: "world", name: "Everywhere", bounds: [...boundsOfBoards(shown)] as Region["bounds"], zoom: 5 };
+  }, [boards, initial]);
   const onViewChange = useCallback((v: MapView) => setView({ bbox: v.bbox, zoom: v.zoom }), []);
 
   const openTrip = useCallback((id: string) => {
@@ -65,6 +88,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
     setQuery("");
   }, []);
   const openPlace = useCallback((place: PlaceTarget) => {
+    setRouteFollowed(undefined);
     setDrawn({ kind: "place", place });
     setFollowing(false);
     setQuery("");
@@ -78,7 +102,14 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
     },
     [world.places, openPlace],
   );
+  const openRoute = useCallback((board: BoardLink, route: RouteSummary) => {
+    setRouteFollowed({ board, route });
+    setDrawn({ kind: "route" });
+    setFollowing(false);
+    setQuery("");
+  }, []);
   const close = useCallback(() => {
+    setRouteFollowed(undefined);
     setDrawn(undefined);
     setFollowing(false);
     setQuery("");
@@ -86,7 +117,10 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
   const onQuery = useCallback((q: string) => {
     setQuery(q);
     setDrawn((d) => (q.trim() ? { kind: "search" } : d?.kind === "search" ? undefined : d));
-    if (q.trim()) setFollowing(false);
+    if (q.trim()) {
+      setFollowing(false);
+      setRouteFollowed(undefined);
+    }
   }, []);
   const onFollowEnd = useCallback(() => setFollowing(false), []);
 
@@ -96,6 +130,53 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
   const liveBoard = live && world.boardOfTrip.get(live.id);
   if (live && liveBoard && known?.trip !== live) setKnown({ trip: live, board: liveBoard });
   const shownTrip = drawn?.kind === "trip" && known?.trip.id === drawn.id ? known : undefined;
+
+  // Open what a shared link asked for, once what it points at has loaded. If it is gone (a trip that has ended), the
+  // map simply starts at its board.
+  const [opened, setOpened] = useState(false);
+  if (!opened && initial?.kind === "trip") {
+    const t = world.trips.find((x) => pinKey(x) === initial.key);
+    if (t) {
+      setOpened(true);
+      setDrawn({ kind: "trip", id: t.id });
+      setFollowing(true);
+    }
+  } else if (!opened && initial?.kind === "place") {
+    const board = boards.find((b) => sameBoard(b, initial));
+    const p = board && world.places.find((x) => x.id === worldPlaceId(board, initial.placeId));
+    if (board && p) {
+      setOpened(true);
+      setDrawn({ kind: "place", place: { id: initial.placeId, name: p.name, mode: board.mode, regionId: board.regionId, lat: p.lat, lon: p.lon } });
+      setFocus({ lat: p.lat, lon: p.lon, zoom: 12.5, key: `link/${initial.placeId}` });
+    }
+  }
+  const routeLinked = useRef(false);
+  useEffect(() => {
+    if (routeLinked.current || initial?.kind !== "route") return;
+    routeLinked.current = true;
+    const board = boards.find((b) => sameBoard(b, initial));
+    if (!board) return;
+    fetch(`/api/routes?mode=${board.mode}&region=${board.regionId}&q=${encodeURIComponent(initial.route)}`)
+      .then((res) => (res.ok ? (res.json() as Promise<RouteSummary[]>) : []))
+      .then((found) => {
+        const route = found.find((x) => x.route.toLowerCase() === initial.route.toLowerCase());
+        if (route) openRoute(board, route);
+      })
+      .catch(() => {});
+  }, [initial, boards, openRoute]);
+
+  // The address follows what is open, so it can be shared or reloaded.
+  const address = useMemo<string>(() => {
+    if (drawn?.kind === "trip" && shownTrip) return linkHref({ kind: "trip", key: pinKey(shownTrip.trip), mode: shownTrip.board.mode, regionId: shownTrip.board.regionId });
+    if (drawn?.kind === "place") return linkHref({ kind: "place", mode: drawn.place.mode, regionId: drawn.place.regionId, placeId: drawn.place.id });
+    if (drawn?.kind === "route" && routeFollowed) return linkHref({ kind: "route", mode: routeFollowed.board.mode, regionId: routeFollowed.board.regionId, route: routeFollowed.route.route });
+    return linkHref(undefined);
+  }, [drawn, shownTrip, routeFollowed]);
+  useEffect(() => {
+    // Until a shared link has opened, leave its address alone.
+    if (initial && !opened && !routeLinked.current && !drawn) return;
+    window.history.replaceState(window.history.state, "", address);
+  }, [address, drawn, initial, opened]);
 
   const toggle = (m: Mode) =>
     setModes((cur) => {
@@ -130,6 +211,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
           followTripId={drawn?.kind === "trip" && following ? drawn.id : undefined}
           onFollowEnd={onFollowEnd}
           focus={focus}
+          fitTo={routeFollowed && world.routeLines.length ? { key: `${routeFollowed.board.href}/${routeFollowed.route.route}`, lines: world.routeLines } : undefined}
           padding={padding}
           onSelectTrip={openTrip}
           onSelectPlace={onSelectPlace}
@@ -168,7 +250,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
 
         {drawn?.kind === "search" && (
           <Drawer label="Search results" onClose={close}>
-            <SearchDrawer query={query} trips={world.trips} places={world.places} onOpenTrip={openTrip} onOpenPlace={openPlace} />
+            <SearchDrawer query={query} trips={world.trips} places={world.places} boards={boards} onOpenTrip={openTrip} onOpenPlace={openPlace} onOpenRoute={openRoute} />
           </Drawer>
         )}
         {shownTrip && (
@@ -176,9 +258,14 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
             <TripDrawer trip={shownTrip.trip} gone={!live} board={shownTrip.board} now={now} following={following} onFollow={() => setFollowing(true)} />
           </Drawer>
         )}
+        {drawn?.kind === "route" && routeFollowed && (
+          <Drawer label={`${MODES[routeFollowed.board.mode].lineNoun} ${routeFollowed.route.route}`} onClose={close}>
+            <RouteDrawer board={routeFollowed.board} route={routeFollowed.route} trips={world.trips} onOpenTrip={openTrip} />
+          </Drawer>
+        )}
         {drawn?.kind === "place" && (
           <Drawer label={drawn.place.name} onClose={close}>
-            <PlaceDrawer place={drawn.place} trips={world.trips} now={now} onOpenTrip={openTrip} />
+            <PlaceDrawer place={drawn.place} trips={world.trips} now={now} onOpenTrip={openTrip} onOpenPlace={openPlace} />
           </Drawer>
         )}
       </section>
