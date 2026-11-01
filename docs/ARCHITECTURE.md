@@ -281,28 +281,6 @@ no longer exist. The home page is all there is, with a plain list of the places 
   NOAA equations, no network, no stored location; skipped when the device is already in a dark theme). When a vehicle
   newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
   reduced-motion turns them off).
-- **Road traffic** is an optional overlay (`lib/traffic.ts`, the "Traffic" chip): TomTom's Traffic Flow raster tiles
-  drawn under the network, from zoom 9, when `TOMTOM_API_KEY` is set on the server. Free, keyless, nationwide traffic
-  data does not exist (NYC DOT's open feed covers about 125 highway segments and lags), so this is the one keyed third
-  party, and its free tier (about 50,000 tile requests a day) is made to go far and never to cost money:
-  - the key is a server secret: the browser asks Hopline's own `/api/traffic/{z}/{x}/{y}`, so the key never reaches
-    the browser and TomTom never sees a viewer's address;
-  - every tile is cached ten minutes at the edge and shared by everyone (traffic is the same for all), so a tile is
-    fetched from TomTom at most about once per ten minutes however many people look at it;
-  - the overlay is an overview of conditions (no ETAs, no directions), so it asks for zooms 9 to 12 only and stretches
-    the zoom-12 tile (about 10 km across) when closer, so few distinct tiles exist;
-  - only tiles that touch an area Hopline covers are served (the route cannot spend quota on anything else);
-  - a daily allowance of upstream requests (`TRAFFIC_DAILY_BUDGET`, default 30,000, counted per server instance on
-    top of the edge cache) stops traffic for the rest of the UTC day rather than running past the free tier.
-  Keep no payment method on the TomTom account: then nothing can be billed whatever happens. The page tells the browser
-  only whether traffic exists. With no key nothing about traffic appears.
-- **Ferries** are a mode of their own (`MODES.ferry`: "Ferries", landings, docks), drawn with a boat glyph and the same
-  wake as trains. Three providers: NYC Ferry (live GPS and trip updates, keyless; its feeds name a trip but not its
-  route, so the schedule's trips are kept to look the route up, and the operator's own route lines are used as given
-  because redrawing them as straight lines between landings would cross land), the MBTA's Boston Harbor ferries
-  (live, from the same feeds as its trains and buses, with a distinct color and badge per route), and the Staten Island
-  Ferry (timetable only: no live feed exists, so boats are placed by the schedule like Philadelphia's Metro). All three
-  are station-first boards (a landing lists the next boats) built from the shared builders in `providers/gtfs/`.
 - **Adding a keyless agency is a few lines.** `providers/gtfs/live-provider.ts` (`createLiveProvider`) makes a station-first
   provider from an operator's GPS and trip-update feeds over bundled stations and track; `timetable-provider.ts`
   (`createTimetableProvider`) does the same from a timetable alone (vehicles placed by the schedule, marked

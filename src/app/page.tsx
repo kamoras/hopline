@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { ModelHome } from "@/components/home/model-home";
 import { toLink } from "@/domain/board";
-import { trafficAvailable } from "@/lib/traffic";
 import { listBoards } from "@/providers/registry";
 
 /**
@@ -14,5 +13,5 @@ export default function Home() {
   const links = boards.map(toLink);
   if (links.length === 1) redirect(links[0]!.href);
 
-  return <ModelHome boards={links} trafficAvailable={trafficAvailable()} />;
+  return <ModelHome boards={links} />;
 }
