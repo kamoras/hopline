@@ -303,6 +303,14 @@ no longer exist. The home page is all there is, with a plain list of the places 
   (live, from the same feeds as its trains and buses, with a distinct color and badge per route), and the Staten Island
   Ferry (timetable only: no live feed exists, so boats are placed by the schedule like Philadelphia's Metro). All three
   are station-first boards (a landing lists the next boats) built from the shared builders in `providers/gtfs/`.
+- **Adding a keyless agency is a few lines.** `providers/gtfs/live-provider.ts` (`createLiveProvider`) makes a station-first
+  provider from an operator's GPS and trip-update feeds over bundled stations and track; `timetable-provider.ts`
+  (`createTimetableProvider`) does the same from a timetable alone (vehicles placed by the schedule, marked
+  "estimated"). An agency is a `scripts/build-rail-gtfs.ts` entry, a `data/<id>` folder, a ~20-line config (its own
+  literal dynamic import of its data) and a registry line. NY Waterway, NYC Ferry and the MBTA ferries are live;
+  SeaStreak, the Statue of Liberty ferries, the Staten Island Ferry and the Roosevelt Island Tram are timetable-only.
+  The shared builder finds a vessel's route from its trip when a feed names only the trip, and joins a vessel that names
+  no trip to its trip update by vehicle id.
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
   (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a

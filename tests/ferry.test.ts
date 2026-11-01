@@ -42,6 +42,19 @@ describe("ferries", () => {
     expect(trips[0]).toMatchObject({ mode: "ferry", number: "ER", routeName: "East River", destination: "East 34th Street" });
   });
 
+  it("joins a vessel that reports no trip to its trip update by vehicle id, and finds the route from that trip (NY Waterway)", () => {
+    const trips = buildSubwayTrips({
+      operatorId: "nywaterway",
+      mode: "ferry",
+      staticData: ferries,
+      tripUpdates: feed([{ id: "305", tripUpdate: { trip: { tripId: "305" }, vehicle: { id: "5" }, stopTimeUpdate: [{ stopId: "18", arrival: { time: sec(25) } }] } }]),
+      vehicles: feed([{ id: "5", vehicle: { position: { latitude: 40.72, longitude: -74.0 }, timestamp: sec(0), vehicle: { id: "5", label: "Empire" } } }]), // no trip of its own
+      now: NOW,
+    });
+    expect(trips).toHaveLength(1);
+    expect(trips[0]).toMatchObject({ number: "ER", routeName: "East River" });
+  });
+
   it("places a timetable-only ferry by the schedule, with the route standing in for a train number", () => {
     const trips = buildScheduledTrips({ id: "nyc-sif", name: "Staten Island Ferry", staticData: data, region: NYC, now: NOW, mode: "ferry" });
     expect(trips).toHaveLength(1);

@@ -125,7 +125,7 @@ export function buildSubwayTrips({ operatorId, mode = "subway", staticData, trip
     const vehicleId = v?.vehicle?.id ?? v?.vehicle?.label;
     const joined = v?.trip?.tripId ? undefined : vehicleId ? updatesByVehicle.get(vehicleId) : undefined;
     // Some feeds (NYC Ferry) name a vessel's trip but not its route: the schedule says which route a trip is on.
-    const routeId = v?.trip?.routeId || joined?.trip.routeId || (v?.trip?.tripId ? staticData.data.trip(v.trip.tripId)?.routeId : undefined);
+    const routeId = v?.trip?.routeId || joined?.trip.routeId || ((v?.trip?.tripId ?? joined?.trip.tripId) ? staticData.data.trip((v?.trip?.tripId ?? joined?.trip.tripId)!)?.routeId : undefined);
     const line = routeId ? staticData.lines[routeId] : undefined;
     if (!v || !line) continue; // the MBTA shares its feed with buses, commuter rail and ferries; WMATA lists trains with no trip
     bump(diag, "vehicles");
