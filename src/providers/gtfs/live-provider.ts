@@ -2,7 +2,7 @@ import type { Attribution, Trip } from "@/domain/trip";
 import type { Mode } from "@/domain/modes";
 import { fetchGtfsRt } from "./feed";
 import { summarizeRouteAlerts } from "./line-status";
-import { buildSubwayArrivals, buildSubwayTrips, createSubwayStatic, subwayPlaces, type SubwayStatic } from "./subway";
+import { buildSubwayArrivals, buildSubwayTrips, createSubwayStatic, subwayPlaces, subwayRoutes, type SubwayStatic } from "./subway";
 import type { FetchContext, TransitProvider } from "../types";
 import { lazy, lazyStaticData, type DataFiles } from "./dataset";
 
@@ -64,8 +64,12 @@ export function createLiveProvider({ id, name, mode, regionIds, attribution, fil
         }
       : {}),
 
-    async fetchLines() {
-      return (await loadStatic()).data.lines();
+    async fetchLines({ route }) {
+      return (await loadStatic()).data.lines(route);
+    },
+
+    async fetchRoutes() {
+      return subwayRoutes(await loadStatic());
     },
   };
 }

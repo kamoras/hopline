@@ -1,7 +1,7 @@
 import type { Trip } from "@/domain/trip";
 import { fetchGtfsRt } from "../gtfs/feed";
 import { summarizeRouteAlerts } from "../gtfs/line-status";
-import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces } from "../gtfs/subway";
+import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces, subwayRoutes } from "../gtfs/subway";
 import type { FetchContext, TransitProvider } from "../types";
 import { loadMtaBusStatic, MTA_BUS_ID } from "./static";
 
@@ -52,7 +52,11 @@ export const mtaBusProvider: TransitProvider = {
     return summarizeRouteAlerts(await fetchFeed("alerts", signal, now, ALERTS_TTL_MS), await loadMtaBusStatic(), now);
   },
 
-  async fetchLines() {
-    return (await loadMtaBusStatic()).data.lines();
+  async fetchLines({ route }) {
+    return (await loadMtaBusStatic()).data.lines(route);
+  },
+
+  async fetchRoutes() {
+    return subwayRoutes(await loadMtaBusStatic());
   },
 };

@@ -12,6 +12,8 @@ export interface FetchContext {
   now: number;
   /** Providers record what they saw and dropped here; surfaced on /status and in the API. */
   diag: Diagnostics;
+  /** For `fetchLines` on a big network: build only this route's track (the others are never needed on one request). */
+  route?: string;
 }
 
 /**
@@ -36,6 +38,8 @@ export interface TransitProvider {
   fetchArrivals?(ctx: FetchContext, place: Place): Promise<Arrival[]>;
   /** Optional: how each line is running (from service alerts). A failure means status is unknown, not good. */
   fetchLineStatus?(ctx: FetchContext): Promise<LineStatus[]>;
+  /** The routes of a big network (number, name, color) without their geometry, for route search. */
+  fetchRoutes?(ctx: FetchContext): Promise<{ route: string; name: string; color: string }[]>;
   /** Optional: track/route geometry to draw on the map. */
   fetchLines?(ctx: FetchContext): Promise<Line[]>;
 }

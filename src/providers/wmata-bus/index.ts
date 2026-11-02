@@ -1,6 +1,6 @@
 import type { Trip } from "@/domain/trip";
 import { summarizeRouteAlerts } from "../gtfs/line-status";
-import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces } from "../gtfs/subway";
+import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces, subwayRoutes } from "../gtfs/subway";
 import type { FetchContext, TransitProvider } from "../types";
 import { fetchWmataFeed as fetchFeed, WMATA_BASE } from "../wmata/feeds";
 import { loadWmataBusStatic, WMATA_BUS_ID } from "./static";
@@ -42,7 +42,11 @@ export const wmataBusProvider: TransitProvider = {
     return summarizeRouteAlerts(await fetchFeed(FEEDS.alerts, signal, now, ALERTS_TTL_MS), await loadWmataBusStatic(), now);
   },
 
-  async fetchLines() {
-    return (await loadWmataBusStatic()).data.lines();
+  async fetchLines({ route }) {
+    return (await loadWmataBusStatic()).data.lines(route);
+  },
+
+  async fetchRoutes() {
+    return subwayRoutes(await loadWmataBusStatic());
   },
 };

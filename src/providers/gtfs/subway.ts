@@ -208,3 +208,10 @@ export function buildSubwayArrivals({
   }
   return out.sort((a, b) => a.at - b.at).slice(0, ARRIVALS_MAX);
 }
+
+/** A big network's routes (number, name, color) without any geometry: what route search needs, at a fraction of the memory. */
+export function subwayRoutes({ lines }: SubwayStatic): { route: string; name: string; color: string }[] {
+  const byShort = new Map<string, { route: string; name: string; color: string }>();
+  for (const l of Object.values(lines)) if (!byShort.has(l.short)) byShort.set(l.short, { route: l.short, name: l.name, color: l.color });
+  return [...byShort.values()];
+}

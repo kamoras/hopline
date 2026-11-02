@@ -1,6 +1,6 @@
 import type { Board } from "@/domain/board";
 import { normalizeName } from "@/domain/place";
-import { getLines } from "./lines";
+import { providersFor } from "@/providers/registry";
 
 /** A route riders ask for by number or name. */
 export interface RouteSummary {
@@ -19,9 +19,11 @@ function allRoutes(board: Board): Promise<RouteSummary[]> {
   const key = `${board.mode}/${board.region.id}`;
   let hit = cache.get(key);
   if (!hit) {
-    hit = getLines(board).then((lines) => {
+    hit = Promise.all(
+      providersFor(board).map((p) => p.fetchRoutes?.({ region: board.region, now: Date.now(), diag: {}, signal: AbortSignal.timeout(8_000) }).catch(() => []) ?? []),
+    ).then((lists) => {
       const routes = new Map<string, RouteSummary>();
-      for (const l of lines) if (l.route && !routes.has(l.route)) routes.set(l.route, { route: l.route, name: l.name, color: l.color });
+      for (const r of lists.flat()) if (r.route && !routes.has(r.route)) routes.set(r.route, r);
       return [...routes.values()].sort(byRoute);
     });
     cache.set(key, hit);
