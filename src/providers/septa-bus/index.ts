@@ -1,7 +1,7 @@
 import type { Trip } from "@/domain/trip";
 import { fetchGtfsRt } from "../gtfs/feed";
 import { summarizeRouteAlerts } from "../gtfs/line-status";
-import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces } from "../gtfs/subway";
+import { buildSubwayArrivals, buildSubwayTrips, subwayPlaces, subwayRoutes } from "../gtfs/subway";
 import type { FetchContext, TransitProvider } from "../types";
 import { loadSeptaBusStatic, SEPTA_BUS_ID } from "./static";
 
@@ -46,7 +46,11 @@ export const septaBusProvider: TransitProvider = {
     return summarizeRouteAlerts(await fetchFeed(FEEDS.alerts, signal, now, ALERTS_TTL_MS), await loadSeptaBusStatic(), now);
   },
 
-  async fetchLines() {
-    return (await loadSeptaBusStatic()).data.lines();
+  async fetchLines({ route }) {
+    return (await loadSeptaBusStatic()).data.lines(route);
+  },
+
+  async fetchRoutes() {
+    return subwayRoutes(await loadSeptaBusStatic());
   },
 };

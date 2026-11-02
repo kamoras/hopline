@@ -285,6 +285,10 @@ no longer exist. The home page is all there is, with a plain list of the places 
   NOAA equations, no network, no stored location; skipped when the device is already in a dark theme). When a vehicle
   newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
   reduced-motion turns them off).
+- **A big network's routes are cheap to list and built on demand.** Route search reads each agency's route table
+  (`fetchRoutes`: number, name, color; no geometry), `/api/lines?route=` builds only that route's track
+  (`GtfsStaticData.lines(onlyRoute)`), and buses are not snapped to track on the server (`getTrack` is empty for a
+  viewport board). This keeps a bus board's memory about half of what holding every route's geometry cost.
 - **Adding a keyless agency is a few lines.** `providers/gtfs/live-provider.ts` (`createLiveProvider`) makes a station-first
   provider from an operator's GPS and trip-update feeds over bundled stations and track; `timetable-provider.ts`
   (`createTimetableProvider`) does the same from a timetable alone (vehicles placed by the schedule, marked
@@ -339,6 +343,9 @@ colors (green, amber, red) mean service status and are never reused for decorati
 - **Motion** is short and purposeful (sheets, new cards, a tap), and all of it stops under reduced motion.
 
 ## Scaling
+
+A measured review of what breaks first (download size, server memory, cold starts, the client) is in
+[docs/SCALING_REVIEW.md](SCALING_REVIEW.md); this section is the design.
 
 Hopline is built so that adding places adds cost only where people are looking. The rules, and what
 enforces them:

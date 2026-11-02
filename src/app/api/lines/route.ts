@@ -12,9 +12,10 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const board = findBoard(params.get("mode") ?? "", params.get("region") ?? "");
   if (!board) return Response.json({ error: "Unknown board" }, { status: 404 });
-  const lines = await getLines(board);
+  // A big network sends one route's track on request and nothing otherwise, and builds only that route's geometry.
   const route = params.get("route");
-  const wanted = !MODES[board.mode].viewport ? lines : route ? lines.filter((l) => l.route?.toLowerCase() === route.toLowerCase()) : [];
+  const viewport = MODES[board.mode].viewport;
+  const wanted = viewport && !route ? [] : await getLines(board, Date.now(), viewport ? route! : undefined);
   return Response.json(wanted, {
     headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800" },
   });

@@ -50,8 +50,8 @@ export interface GtfsStaticData {
   tripsByNumber(number: string, date: string): StaticTripRef[];
   /** Every trip scheduled to run on `date` (YYYYMMDD). */
   tripsOn(date: string): StaticTripRef[];
-  /** Every distinct track, for drawing on the map. */
-  lines(): Line[];
+  /** Every distinct track, for drawing on the map (or just one route's, by its public number). */
+  lines(onlyRoute?: string): Line[];
 }
 
 /** [trainNumber, routeId, headsign, direction, encodedStopTimes, serviceIndex, shapeIndex (-1 = none)] */
@@ -149,13 +149,15 @@ export function createStaticData(
     routes: raw.routes,
     tripIds: () => Object.keys(raw.trips),
     trip: decode,
-    lines() {
+    lines(onlyRoute) {
       // Inbound and outbound often share one geometry; draw each distinct track once.
       const seen = new Set<string>();
       // Station-to-station fallbacks are only drawn for a route that has no real track geometry at all.
       const detailed = new Set(raw.shapes.filter((s) => !s.coarse).map((s) => s.routeId));
+      const want = onlyRoute?.toLowerCase();
       return raw.shapes.flatMap((s, i) => {
         if (s.coarse && detailed.has(s.routeId)) return [];
+        if (want !== undefined && ((raw.routes[s.routeId] as { short?: string } | undefined)?.short ?? s.routeId).toLowerCase() !== want) return [];
         const pts = polylines[i]!.pts;
         const ends = [pts[0], pts.at(-1)].map((p) => `${p?.lat},${p?.lon}`).sort().join("|");
         const key = `${s.routeId}:${pts.length}:${ends}`;

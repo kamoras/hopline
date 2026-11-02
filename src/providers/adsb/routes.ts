@@ -20,7 +20,7 @@ const KEEP_MS = 6 * 60 * 60_000;
 const PER_REFRESH = 250;
 const FETCH_TIMEOUT_MS = 4_000;
 /** How long a refresh waits for lookups before showing what it has; the rest finish for the next one. */
-const WAIT_MS = 3_000;
+const WAIT_MS = 1_500;
 
 const cache = new Map<string, { at: number; route: KnownRoute | null }>();
 const inflight = new Set<string>();
@@ -46,14 +46,25 @@ async function lookup(callsign: string, now: number): Promise<void> {
   }
 }
 
-/** Starts looking up the callsigns not yet known and waits briefly for them. Never throws. */
+/** Lookups in flight at once: enough to name a busy sky in a couple of seconds, few enough not to swamp the network (or the response). */
+const WORKERS = 16;
+
+/**
+ * Starts looking up the callsigns not yet known and waits briefly for them (`WAIT_MS`): a refresh never waits on the
+ * long tail, and whatever is still running finishes in the background for the next one. Never throws.
+ */
 export async function warmRoutes(callsigns: readonly string[], now: number): Promise<void> {
-  const wanted = callsigns.filter((c) => cachedRoute(c, now) === undefined && !inflight.has(c)).slice(0, PER_REFRESH);
-  const jobs = wanted.map((c) => {
-    inflight.add(c);
-    return lookup(c, now).finally(() => inflight.delete(c));
-  });
-  if (jobs.length) await Promise.race([Promise.all(jobs), new Promise((r) => setTimeout(r, WAIT_MS))]);
+  const queue = callsigns.filter((c) => cachedRoute(c, now) === undefined && !inflight.has(c)).slice(0, PER_REFRESH);
+  if (queue.length === 0) return;
+  for (const c of queue) inflight.add(c);
+  const worker = async () => {
+    for (let c = queue.shift(); c !== undefined; c = queue.shift()) {
+      await lookup(c, now);
+      inflight.delete(c);
+    }
+  };
+  const drained = Promise.all(Array.from({ length: Math.min(WORKERS, queue.length) }, worker));
+  await Promise.race([drained, new Promise((r) => setTimeout(r, WAIT_MS))]);
 }
 
 /** Which end of a route a plane is heading for: the airport its track points at best. The other end is where it came from. */

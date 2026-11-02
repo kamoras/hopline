@@ -67,6 +67,11 @@ interface Agency {
   scanStops?: boolean;
   /** Keep stations, routes and track but not the schedule, for operators whose trips come entirely from live feeds. */
   realtimeOnly?: boolean;
+  /**
+   * Keep only track inside this box [west, south, east, north], for a national feed of which only a region is shown (Amtrak):
+   * a point outside it is dropped unless it is the neighbor of one inside, so a line still runs off the edge of the box.
+   */
+  clipTo?: [number, number, number, number];
   /** Keep only track geometry (no trips or stations), for operators whose trips come from a live feed. */
   linesOnly?: boolean;
 }
@@ -399,6 +404,8 @@ const AGENCIES: Record<string, Agency> = {
     // Amtrak shapes are sparse on straight stretches; they are still the real alignment, so keep them.
     coarseGapM: 20_000,
     linesOnly: true,
+    // Only the Northeast is shown, so the long-distance routes are cut where they leave it (Chicago to Albany, and so on).
+    clipTo: [-81.5, 36.4, -66.5, 47.5],
   },
 };
 
@@ -762,6 +769,17 @@ async function main() {
   write("routes.json", routes);
   write("trips.json", agency.linesOnly || agency.realtimeOnly ? {} : trips);
   write("services.json", agency.linesOnly || agency.realtimeOnly ? [] : services);
+  if (agency.clipTo) {
+    const [w, s, e, n] = agency.clipTo;
+    const inside = (la: number, lo: number) => lo >= w && lo <= e && la >= s && la <= n;
+    const kept = shapes.flatMap((sh) => {
+      const idx = Array.from({ length: sh.pts.length / 2 }, (_, i) => i);
+      const keep = idx.filter((i) => inside(sh.pts[2 * i]!, sh.pts[2 * i + 1]!) || (i > 0 && inside(sh.pts[2 * i - 2]!, sh.pts[2 * i - 1]!)) || (i < idx.length - 1 && inside(sh.pts[2 * i + 2]!, sh.pts[2 * i + 3]!)));
+      return keep.length >= 2 ? [{ ...sh, pts: keep.flatMap((i) => [sh.pts[2 * i]!, sh.pts[2 * i + 1]!]) }] : [];
+    });
+    shapes.length = 0;
+    shapes.push(...kept);
+  }
   write("shapes.json", shapes);
   write("meta.json", {
     source: agency.url ?? arg(args, "--zip") ?? "local file",
