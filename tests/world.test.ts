@@ -32,7 +32,7 @@ describe("which boards the model shows", () => {
     expect(activeBoards(boards, nyc(5), all).map((b) => b.mode)).not.toContain("bus");
     expect(activeBoards(boards, nyc(5), all, { board: bus, route: "M15" }).map((b) => b.mode)).toContain("bus");
     const r = requestsFor(bus, nyc(5), "M15+SBS");
-    expect(r.trips).toBe("/api/trips?mode=bus&region=nyc&route=M15%2BSBS");
+    expect(r.trips).toBe("/api/trips?mode=bus&region=nyc&lean=1&route=M15%2BSBS");
     expect(r.lines).toBe("/api/lines?mode=bus&region=nyc&route=M15%2BSBS");
     expect(r.places).toBeUndefined();
   });
@@ -46,14 +46,14 @@ describe("which boards the model shows", () => {
 describe("what a board is asked for", () => {
   it("asks a small board for everything, once", () => {
     const r = requestsFor(boards[1]!, nyc(10));
-    expect(r.trips).toBe("/api/trips?mode=subway&region=nyc");
+    expect(r.trips).toBe("/api/trips?mode=subway&region=nyc&lean=1");
     expect(r.lines).toBe("/api/lines?mode=subway&region=nyc");
     expect(r.places).toBe("/api/places?mode=subway&region=nyc");
   });
 
   it("asks a big network for the visible area only, rounded outward, with stops only when close", () => {
     const far = requestsFor(boards[4]!, nyc(12.5));
-    expect(far.trips).toMatch(/^\/api\/trips\?mode=bus&region=nyc&bbox=-74\.1,40\.64,-73\.84,40\.86$/);
+    expect(far.trips).toMatch(/^\/api\/trips\?mode=bus&region=nyc&lean=1&bbox=-74\.1,40\.64,-73\.84,40\.86$/);
     expect(far.lines).toBeUndefined(); // a route's track comes only when one is chosen
     expect(far.places).toBeUndefined();
     expect(requestsFor(boards[4]!, nyc(14.5)).places).toContain("&bbox=");

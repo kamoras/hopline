@@ -46,14 +46,14 @@ export function requestsFor(board: BoardLink, view: WorldView, route?: string): 
   const base = `mode=${board.mode}&region=${board.regionId}`;
   if (route) {
     const r = encodeURIComponent(route);
-    return { board, trips: `/api/trips?${base}&route=${r}`, lines: `/api/lines?${base}&route=${r}` };
+    return { board, trips: `/api/trips?${base}&lean=1&route=${r}`, lines: `/api/lines?${base}&route=${r}` };
   }
   if (!MODES[board.mode].viewport) {
-    return { board, trips: `/api/trips?${base}`, lines: `/api/lines?${base}`, places: `/api/places?${base}` };
+    return { board, trips: `/api/trips?${base}&lean=1`, lines: `/api/lines?${base}`, places: `/api/places?${base}` };
   }
   // A big network is asked about the visible area, rounded outward so panning reuses cached requests.
   const box = formatBbox(snapBbox(view.bbox));
-  return { board, trips: `/api/trips?${base}&bbox=${box}`, places: view.zoom >= STOP_MIN_ZOOM ? `/api/places?${base}&bbox=${box}` : undefined };
+  return { board, trips: `/api/trips?${base}&lean=1&bbox=${box}`, places: view.zoom >= STOP_MIN_ZOOM ? `/api/places?${base}&bbox=${box}` : undefined };
 }
 
 /** A station's id on the combined map, which holds every board's stations: the board key keeps equal ids apart. */

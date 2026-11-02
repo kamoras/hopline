@@ -285,6 +285,11 @@ no longer exist. The home page is all there is, with a plain list of the places 
   NOAA equations, no network, no stored location; skipped when the device is already in a dark theme). When a vehicle
   newly pulls into a station a ring ripples out and fades (`lib/ripples.ts`; the first data after load makes none, and
   reduced-motion turns them off).
+- **The map polls lean trips.** `/api/trips?lean=1` (`lib/lean.ts`) leaves out each vehicle's timetable (a train's
+  stops are two thirds of its JSON), rounds positions to a meter and drops departures that repeat arrivals, about
+  halving what a viewer downloads (`docs/SCALING_REVIEW.md`). Trains keep the stops still ahead so A-to-B, commutes and a
+  station's trains still work in the browser; a vehicle's full stop list comes from `/api/trip` (`useTripDetail`) when its
+  drawer opens.
 - **A big network's routes are cheap to list and built on demand.** Route search reads each agency's route table
   (`fetchRoutes`: number, name, color; no geometry), `/api/lines?route=` builds only that route's track
   (`GtfsStaticData.lines(onlyRoute)`), and buses are not snapped to track on the server (`getTrack` is empty for a
