@@ -55,7 +55,8 @@
     "data:amtrak": "tsx scripts/build-rail-gtfs.ts amtrak",
     "data:hartford-line": "tsx scripts/build-rail-gtfs.ts hartford-line",
     "data:subway": "tsx scripts/build-subway-gtfs.ts",
-    "data:refresh": "tsx scripts/refresh-data.ts"
+    "data:refresh": "tsx scripts/refresh-data.ts",
+    "data:publish": "tsx scripts/publish-data.ts"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
