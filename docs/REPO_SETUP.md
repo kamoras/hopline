@@ -23,6 +23,12 @@ repo settings, so they can't live in code. Do them once:
 7. **Settings → General → Pull Requests:** enable **Automatically delete head branches**. The
    `delete-merged-branch` workflow is a backstop that does the same, so merged branches never linger.
 
+## Published schedule data (optional, for scale)
+`publish-data.yml` packs every agency's schedule and publishes it to GitHub Pages. To use it: **Settings → Pages → Source:
+GitHub Actions**, run the workflow once, then set `HOPLINE_DATA_URL` in the hosting environment to the Pages address
+(for example `https://<owner>.github.io/<repo>`). Until it is set the server reads the copy bundled at build time, so nothing
+changes; if the host is unreachable it falls back to that copy too.
+
 ## Merge policy
 | PR | Auto-merges when |
 | --- | --- |
