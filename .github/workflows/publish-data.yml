@@ -1,0 +1,39 @@
+name: Publish schedule data
+
+# Packs every agency's generated schedule into one file each (npm run data:publish) and publishes them to GitHub Pages, so
+# the server can fetch an agency's schedule the first time it is needed (HOPLINE_DATA_URL) and the repository does not have
+# to carry every agency's files. Runs after the weekly refresh merges, and on demand.
+on:
+  push:
+    branches: [main]
+    paths: ["data/**", "scripts/publish-data.ts"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run data:publish
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-data
+      - id: deploy
+        uses: actions/deploy-pages@v4

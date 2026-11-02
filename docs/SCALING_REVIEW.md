@@ -128,6 +128,12 @@ follows what is visible, not what is loaded. The remaining cost is rendering, wh
 GPU and drew 3 to 6 frames a second, so frame rate was not measured; JavaScript cost was.) Nothing to fix here; the
 polling payload above is what to reduce.
 
+## Where the national plan stands
+
+`docs/NATIONWIDE.md` has the plan. Done so far: lean polling, memory fixes, and **schedule data off git** (agency bundles
+published to a static host, fetched on first use, least recently used evicted; see `HOPLINE_DATA_URL` and
+`HOPLINE_MAX_RESIDENT`).
+
 ## What a whole-continent Hopline would need
 
 1. The positions-only feed (recommendation 1), so the cost per viewer stops growing with the number of vehicles.

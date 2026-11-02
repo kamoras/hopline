@@ -12,3 +12,4 @@ public/maplibre
 public/test-style.json
 .lighthouseci
 .mta-bus-work
+dist-data/
