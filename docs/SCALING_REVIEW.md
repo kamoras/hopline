@@ -9,7 +9,7 @@ reliable. Date measured: 2 November 2026.
 
 | # | Problem | Evidence | Status |
 | --- | --- | --- | --- |
-| 1 | **Download size per viewer** is the cost that scales worst | ~400 KB gzipped every 10 s for a New York view with every mode on (about 2.4 MB a minute); free hosting bandwidth runs out at tens of thousands of viewer-minutes a month | **Recommendation 1** (not built) |
+| 1 | **Download size per viewer** is the cost that scales worst | ~340 KB gzipped every 10 s for a New York view with every mode on (about 2 MB a minute); free hosting bandwidth runs out at tens of thousands of viewer-minutes a month | **Cut by about half** (lean polling, below); the rest is Recommendation 1 |
 | 2 | **Server memory** per instance grows with every agency touched | RSS 120 MB at start, 295 MB after the rail, metro, ferry and flights boards, **594 MB** after every bus board (a 1 GB function limit is not far) | **Reduced to 473 MB** (this PR) |
 | 3 | **The flights board could fail whole** | 250 route lookups were fired at once; under load the board hit its 8 s provider timeout and showed no aircraft | **Fixed** (this PR) |
 | 4 | Cold start of the rail board | 3.2 s for the first request (loads Metro-North, LIRR, MBTA, SEPTA, Amtrak schedules), 0.2 s after | Known; Recommendation 3 |
@@ -36,13 +36,26 @@ linearly with viewers and with every region added, because every active board is
 Why it is large: each trip carries its full list of stops (3.5 KB per train), and the map only needs a position, a
 heading, a color and a status for 95% of the vehicles it draws.
 
-**Recommendation 1 (biggest win): a positions-only feed for the map, and trip detail on demand.** The map polls a compact
-feed (id, position, heading, color, status, number: about 60 bytes a vehicle, so about 80 KB raw and about 25 KB gzipped
-for the 1,300-vehicle New York view above, 16 times smaller) and opens `/api/trip?id=` for a vehicle's stops only when its
-drawer opens (refreshing while it is open). Search by station, "A to B" and saved commutes need stops, so they move to a
-server-side search endpoint (`/api/search/trips`) that answers from the same cached snapshot. This is a contained change
-(the drawers and search already receive trips through one hook, `useWorld`) but it touches search, so it is worth its own
-PR with its own tests.
+**Done: lean polling (`?lean=1`, `lib/lean.ts`, `/api/trip`).** The map polls vehicles without their timetable, and the
+open vehicle's full stop list comes from `/api/trip` when its drawer opens (refreshed while open). Trains keep the stops
+still ahead (A-to-B, saved commutes and a station's trains are answered from them in the browser), flights keep their
+first stop, everything else sends none; positions are rounded to about a meter, a departure that only repeats its arrival
+is dropped, and the stops already behind come back in the drawer. Measured, gzipped per refresh:
+
+| Board | Before | After |
+| --- | --- | --- |
+| Trains, Northeast | 93 KB | 54 KB |
+| Metro, New York | 30 KB | 13 KB |
+| Buses, New York (whole city) | 156 KB | 70 KB |
+| Ferries, New York | 3 KB | 2 KB |
+
+That is about 45% less for a viewer, with every feature intact.
+
+**Recommendation 1 (the rest): a true positions-only feed.** What remains is mostly each train's schedule-driven `motion`
+legs and the stops trains still carry for in-browser search. Move station, "A to B" and commute search to a server endpoint
+answered from the cached snapshot, and send trains as id, position, heading, color, status and number: about 80 KB raw
+and about 25 KB gzipped for the whole 1,300-vehicle New York view, another 3x smaller. It changes how search works, so it
+is its own PR.
 
 Smaller levers, in order of payoff: drop `nextStop` from the wire (it duplicates `stops[0]`, about 8%); send each
 operator's name and color once per response rather than per trip; poll slower for a board nobody is looking at (a tab in
