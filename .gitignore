@@ -13,3 +13,5 @@ public/test-style.json
 .lighthouseci
 .mta-bus-work
 dist-data/
+ingested/
+.ingest-work/

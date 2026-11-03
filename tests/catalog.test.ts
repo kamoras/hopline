@@ -40,6 +40,10 @@ describe("catalog", () => {
     expect(entries[0]!.id).toMatch(/^berks-area-transit-1$/);
   });
 
+  it("leaves out the ids on the skip list", () => {
+    expect(buildCatalog(parseCsv(csv), { skip: new Set(["mdb-1"]) }).map((e) => e.mdbId)).toEqual(["mdb-6"]); // mdb-6 is not hand-built here, only mdb-1 is skipped
+  });
+
   it("recognizes a hand-built agency's address however it is spelled", () => {
     expect(normalizeUrl("HTTPS://WWW.Example.com/Feed.zip?token=1#x")).toBe("example.com/feed.zip");
   });

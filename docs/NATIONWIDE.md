@@ -36,7 +36,7 @@ piece has a scalable replacement:
    regions, and writes `catalog/agencies.json`. A generic provider is created per entry at startup from the shared factories
    (`createLiveProvider`, `createTimetableProvider`) with the data host as its loader. The existing hand-tuned providers stay
    and win over a generated one for the same service.
-3. **Ingestion at scale:** the weekly job processes agencies in batches (matrix jobs, each within its time limit), validates
+3. **Ingestion (the job is done; running it for every agency, and serving what passes, are next):** the weekly job processes agencies in batches (matrix jobs, each within its time limit), validates
    each (parses, has stops and trips in its horizon, live feed returns vehicles whose routes match the schedule), and
    publishes only what passes, with a report of what failed and why.
 4. **Switch on regions in waves** (largest metros first), watching the load test and the status page after each.
@@ -51,6 +51,25 @@ California (125), New York (78), Washington (58), Oregon (55) and Colorado (49).
 170 live feeds) are left out until a key is provided. The catalog says what exists; the ingestion job (next stage) downloads
 and validates each candidate before anything is served, because a listed feed can be stale, empty or mismatched to its live
 feed (as PVTA's and Middletown's were).
+
+## Ingestion
+
+`npm run ingest` (`scripts/ingest.ts`, decisions in `scripts/lib/ingest.ts`) takes every candidate in the catalog and proves
+it before anything is served: download (80 MB cap, plain-http addresses retried over https), a real schedule (stops,
+routes, trips, stop times), in service from today, which modes its routes hold (bus, metro, rail, ferry), and for a live
+feed: sample its vehicles and check that most (60%) tie to the schedule by route or trip, noting whether the feed names routes
+at all (if not, the schedule's trips are kept to look the route up, as for Portland and NY Waterway). Then each mode is
+built into `ingested/<key>/` with the same builder the hand-built agencies use.
+
+The rules that matter: **a bus network is served only if its live feed works** (a timetable-only bus map is noise); trains,
+metro and ferries fall back to their timetable. Everything rejected gets a reason in `catalog/ingested.json`.
+
+First runs (3 November 2026, from a sandbox that cannot reach plain-http or odd-port feeds, so the real numbers will be
+better): of the 136 candidates with a live feed, **96 agencies pass** (99 live feeds, about 40 MB of data) and 43 are rejected,
+mostly because the live feed was unreachable from here (22) or its vehicles did not match the schedule (7); of the first 40
+others, 9 pass (timetable-only trains and ferries such as Caltrain, BART, Cleveland's rail and Alaska ferries). Duplicates of
+hand-built agencies listed under another address are in `catalog/skip.json`. `ingested/` is not committed (it is published
+to Pages with the rest); `catalog/ingested.json`, the report, is.
 
 ## What stays hand-written
 

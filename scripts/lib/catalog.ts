@@ -76,9 +76,11 @@ export interface BuildOptions {
   /** Static feed URLs already served by hand-built providers (normalized), so they are not added twice. */
   handBuilt?: ReadonlySet<string>;
   country?: string;
+  /** Catalog ids to leave out: duplicates of hand-built agencies listed under another address (see catalog/skip.json). */
+  skip?: ReadonlySet<string>;
 }
 
-export function buildCatalog(rows: readonly Row[], { handBuilt = new Set<string>(), country = "US" }: BuildOptions = {}): CatalogEntry[] {
+export function buildCatalog(rows: readonly Row[], { handBuilt = new Set<string>(), country = "US", skip = new Set<string>() }: BuildOptions = {}): CatalogEntry[] {
   const inCountry = rows.filter((r) => r["location.country_code"] === country && live(r));
   const rtByStatic = new Map<string, Row[]>();
   for (const r of inCountry) {
@@ -91,7 +93,7 @@ export function buildCatalog(rows: readonly Row[], { handBuilt = new Set<string>
     if (r.data_type !== "gtfs" || !keyless(r) || !r["urls.direct_download"]) continue;
     const url = r["urls.direct_download"]!;
     const key = normalizeUrl(url);
-    if (handBuilt.has(key) || seenUrls.has(key)) continue;
+    if (handBuilt.has(key) || seenUrls.has(key) || skip.has(r.id!)) continue;
     const bbox = ["minimum_longitude", "minimum_latitude", "maximum_longitude", "maximum_latitude"].map((k) => Number(r[`location.bounding_box.${k}`]));
     const [w, s, e, n] = bbox as [number, number, number, number];
     if (bbox.some((v) => !Number.isFinite(v) || v === 0) || e <= w || n <= s || e - w > MAX_SPAN_DEG || n - s > MAX_SPAN_DEG) continue;

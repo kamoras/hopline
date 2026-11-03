@@ -1,0 +1,3182 @@
+{
+ "checkedOn": "2026-11-03",
+ "served": [
+  {
+   "id": "amtrak-san-joaquins-2295",
+   "key": "amtrak-san-joaquins-2295",
+   "name": "Amtrak San Joaquins",
+   "state": "California",
+   "mode": "rail",
+   "kind": "timetable",
+   "bbox": [
+    -122.393,
+    35.372,
+    -119.008,
+    40.584
+   ],
+   "stops": 18,
+   "routes": 1,
+   "bytes": 7163
+  },
+  {
+   "id": "area-transit-authority-tld-4551",
+   "key": "area-transit-authority-tld-4551",
+   "name": "Area Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -79.395,
+    40.928,
+    -78.224,
+    41.98
+   ],
+   "stops": 204,
+   "routes": 20,
+   "bytes": 149247,
+   "feeds": {
+    "alerts": "https://rideata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://rideata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://rideata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 13
+   }
+  },
+  {
+   "id": "athens-clarke-county-transit-tld-4777",
+   "key": "athens-clarke-county-transit-tld-4777",
+   "name": "Athens Clarke County Transit",
+   "state": "Georgia",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -83.475,
+    33.911,
+    -83.303,
+    34.029
+   ],
+   "stops": 509,
+   "routes": 18,
+   "bytes": 62687,
+   "feeds": {
+    "alerts": "https://bustracker.accgov.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://bustracker.accgov.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://bustracker.accgov.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 21,
+    "matched": 21,
+    "withRoute": 21
+   }
+  },
+  {
+   "id": "bay-area-rapid-transit-bart-53",
+   "key": "bay-area-rapid-transit-bart-53-subway",
+   "name": "Bay Area Rapid Transit (BART)",
+   "state": "California",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -122.469,
+    37.368,
+    -121.78,
+    38.019
+   ],
+   "stops": 103,
+   "routes": 12,
+   "bytes": 931773,
+   "feeds": {
+    "alerts": "http://api.bart.gov/gtfsrt/alerts.aspx",
+    "tripUpdates": "http://api.bart.gov/gtfsrt/tripupdate.aspx"
+   }
+  },
+  {
+   "id": "bis-man-transit-tld-6095",
+   "key": "bis-man-transit-tld-6095",
+   "name": "Bis-Man Transit",
+   "state": "North Dakota",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -100.904,
+    46.725,
+    -100.729,
+    46.856
+   ],
+   "stops": 55,
+   "routes": 6,
+   "bytes": 16146,
+   "feeds": {
+    "alerts": "https://passio3.com/bisman/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/bisman/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/bisman/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
+   }
+  },
+  {
+   "id": "bloomington-transit-2066",
+   "key": "bloomington-transit-2066",
+   "name": "Bloomington Transit",
+   "state": "Indiana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -86.599,
+    39.121,
+    -86.472,
+    39.208
+   ],
+   "stops": 532,
+   "routes": 15,
+   "bytes": 492098,
+   "feeds": {
+    "alerts": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/alerts.pb",
+    "tripUpdates": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/trip_updates.pb",
+    "vehicles": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/position_updates.pb"
+   },
+   "live": {
+    "vehicles": 27,
+    "matched": 27,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "broward-county-transit-3534",
+   "key": "broward-county-transit-3534",
+   "name": "Broward County Transit",
+   "state": "Florida",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.432,
+    25.762,
+    -80.076,
+    26.351
+   ],
+   "stops": 4657,
+   "routes": 44,
+   "bytes": 521368,
+   "feeds": {
+    "vehicles": "https://myride2.broward.org/gtfsrealtime/api/vehiclepositions",
+    "alerts": "https://myride2.broward.org/gtfsrealtime/api/alerts",
+    "tripUpdates": "https://myride2.broward.org/gtfsrealtime/api/trips"
+   },
+   "live": {
+    "vehicles": 165,
+    "matched": 165,
+    "withRoute": 165
+   }
+  },
+  {
+   "id": "butler-transit-authority-tld-4659",
+   "key": "butler-transit-authority-tld-4659",
+   "name": "Butler Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.115,
+    40.441,
+    -79.876,
+    40.901
+   ],
+   "stops": 203,
+   "routes": 8,
+   "bytes": 63636,
+   "feeds": {
+    "alerts": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 8,
+    "matched": 8,
+    "withRoute": 8
+   }
+  },
+  {
+   "id": "butte-regional-transit-b-line-ntd-90208",
+   "key": "butte-regional-transit-b-line-ntd-90208",
+   "name": "Butte Regional Transit (B-Line)",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -121.899,
+    39.363,
+    -121.463,
+    39.818
+   ],
+   "stops": 483,
+   "routes": 20,
+   "bytes": 77241,
+   "feeds": {
+    "tripUpdates": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_TripUpdates.pb",
+    "vehicles": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_VehiclePositions.pb",
+    "alerts": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_ServiceAlerts.pb"
+   },
+   "live": {
+    "vehicles": 12,
+    "matched": 12,
+    "withRoute": 12
+   }
+  },
+  {
+   "id": "caltrain-54",
+   "key": "caltrain-54",
+   "name": "Caltrain",
+   "state": "California",
+   "mode": "rail",
+   "kind": "timetable",
+   "bbox": [
+    -122.412,
+    37.003,
+    -121.566,
+    37.776
+   ],
+   "stops": 60,
+   "routes": 5,
+   "bytes": 103349
+  },
+  {
+   "id": "cambria-county-transit-authority-tld-4671",
+   "key": "cambria-county-transit-authority-tld-4671",
+   "name": "Cambria County Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -78.979,
+    40.218,
+    -78.41,
+    40.67
+   ],
+   "stops": 583,
+   "routes": 22,
+   "bytes": 299804,
+   "feeds": {
+    "tripUpdates": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 20,
+    "matched": 20,
+    "withRoute": 20
+   }
+  },
+  {
+   "id": "capital-area-transit-goraleigh-2074",
+   "key": "capital-area-transit-goraleigh-2074",
+   "name": "Capital Area Transit (GoRaleigh)",
+   "state": "North Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -78.786,
+    35.649,
+    -78.417,
+    35.916
+   ],
+   "stops": 1386,
+   "routes": 34,
+   "bytes": 197287,
+   "feeds": {
+    "alerts": "https://www.goraleighlive.org/gtfsrt/alerts",
+    "tripUpdates": "https://www.goraleighlive.org/gtfsrt/trips",
+    "vehicles": "https://www.goraleighlive.org/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 86,
+    "matched": 86,
+    "withRoute": 86
+   }
+  },
+  {
+   "id": "capital-area-transit-system-cats-2065",
+   "key": "capital-area-transit-system-cats-2065",
+   "name": "Capital Area Transit System (CATS)",
+   "state": "Louisiana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -91.2,
+    30.346,
+    -91.001,
+    30.588
+   ],
+   "stops": 1371,
+   "routes": 19,
+   "bytes": 125428,
+   "feeds": {
+    "alerts": "https://cats.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://cats.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://cats.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 30,
+    "matched": 30,
+    "withRoute": 30
+   }
+  },
+  {
+   "id": "capital-area-transit-tld-4298",
+   "key": "capital-area-transit-tld-4298",
+   "name": "Capital Area Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.545,
+    40.048,
+    -76.646,
+    40.557
+   ],
+   "stops": 1394,
+   "routes": 29,
+   "bytes": 307083,
+   "feeds": {
+    "alerts": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 36,
+    "matched": 36,
+    "withRoute": 36
+   }
+  },
+  {
+   "id": "capital-metro-150",
+   "key": "capital-metro-150-bus",
+   "name": "Capital Metro",
+   "state": "Texas",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -97.991,
+    30.147,
+    -97.372,
+    30.588
+   ],
+   "stops": 2328,
+   "routes": 69,
+   "bytes": 11034512,
+   "feeds": {
+    "vehicles": "https://data.texas.gov/download/eiei-9rpf/application%2Foctet-stream",
+    "alerts": "https://data.texas.gov/download/9zu9-jwr2/text%2Fplain",
+    "tripUpdates": "https://data.texas.gov/download/rmk2-acnw/application%2Foctet-stream"
+   },
+   "live": {
+    "vehicles": 387,
+    "matched": 251,
+    "withRoute": 251
+   }
+  },
+  {
+   "id": "capital-metro-150",
+   "key": "capital-metro-150-subway",
+   "name": "Capital Metro",
+   "state": "Texas",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -97.991,
+    30.147,
+    -97.372,
+    30.588
+   ],
+   "stops": 10,
+   "routes": 1,
+   "bytes": 48174,
+   "feeds": {
+    "vehicles": "https://data.texas.gov/download/eiei-9rpf/application%2Foctet-stream",
+    "alerts": "https://data.texas.gov/download/9zu9-jwr2/text%2Fplain",
+    "tripUpdates": "https://data.texas.gov/download/rmk2-acnw/application%2Foctet-stream"
+   },
+   "live": {
+    "vehicles": 387,
+    "matched": 251,
+    "withRoute": 251
+   }
+  },
+  {
+   "id": "cascades-east-transit-tld-170",
+   "key": "cascades-east-transit-tld-170",
+   "name": "Cascades East Transit",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -121.679,
+    43.67,
+    -120.844,
+    44.973
+   ],
+   "stops": 256,
+   "routes": 24,
+   "bytes": 92439,
+   "feeds": {
+    "alerts": "https://passio3.com/cet/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/cet/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/cet/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 20,
+    "matched": 20,
+    "withRoute": 20
+   }
+  },
+  {
+   "id": "champaign-urbana-mass-transit-district-ntd-50060",
+   "key": "champaign-urbana-mass-transit-district-ntd-50060",
+   "name": "Champaign-Urbana Mass Transit District",
+   "state": "Illinois",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -88.323,
+    40.048,
+    -88.16,
+    40.153
+   ],
+   "stops": 1915,
+   "routes": 90,
+   "bytes": 541391,
+   "feeds": {
+    "alerts": "https://gtfs-rt.mtd.org/service-alerts",
+    "tripUpdates": "https://gtfs-rt.mtd.org/trip-updates",
+    "vehicles": "https://gtfs-rt.mtd.org/vehicle-positions"
+   },
+   "live": {
+    "vehicles": 89,
+    "matched": 86,
+    "withRoute": 86
+   }
+  },
+  {
+   "id": "charlotte-area-transit-system-cats-2265",
+   "key": "charlotte-area-transit-system-cats-2265-bus",
+   "name": "Charlotte Area Transit System (CATS)",
+   "state": "North Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -81.18,
+    35.049,
+    -80.639,
+    35.503
+   ],
+   "stops": 2850,
+   "routes": 62,
+   "bytes": 371724,
+   "feeds": {
+    "alerts": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Alerts/Alerts.pb",
+    "tripUpdates": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/TripUpdate/Tripupdates.pb",
+    "vehicles": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Vehicle/VehiclePositions.pb"
+   },
+   "live": {
+    "vehicles": 162,
+    "matched": 162,
+    "withRoute": 162
+   }
+  },
+  {
+   "id": "charlotte-area-transit-system-cats-2265",
+   "key": "charlotte-area-transit-system-cats-2265-subway",
+   "name": "Charlotte Area Transit System (CATS)",
+   "state": "North Carolina",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -81.18,
+    35.049,
+    -80.639,
+    35.503
+   ],
+   "stops": 50,
+   "routes": 2,
+   "bytes": 11208,
+   "feeds": {
+    "alerts": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Alerts/Alerts.pb",
+    "tripUpdates": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/TripUpdate/Tripupdates.pb",
+    "vehicles": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Vehicle/VehiclePositions.pb"
+   },
+   "live": {
+    "vehicles": 162,
+    "matched": 162,
+    "withRoute": 162
+   }
+  },
+  {
+   "id": "cincinnati-metro-307",
+   "key": "cincinnati-metro-307-bus",
+   "name": "Cincinnati Metro",
+   "state": "Ohio",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -84.794,
+    39.064,
+    -84.26,
+    39.356
+   ],
+   "stops": 3495,
+   "routes": 52,
+   "bytes": 521658,
+   "feeds": {
+    "tripUpdates": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+    "vehicles": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb",
+    "alerts": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/alert/alerts.pb"
+   },
+   "live": {
+    "vehicles": 225,
+    "matched": 225,
+    "withRoute": 225
+   }
+  },
+  {
+   "id": "cincinnati-metro-307",
+   "key": "cincinnati-metro-307-subway",
+   "name": "Cincinnati Metro",
+   "state": "Ohio",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -84.794,
+    39.064,
+    -84.26,
+    39.356
+   ],
+   "stops": 18,
+   "routes": 1,
+   "bytes": 1684,
+   "feeds": {
+    "tripUpdates": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+    "vehicles": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb",
+    "alerts": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/alert/alerts.pb"
+   },
+   "live": {
+    "vehicles": 225,
+    "matched": 225,
+    "withRoute": 225
+   }
+  },
+  {
+   "id": "city-of-irvine-tld-6724",
+   "key": "city-of-irvine-tld-6724",
+   "name": "City of Irvine",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -117.809,
+    33.652,
+    -117.733,
+    33.732
+   ],
+   "stops": 85,
+   "routes": 1,
+   "bytes": 10660,
+   "feeds": {
+    "alerts": "https://passio3.com/irvine/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/irvine/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/irvine/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
+   }
+  },
+  {
+   "id": "city-of-jacksonville-tld-6735",
+   "key": "city-of-jacksonville-tld-6735",
+   "name": "City of Jacksonville",
+   "state": "North Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.473,
+    34.583,
+    -77.321,
+    34.802
+   ],
+   "stops": 198,
+   "routes": 5,
+   "bytes": 33804,
+   "feeds": {
+    "alerts": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 5,
+    "matched": 5,
+    "withRoute": 5
+   }
+  },
+  {
+   "id": "city-of-kokomo-ntd-50145",
+   "key": "city-of-kokomo-ntd-50145",
+   "name": "City of Kokomo",
+   "state": "Indiana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -86.166,
+    40.42,
+    -86.099,
+    40.52
+   ],
+   "stops": 241,
+   "routes": 6,
+   "bytes": 22696,
+   "feeds": {
+    "tripUpdates": "https://drive.google.com/uc?export=download&id=1Ytg04NVUpr7b069y7GOn1kzdawhkemXm",
+    "vehicles": "https://drive.google.com/uc?export=download&id=12OWJm28dWakSVM3TnmajNWmUrmcytZPq"
+   },
+   "live": {
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
+   }
+  },
+  {
+   "id": "city-of-mobile-tld-6773",
+   "key": "city-of-mobile-tld-6773",
+   "name": "City of Mobile",
+   "state": "Alabama",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -88.201,
+    30.589,
+    -88.039,
+    30.739
+   ],
+   "stops": 630,
+   "routes": 11,
+   "bytes": 60866,
+   "feeds": {
+    "alerts": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://realtimemobile.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
+   }
+  },
+  {
+   "id": "citybus-of-greater-lafayette-indiana-cit-391",
+   "key": "citybus-of-greater-lafayette-indiana-cit-391",
+   "name": "CityBus of Greater Lafayette Indiana (CityBus)",
+   "state": "Indiana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -86.962,
+    40.365,
+    -86.805,
+    40.481
+   ],
+   "stops": 624,
+   "routes": 18,
+   "bytes": 84421,
+   "feeds": {
+    "tripUpdates": "https://bus.gocitybus.com/GTFSRT/GTFS_TripUpdates.pb",
+    "vehicles": "https://bus.gocitybus.com/GTFSRT/GTFS_VehiclePositions.pb"
+   },
+   "live": {
+    "vehicles": 28,
+    "matched": 28,
+    "withRoute": 28
+   }
+  },
+  {
+   "id": "clackco-connects-clackamas-county-2740",
+   "key": "clackco-connects-clackamas-county-2740",
+   "name": "ClackCo Connects (Clackamas County) (Static feed for realtime)",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.64,
+    45.286,
+    -122.334,
+    45.443
+   ],
+   "stops": 98,
+   "routes": 4,
+   "bytes": 22374,
+   "feeds": {
+    "alerts": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
+   }
+  },
+  {
+   "id": "clovis-transit-2894",
+   "key": "clovis-transit-2894",
+   "name": "Clovis Transit",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -119.754,
+    36.787,
+    -119.637,
+    36.889
+   ],
+   "stops": 175,
+   "routes": 8,
+   "bytes": 19159,
+   "feeds": {
+    "alerts": "https://passio3.com/clovis/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/clovis/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/clovis/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 15,
+    "matched": 15,
+    "withRoute": 15
+   }
+  },
+  {
+   "id": "county-of-lackawanna-transit-system-tld-4553",
+   "key": "county-of-lackawanna-transit-system-tld-4553",
+   "name": "County of Lackawanna Transit System",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -75.837,
+    41.248,
+    -75.499,
+    41.582
+   ],
+   "stops": 1423,
+   "routes": 24,
+   "bytes": 171862,
+   "feeds": {
+    "alerts": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 22
+   }
+  },
+  {
+   "id": "des-moines-area-regional-transit-authori-193",
+   "key": "des-moines-area-regional-transit-authori-193",
+   "name": "Des Moines Area Regional Transit Authority (DART)",
+   "state": "Iowa",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -93.809,
+    41.512,
+    -93.503,
+    41.732
+   ],
+   "stops": 954,
+   "routes": 22,
+   "bytes": 111379,
+   "feeds": {
+    "alerts": "https://www.ridedart.com/gtfs/real-time/alerts",
+    "tripUpdates": "https://www.ridedart.com/gtfs/real-time/trip-updates",
+    "vehicles": "https://www.ridedart.com/gtfs/real-time/vehicle-positions"
+   },
+   "live": {
+    "vehicles": 35,
+    "matched": 35,
+    "withRoute": 35
+   }
+  },
+  {
+   "id": "emery-go-round-2224",
+   "key": "emery-go-round-2224",
+   "name": "Emery Go-Round",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.313,
+    37.829,
+    -122.267,
+    37.852
+   ],
+   "stops": 41,
+   "routes": 5,
+   "bytes": 162396,
+   "feeds": {
+    "alerts": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=Alert",
+    "tripUpdates": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=TripUpdate",
+    "vehicles": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "endless-mountains-transportation-authori-tld-7021",
+   "key": "endless-mountains-transportation-authori-tld-7021",
+   "name": "Endless Mountains Transportation Authority",
+   "state": "New York",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.546,
+    41.424,
+    -76.25,
+    42.002
+   ],
+   "stops": 144,
+   "routes": 11,
+   "bytes": 212240,
+   "feeds": {
+    "alerts": "https://best.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://best.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://best.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
+   }
+  },
+  {
+   "id": "fayette-area-coordinated-transportation-tld-7027",
+   "key": "fayette-area-coordinated-transportation-tld-7027",
+   "name": "Fayette Area Coordinated Transportation",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.021,
+    39.796,
+    -79.539,
+    40.445
+   ],
+   "stops": 156,
+   "routes": 7,
+   "bytes": 184774,
+   "feeds": {
+    "alerts": "https://fact.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://fact.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://fact.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 2,
+    "matched": 2,
+    "withRoute": 2
+   }
+  },
+  {
+   "id": "frederick-county-transit-2432",
+   "key": "frederick-county-transit-2432",
+   "name": "Frederick County TransIT",
+   "state": "Maryland",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.665,
+    39.274,
+    -77.318,
+    39.705
+   ],
+   "stops": 355,
+   "routes": 17,
+   "bytes": 79780,
+   "feeds": {
+    "tripUpdates": "https://passio3.com/frederick/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/frederick/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 15,
+    "matched": 15,
+    "withRoute": 15
+   }
+  },
+  {
+   "id": "freedom-transit-tld-4134",
+   "key": "freedom-transit-tld-4134",
+   "name": "Freedom Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.283,
+    40.156,
+    -79.926,
+    40.445
+   ],
+   "stops": 139,
+   "routes": 7,
+   "bytes": 113446,
+   "feeds": {
+    "alerts": "https://freedom.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://freedom.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://freedom.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
+   }
+  },
+  {
+   "id": "godurham-tld-98",
+   "key": "godurham-tld-98",
+   "name": "GoDurham",
+   "state": "North Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -78.997,
+    35.794,
+    -78.708,
+    36.101
+   ],
+   "stops": 831,
+   "routes": 17,
+   "bytes": 114018,
+   "feeds": {
+    "alerts": "https://godurham.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://godurham.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://godurham.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 48,
+    "matched": 48,
+    "withRoute": 48
+   }
+  },
+  {
+   "id": "greater-cleveland-regional-transit-autho-406",
+   "key": "greater-cleveland-regional-transit-autho-406-subway",
+   "name": "Greater Cleveland Regional Transit Authority",
+   "state": "Ohio",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -81.967,
+    41.283,
+    -81.438,
+    41.637
+   ],
+   "stops": 104,
+   "routes": 4,
+   "bytes": 441050,
+   "feeds": {
+    "vehicles": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
+    "tripUpdates": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
+    "alerts": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
+   }
+  },
+  {
+   "id": "greater-peoria-mass-transit-citylink-2208",
+   "key": "greater-peoria-mass-transit-citylink-2208",
+   "name": "Greater Peoria Mass Transit (CityLink)",
+   "state": "Illinois",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -89.695,
+    40.539,
+    -89.482,
+    40.817
+   ],
+   "stops": 883,
+   "routes": 18,
+   "bytes": 90044,
+   "feeds": {
+    "alerts": "https://clk.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://clk.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://clk.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 27,
+    "matched": 27,
+    "withRoute": 27
+   }
+  },
+  {
+   "id": "greenlink-tld-490",
+   "key": "greenlink-tld-490",
+   "name": "Greenlink",
+   "state": "South Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -82.464,
+    34.705,
+    -82.233,
+    34.925
+   ],
+   "stops": 475,
+   "routes": 17,
+   "bytes": 57046,
+   "feeds": {
+    "tripUpdates": "https://gtfsrt.greenlink.cadavl.com/ProfilGtfsRt2_0RSProducer-GTA/TripUpdate.pb",
+    "vehicles": "https://gtfsrt.greenlink.cadavl.com/ProfilGtfsRt2_0RSProducer-GTA/VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 17,
+    "matched": 16,
+    "withRoute": 16
+   }
+  },
+  {
+   "id": "gwinnett-county-transit-2241",
+   "key": "gwinnett-county-transit-2241",
+   "name": "Gwinnett County Transit",
+   "state": "Georgia",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -84.28,
+    33.77,
+    -83.977,
+    34.094
+   ],
+   "stops": 872,
+   "routes": 9,
+   "bytes": 106104,
+   "feeds": {
+    "alerts": "https://realtimegwinnett.availtec.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://realtimegwinnett.availtec.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://realtimegwinnett.availtec.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 32,
+    "matched": 32,
+    "withRoute": 32
+   }
+  },
+  {
+   "id": "hazleton-public-transit-tld-4665",
+   "key": "hazleton-public-transit-tld-4665",
+   "name": "Hazleton Public Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.104,
+    40.901,
+    -75.812,
+    41.268
+   ],
+   "stops": 97,
+   "routes": 11,
+   "bytes": 48159,
+   "feeds": {
+    "alerts": "https://realtimehpts.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://realtimehpts.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://realtimehpts.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 7,
+    "matched": 6,
+    "withRoute": 7
+   }
+  },
+  {
+   "id": "hillsborough-area-regional-transit-hart-325",
+   "key": "hillsborough-area-regional-transit-hart-325-subway",
+   "name": "Hillsborough Area Regional Transit (HART)",
+   "state": "Florida",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -82.585,
+    27.706,
+    -82.226,
+    28.196
+   ],
+   "stops": 14,
+   "routes": 2,
+   "bytes": 234567,
+   "feeds": {
+    "tripUpdates": "http://api.tampa.onebusaway.org:8088/trip-updates",
+    "vehicles": "http://api.tampa.onebusaway.org:8088/vehicle-positions"
+   }
+  },
+  {
+   "id": "indiana-county-transit-authority-tld-4661",
+   "key": "indiana-county-transit-authority-tld-4661",
+   "name": "Indiana County Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -79.266,
+    40.431,
+    -78.971,
+    40.944
+   ],
+   "stops": 292,
+   "routes": 13,
+   "bytes": 117540,
+   "feeds": {
+    "alerts": "https://indigobus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://indigobus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://indigobus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 8,
+    "matched": 8,
+    "withRoute": 8
+   }
+  },
+  {
+   "id": "inter-island-ferry-243",
+   "key": "inter-island-ferry-243",
+   "name": "Inter-Island Ferry",
+   "state": "Alaska",
+   "mode": "ferry",
+   "kind": "timetable",
+   "bbox": [
+    -132.622,
+    55.354,
+    -131.692,
+    55.49
+   ],
+   "stops": 2,
+   "routes": 1,
+   "bytes": 2768
+  },
+  {
+   "id": "kalamazoo-metro-transit-tld-674",
+   "key": "kalamazoo-metro-transit-tld-674",
+   "name": "Kalamazoo Metro Transit",
+   "state": "Michigan",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -85.691,
+    42.165,
+    -85.51,
+    42.333
+   ],
+   "stops": 701,
+   "routes": 21,
+   "bytes": 86588,
+   "feeds": {
+    "alerts": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 29,
+    "matched": 29,
+    "withRoute": 29
+   }
+  },
+  {
+   "id": "ketchikan-gateway-borough-244",
+   "key": "ketchikan-gateway-borough-244-ferry",
+   "name": "Ketchikan Gateway Borough (The Bus)",
+   "state": "Alaska",
+   "mode": "ferry",
+   "kind": "timetable",
+   "bbox": [
+    -131.82,
+    55.294,
+    -131.529,
+    55.467
+   ],
+   "stops": 2,
+   "routes": 1,
+   "bytes": 6242
+  },
+  {
+   "id": "king-county-metro-1330",
+   "key": "king-county-metro-1330-bus",
+   "name": "King County Metro",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.507,
+    47.189,
+    -121.786,
+    47.866
+   ],
+   "stops": 6241,
+   "routes": 138,
+   "bytes": 844671,
+   "feeds": {
+    "tripUpdates": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
+    "alerts": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/alerts.pb",
+    "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
+   },
+   "live": {
+    "vehicles": 514,
+    "matched": 514,
+    "withRoute": 514
+   }
+  },
+  {
+   "id": "king-county-metro-1330",
+   "key": "king-county-metro-1330-ferry",
+   "name": "King County Metro",
+   "state": "Washington",
+   "mode": "ferry",
+   "kind": "live",
+   "bbox": [
+    -122.507,
+    47.189,
+    -121.786,
+    47.866
+   ],
+   "stops": 4,
+   "routes": 2,
+   "bytes": 1229,
+   "feeds": {
+    "tripUpdates": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
+    "alerts": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/alerts.pb",
+    "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
+   },
+   "live": {
+    "vehicles": 514,
+    "matched": 514,
+    "withRoute": 514
+   }
+  },
+  {
+   "id": "king-county-metro-1330",
+   "key": "king-county-metro-1330-subway",
+   "name": "King County Metro",
+   "state": "Washington",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -122.507,
+    47.189,
+    -121.786,
+    47.866
+   ],
+   "stops": 31,
+   "routes": 2,
+   "bytes": 2674,
+   "feeds": {
+    "tripUpdates": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
+    "alerts": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/alerts.pb",
+    "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
+   },
+   "live": {
+    "vehicles": 514,
+    "matched": 514,
+    "withRoute": 514
+   }
+  },
+  {
+   "id": "lebanon-transit-tld-5531",
+   "key": "lebanon-transit-tld-5531",
+   "name": "Lebanon Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.885,
+    40.068,
+    -76.189,
+    40.436
+   ],
+   "stops": 158,
+   "routes": 17,
+   "bytes": 114848,
+   "feeds": {
+    "alerts": "https://realtime.lebanontransit.org/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://realtime.lebanontransit.org/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://realtime.lebanontransit.org/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 9,
+    "matched": 9,
+    "withRoute": 9
+   }
+  },
+  {
+   "id": "link-transit-275",
+   "key": "link-transit-275",
+   "name": "Link Transit",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -120.674,
+    47.363,
+    -119.98,
+    47.885
+   ],
+   "stops": 627,
+   "routes": 21,
+   "bytes": 121925,
+   "feeds": {
+    "tripUpdates": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 29,
+    "matched": 29,
+    "withRoute": 29
+   }
+  },
+  {
+   "id": "luzerne-county-transportation-authority-tld-4555",
+   "key": "luzerne-county-transportation-authority-tld-4555",
+   "name": "Luzerne County Transportation Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.004,
+    41.192,
+    -75.666,
+    41.41
+   ],
+   "stops": 687,
+   "routes": 21,
+   "bytes": 92146,
+   "feeds": {
+    "alerts": "https://realtimelctabus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "vehicles": "https://realtimelctabus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 24,
+    "matched": 24,
+    "withRoute": 24
+   }
+  },
+  {
+   "id": "manatee-county-area-transit-2258",
+   "key": "manatee-county-area-transit-2258",
+   "name": "Manatee County Area Transit",
+   "state": "Florida",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -82.78,
+    27.338,
+    -82.452,
+    27.812
+   ],
+   "stops": 928,
+   "routes": 16,
+   "bytes": 86161,
+   "feeds": {
+    "alerts": "https://realtimemcat.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://realtimemcat.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://realtimemcat.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 23,
+    "matched": 23,
+    "withRoute": 23
+   }
+  },
+  {
+   "id": "metro-transit-205",
+   "key": "metro-transit-205-bus",
+   "name": "Metro Transit",
+   "state": "Minnesota",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -93.73,
+    44.707,
+    -92.806,
+    45.33
+   ],
+   "stops": 8179,
+   "routes": 123,
+   "bytes": 1137483,
+   "feeds": {
+    "tripUpdates": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb",
+    "alerts": "https://svc.metrotransit.org/mtgtfs/alerts.pb",
+    "vehicles": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb"
+   },
+   "live": {
+    "vehicles": 893,
+    "matched": 893,
+    "withRoute": 893
+   }
+  },
+  {
+   "id": "metro-transit-205",
+   "key": "metro-transit-205-subway",
+   "name": "Metro Transit",
+   "state": "Minnesota",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -93.73,
+    44.707,
+    -92.806,
+    45.33
+   ],
+   "stops": 75,
+   "routes": 3,
+   "bytes": 12428,
+   "feeds": {
+    "tripUpdates": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb",
+    "alerts": "https://svc.metrotransit.org/mtgtfs/alerts.pb",
+    "vehicles": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb"
+   },
+   "live": {
+    "vehicles": 893,
+    "matched": 893,
+    "withRoute": 893
+   }
+  },
+  {
+   "id": "metro-transit-city-of-madison-394",
+   "key": "metro-transit-city-of-madison-394",
+   "name": "Metro Transit - City of Madison",
+   "state": "Wisconsin",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -89.564,
+    42.987,
+    -89.206,
+    43.199
+   ],
+   "stops": 1659,
+   "routes": 29,
+   "bytes": 5765006,
+   "feeds": {
+    "alerts": "https://metromap.cityofmadison.com/gtfsrt/alerts",
+    "tripUpdates": "https://metromap.cityofmadison.com/gtfsrt/trips",
+    "vehicles": "https://metromap.cityofmadison.com/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 123,
+    "matched": 88,
+    "withRoute": 88
+   }
+  },
+  {
+   "id": "metropolitan-tulsa-transit-authority-tld-235",
+   "key": "metropolitan-tulsa-transit-authority-tld-235",
+   "name": "Metropolitan Tulsa Transit Authority",
+   "state": "Oklahoma",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -96.12,
+    36.023,
+    -95.791,
+    36.245
+   ],
+   "stops": 1191,
+   "routes": 18,
+   "bytes": 105888,
+   "feeds": {
+    "alerts": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://tulsa.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 38,
+    "matched": 38,
+    "withRoute": 38
+   }
+  },
+  {
+   "id": "mid-mon-valley-transit-authority-tld-5503",
+   "key": "mid-mon-valley-transit-authority-tld-5503",
+   "name": "Mid Mon Valley Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.033,
+    40.027,
+    -79.84,
+    40.454
+   ],
+   "stops": 286,
+   "routes": 10,
+   "bytes": 129351,
+   "feeds": {
+    "alerts": "https://mmvta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://mmvta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://mmvta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
+   }
+  },
+  {
+   "id": "middletown-area-transit-mat-551",
+   "key": "middletown-area-transit-mat-551",
+   "name": "Middletown Area Transit (MAT)",
+   "state": "Connecticut",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -72.8,
+    41.261,
+    -72.093,
+    41.609
+   ],
+   "stops": 755,
+   "routes": 17,
+   "bytes": 133037,
+   "feeds": {
+    "tripUpdates": "https://passio3.com/9town/passioTransit/gtfs/realtime",
+    "vehicles": "https://passio3.com/9town/passioTransit/gtfs/realtime"
+   },
+   "live": {
+    "vehicles": 12,
+    "matched": 12,
+    "withRoute": 12
+   }
+  },
+  {
+   "id": "monroe-county-transportation-authority-m-3460",
+   "key": "monroe-county-transportation-authority-m-3460",
+   "name": "Monroe County Transportation Authority (MCTA)",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -75.416,
+    40.983,
+    -75.038,
+    41.219
+   ],
+   "stops": 218,
+   "routes": 6,
+   "bytes": 54185,
+   "feeds": {
+    "tripUpdates": "https://ponytracker.availtec.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://ponytracker.availtec.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition",
+    "alerts": "https://ponytracker.availtec.com/InfoPoint/gtfs-realtime.ashx?type=alert"
+   },
+   "live": {
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
+   }
+  },
+  {
+   "id": "montebello-bus-lines-2201",
+   "key": "montebello-bus-lines-2201",
+   "name": "Montebello Bus Lines",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -118.266,
+    33.892,
+    -117.995,
+    34.111
+   ],
+   "stops": 819,
+   "routes": 8,
+   "bytes": 72703,
+   "feeds": {
+    "alerts": "https://mbl.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "vehicles": "https://mbl.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition",
+    "tripUpdates": "https://mbl.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate"
+   },
+   "live": {
+    "vehicles": 33,
+    "matched": 33,
+    "withRoute": 33
+   }
+  },
+  {
+   "id": "mountain-line-292",
+   "key": "mountain-line-292",
+   "name": "Mountain Line",
+   "state": "Montana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -114.088,
+    46.82,
+    -113.865,
+    46.924
+   ],
+   "stops": 334,
+   "routes": 13,
+   "bytes": 278630,
+   "feeds": {
+    "alerts": "https://bt.mountainline.com/gtfsrt/alerts",
+    "tripUpdates": "https://bt.mountainline.com/gtfsrt/trips",
+    "vehicles": "https://bt.mountainline.com/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 23,
+    "matched": 16,
+    "withRoute": 16
+   }
+  },
+  {
+   "id": "mountain-line-transit-1979",
+   "key": "mountain-line-transit-1979",
+   "name": "Mountain Line Transit",
+   "state": "Arizona",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -111.696,
+    35.16,
+    -111.573,
+    35.239
+   ],
+   "stops": 180,
+   "routes": 9,
+   "bytes": 433633,
+   "feeds": {
+    "vehicles": "https://mountainline.syncromatics.com/gtfs-rt/vehiclepositions",
+    "tripUpdates": "https://mountainline.syncromatics.com/gtfs-rt/tripupdates",
+    "alerts": "https://mountainline.syncromatics.com/gtfs-rt/alerts"
+   },
+   "live": {
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "muskegon-area-transit-system-tld-4831",
+   "key": "muskegon-area-transit-system-tld-4831",
+   "name": "Muskegon Area Transit System",
+   "state": "Michigan",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -86.278,
+    43.132,
+    -86.172,
+    43.248
+   ],
+   "stops": 306,
+   "routes": 7,
+   "bytes": 64678,
+   "feeds": {
+    "alerts": "https://muskegon.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
+    "tripUpdates": "https://muskegon.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+    "vehicles": "https://muskegon.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   },
+   "live": {
+    "vehicles": 8,
+    "matched": 7,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "nashville-mta-wego-public-transit-360",
+   "key": "nashville-mta-wego-public-transit-360-rail",
+   "name": "Nashville MTA WeGo Public Transit",
+   "state": "Tennessee",
+   "mode": "rail",
+   "kind": "timetable",
+   "bbox": [
+    -87.379,
+    35.742,
+    -86.297,
+    36.525
+   ],
+   "stops": 7,
+   "routes": 1,
+   "bytes": 10036,
+   "feeds": {
+    "tripUpdates": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
+    "alerts": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/alert/alerts.pb",
+    "vehicles": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb"
+   }
+  },
+  {
+   "id": "new-castle-area-transit-authority-tld-7030",
+   "key": "new-castle-area-transit-authority-tld-7030",
+   "name": "New Castle Area Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.518,
+    40.445,
+    -79.914,
+    41.241
+   ],
+   "stops": 127,
+   "routes": 16,
+   "bytes": 111350,
+   "feeds": {
+    "alerts": "https://ncata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://ncata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://ncata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 15,
+    "matched": 15,
+    "withRoute": 15
+   }
+  },
+  {
+   "id": "new-river-transit-authority-tld-6713",
+   "key": "new-river-transit-authority-tld-6713",
+   "name": "New River Transit Authority",
+   "state": "West Virginia",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -81.54,
+    37.57,
+    -81.104,
+    38.057
+   ],
+   "stops": 55,
+   "routes": 6,
+   "bytes": 48763,
+   "feeds": {
+    "alerts": "https://passio3.com/beckley/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/beckley/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/beckley/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
+   }
+  },
+  {
+   "id": "north-carolina-state-university-ncsu-2245",
+   "key": "north-carolina-state-university-ncsu-2245",
+   "name": "North Carolina State University (NCSU)",
+   "state": "North Carolina",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -78.721,
+    35.766,
+    -78.664,
+    35.802
+   ],
+   "stops": 108,
+   "routes": 15,
+   "bytes": 22285,
+   "feeds": {
+    "alerts": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 22
+   }
+  },
+  {
+   "id": "north-central-regional-transit-district-tld-1319",
+   "key": "north-central-regional-transit-district-tld-1319",
+   "name": "North Central Regional Transit District",
+   "state": "New Mexico",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -108.18,
+    35,
+    -105.21,
+    36.979
+   ],
+   "stops": 391,
+   "routes": 23,
+   "bytes": 332853,
+   "feeds": {
+    "alerts": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 8,
+    "matched": 8,
+    "withRoute": 8
+   }
+  },
+  {
+   "id": "norwalk-transit-system-tld-881",
+   "key": "norwalk-transit-system-tld-881",
+   "name": "Norwalk Transit System",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -118.134,
+    33.865,
+    -117.959,
+    34.072
+   ],
+   "stops": 442,
+   "routes": 6,
+   "bytes": 51004,
+   "feeds": {
+    "alerts": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 22
+   }
+  },
+  {
+   "id": "pottstown-area-rapid-transit-tld-7025",
+   "key": "pottstown-area-rapid-transit-tld-7025",
+   "name": "Pottstown Area Rapid Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -75.688,
+    40.228,
+    -75.571,
+    40.334
+   ],
+   "stops": 49,
+   "routes": 5,
+   "bytes": 14777,
+   "feeds": {
+    "alerts": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
+   }
+  },
+  {
+   "id": "regional-transportation-district-rtd-178",
+   "key": "regional-transportation-district-rtd-178-bus",
+   "name": "Regional Transportation District (RTD)",
+   "state": "Colorado",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -108.564,
+    38.835,
+    -104.67,
+    40.59
+   ],
+   "stops": 7339,
+   "routes": 120,
+   "bytes": 1021209,
+   "feeds": {
+    "tripUpdates": "https://www.rtd-denver.com/files/gtfs-rt/TripUpdate.pb",
+    "alerts": "https://www.rtd-denver.com/files/gtfs-rt/Alerts.pb",
+    "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 547,
+    "matched": 463,
+    "withRoute": 463
+   }
+  },
+  {
+   "id": "regional-transportation-district-rtd-178",
+   "key": "regional-transportation-district-rtd-178-rail",
+   "name": "Regional Transportation District (RTD)",
+   "state": "Colorado",
+   "mode": "rail",
+   "kind": "live",
+   "bbox": [
+    -108.564,
+    38.835,
+    -104.67,
+    40.59
+   ],
+   "stops": 45,
+   "routes": 4,
+   "bytes": 10421,
+   "feeds": {
+    "tripUpdates": "https://www.rtd-denver.com/files/gtfs-rt/TripUpdate.pb",
+    "alerts": "https://www.rtd-denver.com/files/gtfs-rt/Alerts.pb",
+    "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 547,
+    "matched": 463,
+    "withRoute": 463
+   }
+  },
+  {
+   "id": "regional-transportation-district-rtd-178",
+   "key": "regional-transportation-district-rtd-178-subway",
+   "name": "Regional Transportation District (RTD)",
+   "state": "Colorado",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -108.564,
+    38.835,
+    -104.67,
+    40.59
+   ],
+   "stops": 95,
+   "routes": 6,
+   "bytes": 30146,
+   "feeds": {
+    "tripUpdates": "https://www.rtd-denver.com/files/gtfs-rt/TripUpdate.pb",
+    "alerts": "https://www.rtd-denver.com/files/gtfs-rt/Alerts.pb",
+    "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 547,
+    "matched": 463,
+    "withRoute": 463
+   }
+  },
+  {
+   "id": "regional-transportation-district-rtd-2280",
+   "key": "regional-transportation-district-rtd-2280",
+   "name": "Regional Transportation District (RTD) (Bustang)",
+   "state": "Colorado",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -108.564,
+    38.835,
+    -104.815,
+    40.59
+   ],
+   "stops": 41,
+   "routes": 5,
+   "bytes": 147632,
+   "feeds": {
+    "tripUpdates": "https://www.rtd-denver.com/files/bustang/gtfs-rt/Bustang_TripUpdate.pb",
+    "vehicles": "https://www.rtd-denver.com/files/bustang/gtfs-rt/Bustang_VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 15,
+    "matched": 15,
+    "withRoute": 15
+   }
+  },
+  {
+   "id": "river-valley-transit-tld-4548",
+   "key": "river-valley-transit-tld-4548",
+   "name": "River Valley Transit",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.297,
+    41.169,
+    -76.717,
+    41.277
+   ],
+   "stops": 1260,
+   "routes": 24,
+   "bytes": 136476,
+   "feeds": {
+    "alerts": "https://my.ridervt.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://my.ridervt.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://my.ridervt.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
+   }
+  },
+  {
+   "id": "rochester-genesee-regional-transportatio-533",
+   "key": "rochester-genesee-regional-transportatio-533",
+   "name": "Rochester-Genesee Regional Transportation Authority (RGRTA)",
+   "state": "New York",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -77.759,
+    43.045,
+    -76.993,
+    43.259
+   ],
+   "stops": 1856,
+   "routes": 198,
+   "bytes": 293948,
+   "feeds": {
+    "vehicles": "https://api.rgrta.com/rtgvehicles?key=00e2dbf6b15742febb37d0a1d7d3acd5"
+   },
+   "live": {
+    "vehicles": 80,
+    "matched": 76,
+    "withRoute": 75
+   }
+  },
+  {
+   "id": "rogue-valley-transportation-district-rvt-3219",
+   "key": "rogue-valley-transportation-district-rvt-3219",
+   "name": "Rogue Valley Transportation District (RVTD)",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.92,
+    42.176,
+    -122.672,
+    42.444
+   ],
+   "stops": 292,
+   "routes": 6,
+   "bytes": 138685,
+   "feeds": {
+    "alerts": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/Alert.pb",
+    "tripUpdates": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/TripUpdate.pb",
+    "vehicles": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/VehiclePosition.pb"
+   },
+   "live": {
+    "vehicles": 12,
+    "matched": 12,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "ryde-racine-2246",
+   "key": "ryde-racine-2246",
+   "name": "Ryde Racine",
+   "state": "Wisconsin",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -87.96,
+    42.682,
+    -87.782,
+    42.786
+   ],
+   "stops": 728,
+   "routes": 10,
+   "bytes": 400186,
+   "feeds": {
+    "alerts": "https://racine.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
+    "tripUpdates": "https://racine.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+    "vehicles": "https://racine.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   },
+   "live": {
+    "vehicles": 21,
+    "matched": 20,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "sandy-area-metro-sam-2739",
+   "key": "sandy-area-metro-sam-2739",
+   "name": "Sandy Area Metro (SAM) (Static feed for realtime)",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.574,
+    45.285,
+    -121.709,
+    45.503
+   ],
+   "stops": 175,
+   "routes": 6,
+   "bytes": 45259,
+   "feeds": {
+    "alerts": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 8,
+    "matched": 8,
+    "withRoute": 8
+   }
+  },
+  {
+   "id": "santa-barbara-metropolitan-transit-distr-1246",
+   "key": "santa-barbara-metropolitan-transit-distr-1246",
+   "name": "Santa Barbara Metropolitan Transit District (MTD)",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -119.906,
+    34.383,
+    -119.481,
+    34.455
+   ],
+   "stops": 608,
+   "routes": 39,
+   "bytes": 1293767,
+   "feeds": {
+    "alerts": "https://bustracker.sbmtd.gov/gtfsrt/alerts",
+    "tripUpdates": "https://bustracker.sbmtd.gov/gtfsrt/trips",
+    "vehicles": "https://bustracker.sbmtd.gov/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 42,
+    "matched": 32,
+    "withRoute": 32
+   }
+  },
+  {
+   "id": "santa-cruz-metro-scmtd-2425",
+   "key": "santa-cruz-metro-scmtd-2425",
+   "name": "Santa Cruz Metro (SCMTD)",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.222,
+    36.904,
+    -121.732,
+    37.338
+   ],
+   "stops": 755,
+   "routes": 28,
+   "bytes": 1965765,
+   "feeds": {
+    "vehicles": "https://rt.scmetro.org/gtfsrt/vehicles",
+    "tripUpdates": "https://rt.scmetro.org/gtfsrt/trips",
+    "alerts": "https://rt.scmetro.org/gtfsrt/alerts"
+   },
+   "live": {
+    "vehicles": 75,
+    "matched": 54,
+    "withRoute": 54
+   }
+  },
+  {
+   "id": "schuylkill-transportation-system-tld-4688",
+   "key": "schuylkill-transportation-system-tld-4688",
+   "name": "Schuylkill Transportation System",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.355,
+    40.624,
+    -75.914,
+    40.902
+   ],
+   "stops": 360,
+   "routes": 10,
+   "bytes": 65815,
+   "feeds": {
+    "alerts": "https://sts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://sts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://sts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 5,
+    "matched": 5,
+    "withRoute": 5
+   }
+  },
+  {
+   "id": "shenango-valley-shuttle-service-tld-4663",
+   "key": "shenango-valley-shuttle-service-tld-4663",
+   "name": "Shenango Valley Shuttle Service",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.519,
+    41.202,
+    -80.449,
+    41.266
+   ],
+   "stops": 160,
+   "routes": 3,
+   "bytes": 26112,
+   "feeds": {
+    "alerts": "https://svss.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://svss.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://svss.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 3,
+    "matched": 3,
+    "withRoute": 3
+   }
+  },
+  {
+   "id": "shore-transit-3149",
+   "key": "shore-transit-3149",
+   "name": "Shore Transit",
+   "state": "Maryland",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -75.855,
+    37.978,
+    -75.089,
+    38.455
+   ],
+   "stops": 71,
+   "routes": 7,
+   "bytes": 160849,
+   "feeds": {
+    "tripUpdates": "https://myride.shoretransit.org/gtfs/GTFS_TripUpdates.pb",
+    "vehicles": "https://myride.shoretransit.org/gtfs/GTFS_VehiclePositions.pb",
+    "alerts": "https://myride.shoretransit.org/gtfs/GTFS_ServiceAlerts.pb"
+   },
+   "live": {
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
+   }
+  },
+  {
+   "id": "skagit-transit-tld-5895",
+   "key": "skagit-transit-tld-5895",
+   "name": "Skagit Transit",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.688,
+    47.973,
+    -121.739,
+    48.751
+   ],
+   "stops": 479,
+   "routes": 19,
+   "bytes": 135340,
+   "feeds": {
+    "alerts": "https://strweb.skagittransit.org/GTFS/GTFS_ServiceAlerts.pb",
+    "tripUpdates": "https://strweb.skagittransit.org/GTFS/GTFS_TripUpdates.pb",
+    "vehicles": "https://strweb.skagittransit.org/GTFS/GTFS_VehiclePositions.pb"
+   },
+   "live": {
+    "vehicles": 21,
+    "matched": 21,
+    "withRoute": 21
+   }
+  },
+  {
+   "id": "south-metro-area-regional-transit-smart-2706",
+   "key": "south-metro-area-regional-transit-smart-2706",
+   "name": "South Metro Area Regional Transit (SMART)",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -123.035,
+    44.938,
+    -122.568,
+    45.438
+   ],
+   "stops": 167,
+   "routes": 9,
+   "bytes": 144837,
+   "feeds": {
+    "tripUpdates": "https://mysmartbus.com/gtfs-rt/tripupdates",
+    "vehicles": "https://mysmartbus.com/gtfs-rt/vehiclepositions",
+    "alerts": "https://mysmartbus.com/gtfs-rt/alerts"
+   },
+   "live": {
+    "vehicles": 10,
+    "matched": 10,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "south-shore-line-585",
+   "key": "south-shore-line-585",
+   "name": "South Shore Line",
+   "state": "Illinois",
+   "mode": "rail",
+   "kind": "timetable",
+   "bbox": [
+    -87.624,
+    41.524,
+    -86.311,
+    41.884
+   ],
+   "stops": 21,
+   "routes": 2,
+   "bytes": 23609,
+   "feeds": {
+    "alerts": "https://passio3.com/transpo/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/transpo/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/transpo/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 23,
+    "matched": 0,
+    "withRoute": 23
+   }
+  },
+  {
+   "id": "spirit-bus-2202",
+   "key": "spirit-bus-2202",
+   "name": "Spirit Bus",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -118.169,
+    34.035,
+    -118.109,
+    34.071
+   ],
+   "stops": 88,
+   "routes": 5,
+   "bytes": 10521,
+   "feeds": {
+    "tripUpdates": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/vehiclePositions",
+    "alerts": "https://passio3.com/montereyp/passioTransit/gtfs/realtime/serviceAlerts"
+   },
+   "live": {
+    "vehicles": 3,
+    "matched": 3,
+    "withRoute": 3
+   }
+  },
+  {
+   "id": "spokane-transit-authority-sta-290",
+   "key": "spokane-transit-authority-sta-290",
+   "name": "Spokane Transit Authority (STA)",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -117.706,
+    47.477,
+    -117.076,
+    47.769
+   ],
+   "stops": 1668,
+   "routes": 53,
+   "bytes": 260578,
+   "feeds": {
+    "alerts": "https://gtfsbridge.spokanetransit.com/realtime/Alert/Alerts.pb",
+    "tripUpdates": "https://gtfsbridge.spokanetransit.com/realtime/TripUpdate/TripUpdates.pb",
+    "vehicles": "https://gtfsbridge.spokanetransit.com/realtime/vehicle/VehiclePositions.pb"
+   },
+   "live": {
+    "vehicles": 109,
+    "matched": 109,
+    "withRoute": 109
+   }
+  },
+  {
+   "id": "stanislaus-regional-transit-start-2273",
+   "key": "stanislaus-regional-transit-start-2273",
+   "name": "Stanislaus Regional Transit (StaRT)",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -121.898,
+    37.311,
+    -120.749,
+    37.955
+   ],
+   "stops": 901,
+   "routes": 27,
+   "bytes": 114485,
+   "feeds": {
+    "tripUpdates": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 58,
+    "matched": 58,
+    "withRoute": 58
+   }
+  },
+  {
+   "id": "startran-2269",
+   "key": "startran-2269",
+   "name": "StarTran",
+   "state": "Nebraska",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -96.789,
+    40.726,
+    -96.594,
+    40.88
+   ],
+   "stops": 814,
+   "routes": 18,
+   "bytes": 472510,
+   "feeds": {
+    "alerts": "https://startran.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
+    "tripUpdates": "https://startran.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+    "vehicles": "https://startran.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   },
+   "live": {
+    "vehicles": 32,
+    "matched": 30,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "the-rapid-400",
+   "key": "the-rapid-400",
+   "name": "The Rapid",
+   "state": "Michigan",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -85.91,
+    42.838,
+    -85.48,
+    43.692
+   ],
+   "stops": 1518,
+   "routes": 30,
+   "bytes": 182854,
+   "feeds": {
+    "alerts": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?&Type=Alert",
+    "tripUpdates": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 95,
+    "matched": 95,
+    "withRoute": 95
+   }
+  },
+  {
+   "id": "tompkins-consolidated-area-transit-inc-535",
+   "key": "tompkins-consolidated-area-transit-inc-535",
+   "name": "Tompkins Consolidated Area Transit Inc",
+   "state": "New York",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.678,
+    42.328,
+    -76.281,
+    42.591
+   ],
+   "stops": 628,
+   "routes": 25,
+   "bytes": 193477,
+   "feeds": {
+    "tripUpdates": "https://realtimetcatbus.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=TripUpdate",
+    "alerts": "https://realtimetcatbus.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=Alert",
+    "vehicles": "https://realtimetcatbus.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=VehiclePosition&serverid=0"
+   },
+   "live": {
+    "vehicles": 27,
+    "matched": 27,
+    "withRoute": 27
+   }
+  },
+  {
+   "id": "towson-loop-1784",
+   "key": "towson-loop-1784",
+   "name": "Towson Loop",
+   "state": "Maryland",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -76.627,
+    39.373,
+    -76.576,
+    39.412
+   ],
+   "stops": 48,
+   "routes": 2,
+   "bytes": 7327,
+   "feeds": {
+    "tripUpdates": "https://passio3.com/towson/passioTransit/gtfs/realtime/tripUpdates",
+    "alerts": "https://passio3.com/towson/passioTransit/gtfs/realtime/serviceAlerts",
+    "vehicles": "https://passio3.com/towson/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
+   }
+  },
+  {
+   "id": "transit-authority-of-river-city-tarc-2662",
+   "key": "transit-authority-of-river-city-tarc-2662",
+   "name": "Transit Authority of River City (TARC) (Fixed Route)",
+   "state": "Indiana",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -85.875,
+    38.096,
+    -85.543,
+    38.346
+   ],
+   "stops": 1367,
+   "routes": 14,
+   "bytes": 144771,
+   "feeds": {
+    "alerts": "https://tarc.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://tarc.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://tarc.rideralerts.com/InfoPoint/GTFS-realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 71,
+    "matched": 70,
+    "withRoute": 70
+   }
+  },
+  {
+   "id": "university-of-georgia-tld-2276",
+   "key": "university-of-georgia-tld-2276",
+   "name": "University of Georgia",
+   "state": "Georgia",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -83.404,
+    33.895,
+    -83.34,
+    33.965
+   ],
+   "stops": 117,
+   "routes": 19,
+   "bytes": 39464,
+   "feeds": {
+    "tripUpdates": "https://passio3.com/uga/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/uga/passioTransit/gtfs/realtime/vehiclePositions",
+    "alerts": "https://passio3.com/uga/passioTransit/gtfs/realtime/"
+   },
+   "live": {
+    "vehicles": 29,
+    "matched": 29,
+    "withRoute": 29
+   }
+  },
+  {
+   "id": "valley-metro-vm-147",
+   "key": "valley-metro-vm-147-bus",
+   "name": "Valley Metro (VM)",
+   "state": "Arizona",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -112.872,
+    32.372,
+    -111.661,
+    33.714
+   ],
+   "stops": 7894,
+   "routes": 108,
+   "bytes": 810101,
+   "feeds": {
+    "tripUpdates": "https://app.mecatran.com/utw/ws/gtfsfeed/realtime/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "alerts": "https://app.mecatran.com/utw/ws/gtfsfeed/alerts/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "vehicles": "https://app.mecatran.com/utw/ws/gtfsfeed/vehicles/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f"
+   },
+   "live": {
+    "vehicles": 631,
+    "matched": 542,
+    "withRoute": 542
+   }
+  },
+  {
+   "id": "valley-metro-vm-147",
+   "key": "valley-metro-vm-147-subway",
+   "name": "Valley Metro (VM)",
+   "state": "Arizona",
+   "mode": "subway",
+   "kind": "live",
+   "bbox": [
+    -112.872,
+    32.372,
+    -111.661,
+    33.714
+   ],
+   "stops": 124,
+   "routes": 4,
+   "bytes": 20290,
+   "feeds": {
+    "tripUpdates": "https://app.mecatran.com/utw/ws/gtfsfeed/realtime/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "alerts": "https://app.mecatran.com/utw/ws/gtfsfeed/alerts/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "vehicles": "https://app.mecatran.com/utw/ws/gtfsfeed/vehicles/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f"
+   },
+   "live": {
+    "vehicles": 631,
+    "matched": 542,
+    "withRoute": 542
+   }
+  },
+  {
+   "id": "valley-regional-transit-142",
+   "key": "valley-regional-transit-142",
+   "name": "Valley Regional Transit",
+   "state": "Idaho",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -116.687,
+    43.564,
+    -116.118,
+    43.678
+   ],
+   "stops": 574,
+   "routes": 19,
+   "bytes": 938933,
+   "feeds": {
+    "alerts": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/alerts.pb",
+    "tripUpdates": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/trip_updates.pb",
+    "vehicles": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/position_updates.pb"
+   },
+   "live": {
+    "vehicles": 20,
+    "matched": 18,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "valley-transit-tld-820",
+   "key": "valley-transit-tld-820",
+   "name": "Valley Transit",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -118.399,
+    46.032,
+    -118.276,
+    46.087
+   ],
+   "stops": 173,
+   "routes": 12,
+   "bytes": 71361,
+   "feeds": {
+    "alerts": "https://itransitnw.com/rtt/public/utility/gtfsrealtime.aspx/alert",
+    "tripUpdates": "https://itransitnw.com/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+    "vehicles": "https://itransitnw.com/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   },
+   "live": {
+    "vehicles": 9,
+    "matched": 9,
+    "withRoute": 0
+   }
+  },
+  {
+   "id": "via-mobility-2395",
+   "key": "via-mobility-2395",
+   "name": "Via Mobility",
+   "state": "Colorado",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -105.525,
+    39.649,
+    -105.017,
+    40.225
+   ],
+   "stops": 122,
+   "routes": 9,
+   "bytes": 48580,
+   "feeds": {
+    "alerts": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
+   }
+  },
+  {
+   "id": "western-reserve-transit-authority-tld-1717",
+   "key": "western-reserve-transit-authority-tld-1717",
+   "name": "Western Reserve Transit Authority",
+   "state": "Ohio",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.893,
+    40.977,
+    -80.576,
+    41.238
+   ],
+   "stops": 1019,
+   "routes": 24,
+   "bytes": 113506,
+   "feeds": {
+    "alerts": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 32,
+    "matched": 32,
+    "withRoute": 32
+   }
+  },
+  {
+   "id": "westmoreland-county-transit-authority-tld-6785",
+   "key": "westmoreland-county-transit-authority-tld-6785",
+   "name": "Westmoreland County Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -80.005,
+    40.093,
+    -78.917,
+    40.617
+   ],
+   "stops": 1010,
+   "routes": 15,
+   "bytes": 247848,
+   "feeds": {
+    "alerts": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
+    "tripUpdates": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
+    "vehicles": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
+   },
+   "live": {
+    "vehicles": 15,
+    "matched": 15,
+    "withRoute": 15
+   }
+  },
+  {
+   "id": "wichita-transit-tld-395",
+   "key": "wichita-transit-tld-395",
+   "name": "Wichita Transit",
+   "state": "Kansas",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -97.463,
+    37.606,
+    -97.189,
+    37.757
+   ],
+   "stops": 1125,
+   "routes": 23,
+   "bytes": 116239,
+   "feeds": {
+    "alerts": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 26,
+    "matched": 26,
+    "withRoute": 26
+   }
+  },
+  {
+   "id": "yamhill-county-transit-area-250",
+   "key": "yamhill-county-transit-area-250",
+   "name": "Yamhill County Transit Area",
+   "state": "Oregon",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -123.617,
+    44.951,
+    -122.769,
+    45.522
+   ],
+   "stops": 178,
+   "routes": 9,
+   "bytes": 88130,
+   "feeds": {
+    "alerts": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
+    "tripUpdates": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
+    "vehicles": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   },
+   "live": {
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 0
+   }
+  }
+ ],
+ "rejected": [
+  {
+   "id": "akron-metro-regional-transit-authority-m-2071",
+   "name": "Akron Metro Regional Transit Authority (METRO)",
+   "reason": "bus: no live feed that matches the schedule (0 of 72 vehicles matched)"
+  },
+  {
+   "id": "amador-transit-92",
+   "name": "Amador Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "anchorage-people-mover-225",
+   "name": "Anchorage People Mover",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "arcadia-transit-2243",
+   "name": "Arcadia Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "arlington-transit-485",
+   "name": "Arlington Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "auburn-transit-2275",
+   "name": "Auburn Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "baldwin-park-transit-2247",
+   "name": "Baldwin Park Transit",
+   "reason": "could not download (0)"
+  },
+  {
+   "id": "beach-cities-transit-1999",
+   "name": "Beach Cities Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "beaumont-transit-106",
+   "name": "Beaumont Transit",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "ben-franklin-transit-2122",
+   "name": "Ben Franklin Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "big-blue-bus-37",
+   "name": "Big Blue Bus",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "billings-metropolitan-transit-tld-5893",
+   "name": "Billings Metropolitan Transit",
+   "reason": "could not download (UND_ERR_SOCKET)"
+  },
+  {
+   "id": "birmingham-jefferson-county-transit-auth-3434",
+   "name": "Birmingham Jefferson County Transit Authority (MAX)",
+   "reason": "schedule has no stops.txt"
+  },
+  {
+   "id": "bisbee-bus-2857",
+   "name": "Bisbee Bus",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "blossom-express-236",
+   "name": "Blossom Express",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "bullhead-area-transit-system-109",
+   "name": "Bullhead Area Transit System",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "burbankbus-2149",
+   "name": "BurbankBus",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "c-tran-258",
+   "name": "C-TRAN (Clark County Public Transportation Benefit Area)",
+   "reason": "could not download (ECONNRESET)"
+  },
+  {
+   "id": "calaveras-transit-93",
+   "name": "Calaveras Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "capital-area-transportation-authority-ca-402",
+   "name": "Capital Area Transportation Authority (CATA)",
+   "reason": "download answered 404"
+  },
+  {
+   "id": "capital-transit-294",
+   "name": "Capital Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "capitol-corridor-joint-powers-authority--74",
+   "name": "Capitol Corridor Joint Powers Authority (Capitol Corridor)",
+   "reason": "download answered 404"
+  },
+  {
+   "id": "carson-transportation-services-ntd-90258",
+   "name": "Carson Transportation Services",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "central-florida-regional-transit-authori-347",
+   "name": "Central Florida Regional Transit Authority (LYNX)",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "central-ohio-transit-authority-cota-404",
+   "name": "Central Ohio Transit Authority (COTA)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "cerritos-on-wheels-tld-4667",
+   "name": "Cerritos On Wheels",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "chapel-hill-transit-tld-89",
+   "name": "Chapel Hill Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "city-of-fort-smith-ntd-60086",
+   "name": "City of Fort Smith",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "city-of-gadsen-2419",
+   "name": "City of Gadsen (COG Trolley Routes)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "city-of-santa-clarita-transit-tld-1256",
+   "name": "City of Santa Clarita Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "city-of-sierra-vista-tld-679",
+   "name": "City of Sierra Vista",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "cobblinc-3193",
+   "name": "CobbLinc",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "commerce-municipal-bus-lines-994",
+   "name": "Commerce Municipal Bus Lines",
+   "reason": "could not download (ECONNRESET)"
+  },
+  {
+   "id": "community-transit-ct-287",
+   "name": "Community Transit (CT)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "concord-kannapolis-area-transit-rider-tr-2244",
+   "name": "Concord Kannapolis Area Transit (Rider Transit)",
+   "reason": "bus: no live feed that matches the schedule (0 of 0 vehicles matched)"
+  },
+  {
+   "id": "cottonwood-area-transit-cat-158",
+   "name": "Cottonwood Area Transit (CAT)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "duluth-transit-301",
+   "name": "Duluth Transit",
+   "reason": "bus: build failed ((node:2462) [UNDICI-EHPA] Warning: EnvHttpProxyAgent is experimental, expect them to change at any time.)"
+  },
+  {
+   "id": "eureka-springs-transit-ntd-60161",
+   "name": "Eureka Springs Transit",
+   "reason": "schedule is out of service (ends before today)"
+  },
+  {
+   "id": "everett-transit-3038",
+   "name": "Everett Transit",
+   "reason": "bus: no live feed that matches the schedule (16 of 29 vehicles matched)"
+  },
+  {
+   "id": "foothill-transit-101",
+   "name": "Foothill Transit",
+   "reason": "bus: no live feed that matches the schedule (0 of 0 vehicles matched)"
+  },
+  {
+   "id": "fresno-area-express-fax-90",
+   "name": "Fresno Area Express (FAX)",
+   "reason": "schedule is out of service (ends before today)"
+  },
+  {
+   "id": "gocary-2277",
+   "name": "GoCary",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "grand-canyon-national-park-1905",
+   "name": "Grand Canyon National Park (South Rim Shuttle)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "huntsville-shuttle-2081",
+   "name": "Huntsville Shuttle",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "intercity-transit-266",
+   "name": "Intercity Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "kings-area-rural-transit-2204",
+   "name": "Kings Area Rural Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "knoxville-area-transit-kat-3512",
+   "name": "Knoxville Area Transit (KAT)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "lakeland-area-mass-transit-district-tld-5899",
+   "name": "Lakeland Area Mass Transit District",
+   "reason": "could not download (UND_ERR_SOCKET)"
+  },
+  {
+   "id": "maricopa-express-transit-tld-6743",
+   "name": "Maricopa Express Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "minnesota-valley-transit-authority-mvta-206",
+   "name": "Minnesota Valley Transit Authority (MVTA)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "monterey-salinas-transit-mst-56",
+   "name": "Monterey-Salinas Transit (MST)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "montgomery-transit-338",
+   "name": "Montgomery Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "orange-county-transportation-authority-o-15",
+   "name": "Orange County Transportation Authority (OCTA)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "ozark-regional-transit-tld-4470",
+   "name": "Ozark Regional Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "palm-tran-332",
+   "name": "Palm Tran",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "pasadena-transit-41",
+   "name": "Pasadena Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "philomath-connection-2205",
+   "name": "Philomath Connection",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "pioneer-valley-transit-authority-pvta-2416",
+   "name": "Pioneer Valley Transit Authority (PVTA)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "regional-transportation-authority-of-pim-ntd-91122",
+   "name": "Regional Transportation Authority of Pima County",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "rhode-island-public-transit-authority-624",
+   "name": "Rhode Island Public Transit Authority",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "riverside-transit-agency-98",
+   "name": "Riverside Transit Agency",
+   "reason": "bus: no live feed that matches the schedule (104 of 174 vehicles matched)"
+  },
+  {
+   "id": "rochester-institute-of-technology-tld-5863",
+   "name": "Rochester Institute of Technology",
+   "reason": "bus: no live feed that matches the schedule (0 of 0 vehicles matched)"
+  },
+  {
+   "id": "rosemead-explorer-3098",
+   "name": "Rosemead Explorer",
+   "reason": "bus: no live feed that matches the schedule (0 of 0 vehicles matched)"
+  },
+  {
+   "id": "san-luis-obispo-regional-transit-authori-43",
+   "name": "San Luis Obispo Regional Transit Authority (SLORTA)",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "santa-ynez-valley-transit-tld-1301",
+   "name": "Santa Ynez Valley Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "shreveport-and-bossier-city-1060",
+   "name": "Shreveport and Bossier City",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "south-florida-regional-transportation-au-333",
+   "name": "South Florida Regional Transportation Authority (Tri-Rail)",
+   "reason": "download answered 404"
+  },
+  {
+   "id": "sunline-transit-agency-tld-461",
+   "name": "SunLine Transit Agency",
+   "reason": "could not download (ENOTFOUND)"
+  },
+  {
+   "id": "tuscaloosa-transit-authority-tld-7046",
+   "name": "Tuscaloosa Transit Authority",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "via-metropolitan-transit-tld-217",
+   "name": "VIA Metropolitan Transit",
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
+  },
+  {
+   "id": "whatcom-transportation-authority-284",
+   "name": "Whatcom Transportation Authority",
+   "reason": "download answered 403"
+  },
+  {
+   "id": "yuma-county-intergovernmental-public-tra-17",
+   "name": "Yuma County Intergovernmental Public Transportation Authority (YCIPTA)",
+   "reason": "download answered 403"
+  }
+ ]
+}

@@ -539,8 +539,10 @@ const WEEKDAY_COLUMNS = ["sunday", "monday", "tuesday", "wednesday", "thursday",
 async function main() {
   const args = process.argv.slice(2);
   const agencyId = args[0] ?? "";
-  const agency = AGENCIES[agencyId];
-  if (!agency) throw new Error(`Usage: build-rail-gtfs <${Object.keys(AGENCIES).join("|")}> [--zip file] [--days n]`);
+  // A known agency, or (for a catalog agency the ingestion job is building) options given as JSON.
+  const given = arg(args, "--options");
+  const agency = AGENCIES[agencyId] ?? (given ? (JSON.parse(given) as Agency) : undefined);
+  if (!agency) throw new Error(`Usage: build-rail-gtfs <${Object.keys(AGENCIES).join("|")}> [--zip file] [--days n] [--out dir] [--options json]`);
   const days = Number(arg(args, "--days") ?? 60);
   const OUT_DIR = arg(args, "--out") ?? join(ROOT, "data", agencyId); // --out: build into another folder (used to merge several feeds)
 
