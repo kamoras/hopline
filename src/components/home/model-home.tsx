@@ -7,6 +7,8 @@ import { BRAND } from "@/brand";
 import type { BoardLink } from "@/domain/board";
 import type { Trip } from "@/domain/trip";
 import type { RouteSummary } from "@/server/routes";
+import { boardsIn } from "@/lib/boards";
+import { useBoards } from "@/hooks/use-boards";
 import { useAllCommutes } from "@/hooks/use-commutes";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -58,7 +60,7 @@ interface Followed {
  * and zoom. Tap a vehicle and a drawer opens with everything about it and its route while the camera follows it; search
  * opens a drawer of results; a station opens what is due there. Nothing sends you to another page.
  */
-export function ModelHome({ boards }: { boards: BoardLink[] }) {
+export function ModelHome({ initialBoards, modes: available }: { initialBoards: BoardLink[]; /** Every mode Hopline has anywhere (the chips), whether or not a board of it is in view. */ modes: Mode[] }) {
   // What the address asked to open (a shared link): read once, in the browser. Nothing is stored or sent.
   const [initial] = useState<DeepLink | undefined>(() => {
     if (typeof window === "undefined") return undefined;
@@ -66,7 +68,9 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
     return parseLink({ trip: q.get("trip") ?? undefined, board: q.get("board") ?? undefined, place: q.get("place") ?? undefined, route: q.get("route") ?? undefined });
   });
   const [view, setView] = useState<WorldView>();
-  const [modes, setModes] = useState<ReadonlySet<Mode>>(() => new Set(boards.map((b) => b.mode)));
+  // The boards the page came with, plus those that cover where the map is looking (a few at a time, not every board there is).
+  const boards = useBoards(initialBoards, view, initial);
+  const [modes, setModes] = useState<ReadonlySet<Mode>>(() => new Set(available));
   const [drawn, setDrawn] = useState<Drawn>();
   const [following, setFollowing] = useState(false);
   const [query, setQuery] = useState("");
@@ -200,7 +204,9 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
       else next.add(m);
       return next;
     });
-  const allModes = [...new Set(boards.map((b) => b.mode))];
+  const allModes = available;
+  // Route search asks each big network that overlaps what is on screen (not every network the map has ever seen).
+  const viewBoards = useMemo(() => (view ? boardsIn(boards, view.bbox) : boards), [boards, view]);
   const moving = Object.values(world.counts).reduce((a, b) => a + b, 0);
   const zoomedOutBuses = allModes.includes("bus") && modes.has("bus") && view && view.zoom < 12;
 
@@ -270,7 +276,7 @@ export function ModelHome({ boards }: { boards: BoardLink[] }) {
                 query={query}
                 trips={world.trips}
                 places={world.places}
-                boards={boards}
+                boards={viewBoards}
                 now={now}
                 boardOfTrip={boardKeyOf}
                 isSaved={commutes.isSaved}

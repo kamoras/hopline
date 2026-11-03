@@ -27,9 +27,10 @@ piece has a scalable replacement:
       on Pages; with `HOPLINE_DATA_URL` set the server fetches an agency on first use and falls back to the bundled copy; at
       most `HOPLINE_MAX_RESIDENT` agencies stay in memory (least recently used dropped).
    2. *Lean polling (done, #60)* and the *positions-only feed* (next stage of the scaling review).
-   3. *Boards by viewport:* `/api/boards?bbox=` and a light index in the page, so the HTML does not grow with coverage.
-   4. *Load test:* a script that drives the API at a chosen concurrency and reports latency, memory and upstream calls, run
-      before any large batch of agencies is turned on.
+   3. *Boards by viewport (done):* `/api/boards?bbox=` and a page that carries only the boards where the map opens, so the HTML
+      does not grow with coverage. (Station search still walks every board: it needs the server-side place index below.)
+   4. *Load test (done):* `npm run loadtest` drives the API with simulated viewers and reports latency, errors and memory;
+      its first run found, and this stage fixed, flights timing out under load. Run it before switching on a batch of agencies.
 2. **Catalog and generic providers:** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
    keyless static feed (live where a keyless real-time feed exists and answers, timetable-only otherwise), clusters them into
    regions, and writes `catalog/agencies.json`. A generic provider is created per entry at startup from the shared factories

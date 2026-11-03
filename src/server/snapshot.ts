@@ -87,11 +87,30 @@ function runShared(provider: TransitProvider, board: Board, now: number) {
   return run;
 }
 
-/** Fan out to every provider for the board; one failing source never blocks the others. */
+const built = new Map<string, { at: number; snapshot: Promise<Snapshot> }>();
+
+/**
+ * Fan out to every provider for the board; one failing source never blocks the others. Every board shares one run of each
+ * provider for a few seconds (not just the big networks), and a whole board's snapshot is built once per moment, so many
+ * viewers cost one set of upstream fetches and one snapshot, not one each (the load test showed the flights board
+ * running its provider again for every request).
+ */
 export async function getSnapshot(board: Board, now = Date.now(), scope?: Scope): Promise<Snapshot> {
   const viewport = MODES[board.mode].viewport;
+  if (viewport) return buildSnapshot(board, now, scope);
+  const key = `${board.mode}:${board.region.id}`;
+  const hit = built.get(key);
+  if (hit && now - hit.at < SHARE_MS) return hit.snapshot;
+  const snapshot = buildSnapshot(board, now, undefined);
+  built.set(key, { at: now, snapshot });
+  snapshot.catch(() => built.delete(key));
+  return snapshot;
+}
+
+async function buildSnapshot(board: Board, now: number, scope?: Scope): Promise<Snapshot> {
+  const viewport = MODES[board.mode].viewport;
   const [results, track] = await Promise.all([
-    Promise.all(providersFor(board).map((p) => (viewport ? runShared(p, board, now) : runProvider(p, board, now)))),
+    Promise.all(providersFor(board).map((p) => runShared(p, board, now))),
     getTrack(board).catch(() => undefined), // no track data just means nothing to snap to
   ]);
   return {
