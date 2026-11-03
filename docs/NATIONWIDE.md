@@ -31,7 +31,7 @@ piece has a scalable replacement:
       does not grow with coverage. (Station search still walks every board: it needs the server-side place index below.)
    4. *Load test (done):* `npm run loadtest` drives the API with simulated viewers and reports latency, errors and memory;
       its first run found, and this stage fixed, flights timing out under load. Run it before switching on a batch of agencies.
-2. **Catalog and generic providers:** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
+2. **Catalog (done) and generic providers:** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
    keyless static feed (live where a keyless real-time feed exists and answers, timetable-only otherwise), clusters them into
    regions, and writes `catalog/agencies.json`. A generic provider is created per entry at startup from the shared factories
    (`createLiveProvider`, `createTimetableProvider`) with the data host as its loader. The existing hand-tuned providers stay
@@ -40,6 +40,17 @@ piece has a scalable replacement:
    each (parses, has stops and trips in its horizon, live feed returns vehicles whose routes match the schedule), and
    publishes only what passes, with a report of what failed and why.
 4. **Switch on regions in waves** (largest metros first), watching the load test and the status page after each.
+
+## The catalog
+
+`npm run catalog` (`scripts/build-catalog.ts`, logic in `scripts/lib/catalog.ts`) reads the Mobility Database's public CSV and
+writes `catalog/agencies.json`: every US agency with a **keyless schedule feed** and a plausible service area, each with its
+keyless real-time feeds where the catalog lists them, minus the agencies Hopline already serves by hand (matched by schedule
+URL). First run (3 November 2026): **807 candidate agencies in 51 states, 139 with a keyless live vehicle feed**; most are in
+California (125), New York (78), Washington (58), Oregon (55) and Colorado (49). Agencies behind a key (9 schedule feeds, about
+170 live feeds) are left out until a key is provided. The catalog says what exists; the ingestion job (next stage) downloads
+and validates each candidate before anything is served, because a listed feed can be stale, empty or mismatched to its live
+feed (as PVTA's and Middletown's were).
 
 ## What stays hand-written
 
