@@ -1,47 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { boardHref } from "@/domain/board";
-import { getMode, MODES } from "@/domain/modes";
-import { NORTHEAST, type Region } from "@/domain/region";
-import { deriveBoards, findBoard, selectProviders } from "@/providers/registry";
-import type { TransitProvider } from "@/providers/types";
+import { GET } from "@/app/api/boards/route";
+import { toLink } from "@/domain/board";
+import { BOSTON, NORTHEAST, NYC, PITTSBURGH } from "@/domain/region";
+import { parseBbox } from "@/lib/bbox";
+import { boardsIn } from "@/lib/boards";
 
-const provider = (id: string, mode: TransitProvider["mode"], regionIds: string[]): TransitProvider => ({
-  id, name: id, attribution: { label: id, url: "https://example.com" }, mode, regionIds, fetchTrips: async () => [], fetchPlaces: async () => [],
-});
+const boards = [toLink({ mode: "subway", region: NYC }), toLink({ mode: "subway", region: BOSTON }), toLink({ mode: "bus", region: PITTSBURGH }), toLink({ mode: "rail", region: NORTHEAST })];
 
-describe("boards", () => {
-  it("derives boards from what providers serve, without duplicates", () => {
-    const boards = deriveBoards([provider("a", "rail", ["northeast"]), provider("b", "rail", ["northeast"])]);
-    expect(boards).toHaveLength(1);
-    expect(boards[0]).toMatchObject({ mode: "rail", region: NORTHEAST });
+describe("boards by view", () => {
+  it("gives only the boards that overlap what is on screen", () => {
+    expect(boardsIn(boards, [-74.1, 40.65, -73.85, 40.85]).map((b) => b.href)).toEqual(["/metro/nyc", "/rail/northeast"]);
+    expect(boardsIn(boards, [-80.1, 40.4, -79.9, 40.5]).map((b) => b.mode)).toEqual(["bus"]);
+    expect(boardsIn(boards, [-120, 30, -119, 31])).toEqual([]);
   });
 
-  it("ignores regions that are not defined", () => {
-    expect(deriveBoards([provider("a", "rail", ["atlantis"])])).toEqual([]);
-  });
-
-  it("only selects providers for the board's own mode and region", () => {
-    const other: Region = { ...NORTHEAST, id: "elsewhere" };
-    const all = [provider("a", "rail", ["northeast"]), provider("b", "rail", ["elsewhere"])];
-    expect(selectProviders(all, { mode: "rail", region: NORTHEAST }).map((p) => p.id)).toEqual(["a"]);
-    expect(selectProviders(all, { mode: "rail", region: other }).map((p) => p.id)).toEqual(["b"]);
-  });
-
-  it("resolves URL segments and rejects unknown ones", () => {
-    expect(findBoard("rail", "northeast")?.region.id).toBe("northeast");
-    expect(findBoard("flights", "northeast")).toBeUndefined();
-    expect(findBoard("rail", "nowhere")).toBeUndefined();
-  });
-
-  it("round-trips mode slugs into hrefs", () => {
-    expect(getMode(MODES.rail.slug)).toBe("rail");
-    expect(boardHref("rail", "northeast")).toBe("/rail/northeast");
+  it("lets a view be wider than a viewport query, but not a continent", () => {
+    expect(parseBbox("-80,36,-70,46", 40)).toBeDefined();
+    expect(parseBbox("-130,20,-60,50", 40)).toBeUndefined();
+    expect(parseBbox("-80,36,-70,46")).toBeUndefined(); // the default limit is a neighborhood
   });
 });
 
-describe("board order", () => {
-  it("lists modes in the order MODES defines (trains, metro, flights), not alphabetically", () => {
-    const boards = deriveBoards([provider("f", "flights", ["northeast"]), provider("s", "subway", ["northeast"]), provider("r", "rail", ["northeast"])]);
-    expect(boards.map((b) => b.mode)).toEqual(["rail", "subway", "flights"]);
+describe("/api/boards", () => {
+  const ask = async (q: string) => GET(new Request(`http://x/api/boards?${q}`));
+
+  it("answers for a view, for one board, and refuses a request with neither", async () => {
+    const view = (await (await ask("bbox=-74.2,40.5,-73.7,40.9")).json()) as { href: string }[];
+    expect(view.some((b) => b.href === "/metro/nyc")).toBe(true);
+    expect(view.some((b) => b.href === "/metro/boston")).toBe(false);
+    expect(await (await ask("board=subway/nyc")).json()).toHaveLength(1);
+    expect(await (await ask("board=nope/x")).json()).toEqual([]);
+    expect((await ask("")).status).toBe(400);
   });
 });

@@ -5,11 +5,11 @@ export type BBox = readonly [number, number, number, number];
 export const MAX_BBOX_SPAN_DEG = 4;
 
 /** "w,s,e,n" as sent by the browser, or nothing if it is not a sensible rectangle. */
-export function parseBbox(raw: string | null | undefined): BBox | undefined {
+export function parseBbox(raw: string | null | undefined, maxSpanDeg = MAX_BBOX_SPAN_DEG): BBox | undefined {
   const parts = (raw ?? "").split(",").map(Number);
   if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return undefined;
   const [w, s, e, n] = parts as [number, number, number, number];
-  if (e <= w || n <= s || e - w > MAX_BBOX_SPAN_DEG || n - s > MAX_BBOX_SPAN_DEG) return undefined;
+  if (e <= w || n <= s || e - w > maxSpanDeg || n - s > maxSpanDeg) return undefined;
   if (s < -90 || n > 90 || w < -180 || e > 180) return undefined;
   return [w, s, e, n];
 }

@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { ModelHome } from "@/components/home/model-home";
 import { toLink } from "@/domain/board";
+import { NORTHEAST } from "@/domain/region";
+import { boardsIn } from "@/lib/boards";
 import { listBoards } from "@/providers/registry";
 
 /**
@@ -9,9 +11,10 @@ import { listBoards } from "@/providers/registry";
  * model of everything moving, with search on top and the boards listed below it.
  */
 export default function Home() {
-  const boards = listBoards();
-  const links = boards.map(toLink);
+  const links = listBoards().map(toLink);
   if (links.length === 1) redirect(links[0]!.href);
 
-  return <ModelHome boards={links} />;
+  // The page carries only the boards of where the map opens; the rest are asked for as the map moves (/api/boards).
+  const modes = [...new Set(links.map((b) => b.mode))];
+  return <ModelHome initialBoards={boardsIn(links, NORTHEAST.bounds)} modes={modes} />;
 }

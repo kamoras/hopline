@@ -128,6 +128,27 @@ follows what is visible, not what is loaded. The remaining cost is rendering, wh
 GPU and drew 3 to 6 frames a second, so frame rate was not measured; JavaScript cost was.) Nothing to fix here; the
 polling payload above is what to reduce.
 
+## Load test (`npm run loadtest`)
+
+`scripts/load-test.ts` simulates viewers (each polling the boards of a metro every 10 s, like the browser) and reports latency,
+errors and the server's memory per endpoint. Run against one local production server, 40 viewers for 40 s, with no CDN in
+front (so every request reaches the origin: the worst case):
+
+| Endpoint | Before the fix: p50 / p95 | After: p50 / p95 |
+| --- | --- | --- |
+| Flights | **7,192 ms** / 8,048 ms (near the 8 s timeout: mostly empty answers) | 1,638 ms / 3,078 ms |
+| Trains | 721 ms / 1,675 ms | 274 ms / 1,889 ms |
+| Metro | 95 ms / 1,099 ms | 135 ms / 1,155 ms |
+| Buses (New York) | 110 ms / 1,238 ms | 209 ms / 1,515 ms |
+
+The test found a real problem: only the big networks shared one run of each provider between concurrent requests, so every
+viewer of a train, metro, ferry or flights board made the server fetch and decode the feeds again, and under load the
+flights board timed out and answered with no aircraft (the "before" bytes were small because the answers were empty; "after"
+they are full). Now every board shares one run of each provider for 3 s and builds its snapshot once per moment. No errors in
+either run. Memory climbed to about 970 MB in this worst case (every board touched, 160 MB of JSON served, garbage not yet
+collected): the next lever is the per-request JSON string (stream or cache the serialized body) and, in production, the edge
+cache, which answers repeat requests without reaching the server at all.
+
 ## Where the national plan stands
 
 `docs/NATIONWIDE.md` has the plan. Done so far: lean polling, memory fixes, and **schedule data off git** (agency bundles
