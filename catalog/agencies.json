@@ -3129,24 +3129,6 @@
    ]
   },
   {
-   "id": "maryland-transit-administration-468",
-   "name": "Maryland Transit Administration (MARC Train)",
-   "state": "District of Columbia",
-   "municipality": "Washington",
-   "mdbId": "mdb-468",
-   "staticUrl": "https://mdotmta-gtfs.s3.amazonaws.com/mdotmta_gtfs_marc.zip",
-   "bbox": [
-    -77.961,
-    38.899,
-    -76.074,
-    39.558
-   ],
-   "rt": {
-    "tripUpdates": "https://mdotmta-gtfs-rt.s3.amazonaws.com/MARC+RT/marc.pb",
-    "vehicles": "https://mdotmta-gtfs-rt.s3.amazonaws.com/MARC+RT/marc.pb"
-   }
-  },
-  {
    "id": "brightline-trains-llc-1126",
    "name": "Brightline Trains LLC",
    "state": "Florida",
@@ -7092,26 +7074,6 @@
    ]
   },
   {
-   "id": "metropolitan-transit-authority-mta-507",
-   "name": "Metropolitan Transit Authority (MTA) (Long Island Rail Road)",
-   "state": "New York",
-   "municipality": "Kings County",
-   "mdbId": "mdb-507",
-   "staticUrl": "http://web.mta.info/developers/data/lirr/google_transit.zip",
-   "license": "http://web.mta.info/developers/developer-data-terms.html",
-   "bbox": [
-    -73.994,
-    40.59,
-    -71.954,
-    41.1
-   ],
-   "rt": {
-    "tripUpdates": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/lirr%2Fgtfs-lirr",
-    "vehicles": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/lirr%2Fgtfs-lirr",
-    "alerts": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Flirr-alerts"
-   }
-  },
-  {
    "id": "metropolitan-transit-authority-mta-513",
    "name": "Metropolitan Transit Authority (MTA) (Manhattan Bus)",
    "state": "New York",
@@ -7289,26 +7251,6 @@
     -73.436,
     44.934
    ]
-  },
-  {
-   "id": "nyc-ferry-515",
-   "name": "NYC Ferry",
-   "state": "New York",
-   "municipality": "Bronx County",
-   "mdbId": "mdb-515",
-   "staticUrl": "http://nycferry.connexionz.net/rtt/public/utility/gtfs.aspx",
-   "license": "https://www.ferry.nyc/developer-tools/",
-   "bbox": [
-    -74.074,
-    40.566,
-    -73.769,
-    40.805
-   ],
-   "rt": {
-    "tripUpdates": "http://nycferry.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
-    "alerts": "http://nycferry.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
-    "vehicles": "http://nycferry.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
-   }
   },
   {
    "id": "olean-area-transit-system-586",

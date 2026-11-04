@@ -27,7 +27,8 @@ function handBuiltUrls(): Set<string> {
 
 const csvPath = flag("--csv");
 const text = csvPath ? readFileSync(csvPath, "utf8") : await (await fetch(SOURCE)).text();
-const entries = buildCatalog(parseCsv(text), { handBuilt: handBuiltUrls() });
+const skip = new Set(Object.keys(JSON.parse(readFileSync(join(ROOT, "catalog", "skip.json"), "utf8")) as Record<string, string>));
+const entries = buildCatalog(parseCsv(text), { handBuilt: handBuiltUrls(), skip });
 writeFileSync(join(ROOT, "catalog", "agencies.json"), JSON.stringify({ source: SOURCE, generatedOn: new Date().toISOString().slice(0, 10), agencies: entries }, null, 1) + "\n");
 
 const s = summarize(entries);
