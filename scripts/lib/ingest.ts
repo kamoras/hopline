@@ -82,3 +82,25 @@ export function planFor(mode: IngestMode, routeTypes: string[], live: LiveCheck 
 
 /** The data key for one mode of an agency (an agency with several modes gets one key each). */
 export const keyFor = (id: string, mode: IngestMode, modeCount: number) => (modeCount > 1 ? `${id}-${mode}` : id);
+
+export interface Report<S extends { key: string }, R extends { id: string }> {
+  served: S[];
+  rejected: R[];
+}
+
+/** Joins the reports of parallel batches (each a slice of the catalog) into one, sorted, with an agency counted once. */
+export function mergeReports<S extends { key: string }, R extends { id: string }>(parts: readonly Report<S, R>[]): Report<S, R> {
+  const served = new Map<string, S>();
+  const rejected = new Map<string, R>();
+  for (const part of parts) {
+    for (const s of part.served) served.set(s.key, s);
+    for (const r of part.rejected) rejected.set(r.id, r);
+  }
+  return {
+    served: [...served.values()].sort((a, b) => a.key.localeCompare(b.key)),
+    rejected: [...rejected.values()].sort((a, b) => a.id.localeCompare(b.id)),
+  };
+}
+
+/** The served agencies whose published files are not in hand: kept from the host that already has them. */
+export const missingKeys = (served: readonly { key: string }[], have: ReadonlySet<string>) => served.map((s) => s.key).filter((k) => !have.has(k));

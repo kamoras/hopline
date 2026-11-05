@@ -66,3 +66,18 @@ describe("what to serve", () => {
     expect(keyFor("big-blue-bus-37", "bus", 1)).toBe("big-blue-bus-37");
   });
 });
+
+describe("joining batches", () => {
+  const s = (key: string) => ({ key });
+  const r = (id: string) => ({ id });
+  it("sorts and counts each agency once", async () => {
+    const { mergeReports, missingKeys } = await import("../scripts/lib/ingest");
+    const merged = mergeReports([
+      { served: [s("b"), s("a")], rejected: [r("z")] },
+      { served: [s("c"), s("a")], rejected: [r("y"), r("z")] },
+    ]);
+    expect(merged.served.map((x) => x.key)).toEqual(["a", "b", "c"]);
+    expect(merged.rejected.map((x) => x.id)).toEqual(["y", "z"]);
+    expect(missingKeys(merged.served, new Set(["a", "c"]))).toEqual(["b"]);
+  });
+});

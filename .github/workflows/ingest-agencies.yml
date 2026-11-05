@@ -1,0 +1,118 @@
+name: Ingest agencies
+
+# Finds every US transit agency with a keyless feed (Mobility Database), downloads and proves each one (npm run ingest, split
+# into parallel batches), publishes what passes to GitHub Pages next to the bundled schedules, and opens a PR with the
+# report (catalog/ingested.json) that says what the app will serve. Nothing is served until HOPLINE_STATES is set where the
+# app runs (docs/NATIONWIDE.md). Runs weekly after the schedule refresh, and on demand.
+on:
+  schedule:
+    - cron: "43 7 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  BATCHES: 8
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run catalog
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog
+          path: catalog/agencies.json
+
+  ingest:
+    needs: catalog
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        batch: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: catalog
+          path: catalog
+      - run: npm run ingest -- --batch ${{ matrix.batch }}/${{ env.BATCHES }} --part part-${{ matrix.batch }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ingest-${{ matrix.batch }}
+          path: |
+            ingested
+            part-${{ matrix.batch }}.json
+
+  publish:
+    needs: ingest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: catalog
+          path: catalog
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ingest-*
+          merge-multiple: true
+          path: .
+      - run: npm run ingest:merge -- part-*.json
+      - run: npm run data:publish
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-data
+      - id: pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+          branch: chore/ingest-agencies
+          delete-branch: true
+          add-paths: |
+            catalog/agencies.json
+            catalog/ingested.json
+          commit-message: "chore: update the ingested agency report"
+          title: "chore: update the ingested agency report"
+          body: "Automated weekly ingest (`npm run ingest`): which agencies passed and why the rest did not. The schedules themselves are published to GitHub Pages by the same run."
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-number
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -6,7 +6,7 @@ name: Publish schedule data
 on:
   push:
     branches: [main]
-    paths: ["data/**", "scripts/publish-data.ts"]
+    paths: ["data/**", "scripts/publish-data.ts", "scripts/lib/ingest.ts"]
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run data:publish
+      # Ingested agencies are published by ingest-agencies.yml; carry them over so this deploy does not drop them.
+      - run: npm run data:publish -- --keep-from "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-data

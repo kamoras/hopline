@@ -6,7 +6,7 @@
  *   npm run ingest                         # every candidate (slow: run in CI, in batches)
  *   npm run ingest -- --only id1 id2       # just these
  *   npm run ingest -- --live-only --limit 20
- *   npm run ingest -- --batch 3/10         # the third of ten slices (for parallel jobs; merge with --merge)
+ *   npm run ingest -- --batch 3/10 --part part-3.json   # the third of ten slices (parallel jobs); `npm run ingest:merge` joins them
  *
  * A candidate is rejected, with a reason, when its download fails or is too large, it is not a usable schedule, it is out
  * of service, its live feed does not match it (and it is a bus network), or the build yields nothing.
@@ -181,6 +181,14 @@ await Promise.all(
   }),
 );
 
+const partFile = process.argv[flag("--part") + 1];
+if (flag("--part") >= 0 && partFile) {
+  // A parallel batch: write just this slice's result; `npm run ingest:merge` joins the slices into the report.
+  writeFileSync(partFile, JSON.stringify({ served, rejected }) + "\n");
+  rmSync(WORK, { recursive: true, force: true });
+  console.log(`\n${served.length} served, ${rejected.length} rejected (written to ${partFile})`);
+  process.exit(0);
+}
 const reportFile = join(ROOT, "catalog", "ingested.json");
 // A partial run (--only, --limit, --batch) updates the report instead of replacing it.
 const prior = existsSync(reportFile) ? (JSON.parse(readFileSync(reportFile, "utf8")) as { served: Served[]; rejected: Rejected[] }) : { served: [], rejected: [] };
