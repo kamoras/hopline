@@ -66,6 +66,15 @@ export function parseWorldPlaceId(id: string): { mode: Mode; regionId: string; p
   return mode && regionId && rest.length ? { mode: mode as Mode, regionId, placeId: rest.join("~") } : undefined;
 }
 
+/**
+ * Where the map first looks: a rectangle holding the boards that are small enough to see whole (trains, metro, flights), or
+ * all of them if there are none. The same boards always give the same rectangle.
+ */
+export function startingBounds(boards: readonly BoardLink[]): BBox {
+  const whole = boards.filter((b) => !MODES[b.mode].viewport);
+  return boundsOfBoards(whole.length ? whole : boards);
+}
+
 /** A rectangle that holds every board, for the first view. */
 export function boundsOfBoards(boards: readonly BoardLink[]): BBox {
   const all = boards.map((b) => b.bounds);
