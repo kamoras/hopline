@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { toLink } from "@/domain/board";
 import { BOSTON, NORTHEAST, NORTHEAST_AIR, NYC } from "@/domain/region";
-import { activeBoards, boundsOfBoards, MODE_MIN_ZOOM, parseWorldPlaceId, requestsFor, worldPlaceId, type WorldView } from "@/lib/world";
+import { activeBoards, boundsOfBoards, startingBounds, MODE_MIN_ZOOM, parseWorldPlaceId, requestsFor, worldPlaceId, type WorldView } from "@/lib/world";
 
 const boards = [
   toLink({ mode: "rail", region: NORTHEAST }),
@@ -77,5 +77,20 @@ describe("the combined map's ids and first view", () => {
       expect(e).toBeGreaterThanOrEqual(b.bounds[2]);
       expect(n).toBeGreaterThanOrEqual(b.bounds[3]);
     }
+  });
+});
+
+describe("where the map opens", () => {
+  it("is the boards small enough to see whole, and the same boards always give the same rectangle", () => {
+    const first = startingBounds(boards);
+    expect(startingBounds([...boards])).toEqual(first);
+    // A big network's board (buses) does not widen it, so boards arriving later cannot change where the map opened.
+    expect(startingBounds(boards.filter((b) => b.mode !== "bus"))).toEqual(first);
+    expect(first).toEqual(boundsOfBoards(boards.filter((b) => b.mode !== "bus")));
+  });
+
+  it("falls back to every board when none is small enough to see whole", () => {
+    const buses = boards.filter((b) => b.mode === "bus");
+    expect(startingBounds(buses)).toEqual(boundsOfBoards(buses));
   });
 });

@@ -20,7 +20,7 @@ import { useNow } from "@/hooks/use-now";
 import { useWorld } from "@/hooks/use-world";
 import { linkHref, parseLink, type Link as DeepLink } from "@/lib/deeplink";
 import { pinKey } from "@/lib/search";
-import { boundsOfBoards, parseWorldPlaceId, sameBoard, worldPlaceId, type WorldView } from "@/lib/world";
+import { parseWorldPlaceId, sameBoard, startingBounds, worldPlaceId, type WorldView } from "@/lib/world";
 import { Logo } from "../brand/logo";
 import type { MapView } from "../map/trip-map";
 import { Drawer, drawerPadding } from "./drawer";
@@ -88,13 +88,16 @@ export function ModelHome({ initialBoards, modes: available }: { initialBoards: 
     return b && `${b.mode}/${b.regionId}`;
   }, [world.boardOfTrip]);
 
-  // The first view holds the networks that are small enough to show whole (trains, metros, flights); after that the person is in charge.
+  // Where the map opens: a shared link's board, else everything small enough to see whole. It is decided from the boards the
+  // page came with (and the link's own board once it is known), never from boards fetched later as the map moves: a changed
+  // starting area rebuilds the map and throws the camera back to it.
+  const linkedBoard = initial && boards.find((b) => b.mode === initial.mode && b.regionId === initial.regionId);
+  const startKey = `${linkedBoard?.href ?? ""}`;
   const region = useMemo<Region>(() => {
-    // A shared link starts at its board; otherwise everything small enough to see whole.
-    const linked = initial && boards.find((b) => b.mode === initial.mode && b.regionId === initial.regionId);
-    const shown = linked ? [linked] : boards.some((b) => !MODES[b.mode].viewport) ? boards.filter((b) => !MODES[b.mode].viewport) : boards;
-    return { ...NORTHEAST, id: "world", name: "Everywhere", bounds: [...boundsOfBoards(shown)] as Region["bounds"], zoom: 5 };
-  }, [boards, initial]);
+    const start = startKey ? boards.filter((b) => b.href === startKey) : initialBoards;
+    return { ...NORTHEAST, id: "world", name: "Everywhere", bounds: [...startingBounds(start)] as Region["bounds"], zoom: 5 };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startKey, initialBoards]);
   const onViewChange = useCallback((v: MapView) => setView({ bbox: v.bbox, zoom: v.zoom }), []);
 
   const openTrip = useCallback((id: string) => {

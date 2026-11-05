@@ -27,6 +27,8 @@ interface Props {
 
 /** The one place that knows how to create, theme and tear down a map. */
 export function BaseMap({ bounds, onReady, controlsPosition = "top-right", children }: Props) {
+  // The map is rebuilt when the area it opens on changes, not when a new array of the same numbers arrives.
+  const boundsKey = bounds.join(",");
   const container = useRef<HTMLDivElement>(null);
   const ready = useRef(onReady);
   const [failed, setFailed] = useState(false);
@@ -60,7 +62,7 @@ export function BaseMap({ bounds, onReady, controlsPosition = "top-right", child
     });
     return () => map.remove();
     // The map is created once per bounds; callbacks are read through a ref.
-  }, [bounds, controlsPosition]);
+  }, [boundsKey, controlsPosition]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-surface-2">
