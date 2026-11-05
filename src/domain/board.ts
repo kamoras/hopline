@@ -18,6 +18,8 @@ export interface BoardLink {
   mode: Mode;
   regionId: string;
   regionName: string;
+  /** IANA zone the people looking at this board read times in. */
+  timeZone: string;
   href: string;
   /** [lon, lat] and [west, south, east, north], so the client can pick the board for where you are looking. */
   center: [number, number];
@@ -30,6 +32,7 @@ export const toLink = ({ mode, region }: Board): BoardLink => ({
   mode,
   regionId: region.id,
   regionName: region.name,
+  timeZone: region.timeZone,
   href: boardHref(mode, region.id),
   center: region.center,
   bounds: region.bounds,

@@ -43,12 +43,13 @@ import type { TransitProvider } from "./types";
 import { vreProvider } from "./vre";
 import { wmataProvider } from "./wmata";
 import { wmataBusProvider } from "./wmata-bus";
+import { generatedProviders } from "./generated";
 
-/** Every data source the app knows about. Add new providers here. */
+const HAND_BUILT: readonly TransitProvider[] = [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, cttransitProvider, norwalkProvider, hartProvider, portlandMeProvider, prtBusProvider, prtRailProvider, fairfaxConnectorProvider, dashProvider, lantaProvider, bartaProvider, redRoseProvider, rabbittransitProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
+
+/** Every data source the app knows about. Add new providers above; agencies from the ingestion catalog follow when switched on. */
 export const PROVIDERS: readonly TransitProvider[] =
-  process.env.HOPLINE_DEMO === "1"
-    ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider]
-    : [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, cttransitProvider, norwalkProvider, hartProvider, portlandMeProvider, prtBusProvider, prtRailProvider, fairfaxConnectorProvider, dashProvider, lantaProvider, bartaProvider, redRoseProvider, rabbittransitProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
+  process.env.HOPLINE_DEMO === "1" ? [demoProvider, demoSubwayProvider, demoFlightsProvider, demoBusProvider] : [...HAND_BUILT, ...generatedProviders(HAND_BUILT)];
 
 /** Providers that serve this exact mode and region; nothing else leaks into a board. */
 export function selectProviders(all: readonly TransitProvider[], { mode, region }: Board): TransitProvider[] {

@@ -1,7 +1,7 @@
 "use client";
 
 import { MODES } from "@/domain/modes";
-import { getRegion, NORTHEAST } from "@/domain/region";
+import { useZone } from "@/hooks/use-zone";
 import type { Place } from "@/domain/place";
 import type { Trip } from "@/domain/trip";
 import { describeLeg, routeKey, type Route } from "@/lib/query";
@@ -139,7 +139,7 @@ function CommuteCard({
   onRemove(): void;
   onOpen(): void;
 }) {
-  const region = getRegion(commute.board.split("/")[1] ?? "") ?? NORTHEAST;
+  const region = useZone(commute.board.split("/")[1] ?? "");
   // The next trains between the two places, on the board it was saved on.
   const matches = commuteMatches(trips.filter((t) => boardOfTrip(t.id) === commute.board), commute, now).slice(0, 3);
   return (

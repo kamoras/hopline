@@ -38,7 +38,7 @@ export function StopTime({
   showScheduled = true,
 }: {
   stop: StopCall;
-  region: Region;
+  region: Pick<Region, "timeZone">;
   emphasize?: boolean;
   /** Also show the timetable time, struck through, when it differs. */
   showScheduled?: boolean;

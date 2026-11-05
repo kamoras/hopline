@@ -31,11 +31,11 @@ piece has a scalable replacement:
       does not grow with coverage. (Station search still walks every board: it needs the server-side place index below.)
    4. *Load test (done):* `npm run loadtest` drives the API with simulated viewers and reports latency, errors and memory;
       its first run found, and this stage fixed, flights timing out under load. Run it before switching on a batch of agencies.
-2. **Catalog (done) and generic providers:** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
+2. **Catalog and generic providers (done):** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
    keyless static feed (live where a keyless real-time feed exists and answers, timetable-only otherwise), clusters them into
    regions, and writes `catalog/agencies.json`. A generic provider is created per entry at startup from the shared factories
    (`createLiveProvider`, `createTimetableProvider`) with the data host as its loader. The existing hand-tuned providers stay
-   and win over a generated one for the same service.
+   and win over a generated one for the same service. See *Serving ingested agencies* below.
 3. **Ingestion (the job is done; running it for every agency, and serving what passes, are next):** the weekly job processes agencies in batches (matrix jobs, each within its time limit), validates
    each (parses, has stops and trips in its horizon, live feed returns vehicles whose routes match the schedule), and
    publishes only what passes, with a report of what failed and why.
@@ -70,6 +70,20 @@ mostly because the live feed was unreachable from here (22) or its vehicles did 
 others, 9 pass (timetable-only trains and ferries such as Caltrain, BART, Cleveland's rail and Alaska ferries). Duplicates of
 hand-built agencies listed under another address are in `catalog/skip.json`. `ingested/` is not committed (it is published
 to Pages with the rest); `catalog/ingested.json`, the report, is.
+
+## Serving ingested agencies
+
+`src/providers/generated/` turns `catalog/ingested.json` into providers at startup, with the same factories as the hand-built
+ones. It is **off unless both `HOPLINE_DATA_URL` (where the schedules are) and `HOPLINE_STATES` are set**; `HOPLINE_STATES` is
+`all` or state names separated by commas (`Oregon,Washington`), so regions are switched on in waves and the load test can be
+run after each. Each agency gets its own region: its service area padded 10 %, a zoom to fit, and a time zone from its
+state (split states such as Texas, Florida and Idaho are decided by position). A hand-built provider of the same mode whose
+area holds the agency's centre wins, and a live agency missing either feed is left out. Boards, search and the trip and
+station drawers need nothing special: `BoardLink` carries the zone, and the drawers read it from the boards the page has.
+`npm run data:publish` packs `ingested/` along with `data/`.
+
+Checked locally with Oregon and Washington on and the published files served from a static server: King County Metro's
+board listed, its live buses and stops answered, and the other agencies' boards answered empty only outside their areas.
 
 ## What stays hand-written
 

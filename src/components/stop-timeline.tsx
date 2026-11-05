@@ -17,7 +17,7 @@ export function stopPhases(stops: readonly StopCall[]): Phase[] {
 interface Props {
   stops: readonly StopCall[];
   routeColor: string;
-  region: Region;
+  region: Pick<Region, "timeZone">;
   platformNoun: string;
   now: number;
 }
@@ -87,7 +87,7 @@ interface ItemProps {
   nextPhase?: Phase;
   isLast: boolean;
   routeColor: string;
-  region: Region;
+  region: Pick<Region, "timeZone">;
   platformNoun: string;
   now: number;
 }

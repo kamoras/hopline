@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { BoardLink } from "@/domain/board";
 import { LINE_STATE_LABEL } from "@/domain/line-status";
 import { MODES } from "@/domain/modes";
-import { getRegion, NORTHEAST } from "@/domain/region";
+import { useZone } from "@/hooks/use-zone";
 import type { Trip } from "@/domain/trip";
 import { useLineStatus } from "@/hooks/use-line-status";
 import { usePinned } from "@/hooks/use-pinned";
@@ -35,7 +35,7 @@ export function TripDrawer({
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus({ preventScroll: true }), [trip.id]);
   const { pinned, toggle } = usePinned();
-  const region = getRegion(board.regionId) ?? NORTHEAST;
+  const region = useZone(board.regionId);
   const mode = MODES[trip.mode];
   const status = useLineStatus(board.mode, board.regionId, true);
   const alerts = status.lines.filter((l) => l.state !== "good" && (l.route === trip.number || l.route === trip.routeName));
