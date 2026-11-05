@@ -156,8 +156,12 @@ export const NORTHEAST_AIR: Region = {
 /** Add new regions here; providers declare which ids they can serve. */
 export const REGIONS: readonly Region[] = [NORTHEAST, NYC, BOSTON, WASHINGTON, PHILADELPHIA, CONNECTICUT, PORTLAND_ME, PITTSBURGH, ALLENTOWN, READING, LANCASTER, YORK, NORTHEAST_AIR];
 
+/** Regions made at startup from the ingestion catalog (server only); the hand-written ones above always win. */
+const generated = new Map<string, Region>();
+export const addRegion = (region: Region) => void (REGIONS.some((r) => r.id === region.id) || generated.set(region.id, region));
+
 export function getRegion(id: string | null | undefined): Region | undefined {
-  return REGIONS.find((r) => r.id === id);
+  return REGIONS.find((r) => r.id === id) ?? (id ? generated.get(id) : undefined);
 }
 
 export function inBounds(region: Region, lat: number, lon: number): boolean {

@@ -17,7 +17,7 @@ import type { CatalogHit } from "@/server/catalog";
 import type { RouteSummary } from "@/server/routes";
 import { LineBadge } from "../line-badge";
 import { destinationPhrase, StopTime } from "../trip-parts";
-import { getRegion, NORTHEAST } from "@/domain/region";
+import { useZoneOf } from "@/hooks/use-zone";
 import type { PlaceTarget } from "./model-home";
 
 /** What a search finds, in one list: vehicles running now, then stations and airports. Choosing one opens its drawer. */
@@ -48,6 +48,7 @@ export function SearchDrawer({
   onOpenPlace(place: PlaceTarget): void;
   onOpenRoute(board: BoardLink, route: RouteSummary): void;
 }) {
+  const zoneOf = useZoneOf();
   const [hits, setHits] = useState<{ query: string; found: CatalogHit[] }>();
   const q = query.trim();
 
@@ -124,7 +125,7 @@ export function SearchDrawer({
           {journeys.length === 0 && <p className="text-sm text-muted">No train is running between these right now.</p>}
           <ul className="space-y-2">
             {journeys.map(({ trip, stop, to }) => {
-              const region = getRegion(boardOfTrip(trip.id)?.split("/")[1] ?? "") ?? NORTHEAST;
+              const region = zoneOf(boardOfTrip(trip.id)?.split("/")[1] ?? "");
               return (
                 <li key={`${trip.id}/${stop?.id}`}>
                   <button type="button" onClick={() => onOpenTrip(trip.id)} className="press flex w-full items-center gap-3 rounded-xl border border-line px-3 py-2.5 text-left hover:bg-surface-2">

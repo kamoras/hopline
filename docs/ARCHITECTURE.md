@@ -165,6 +165,7 @@ normalized name), `searchTrips` (number, station, route),
   shapes of its own, so it borrows the Northeast Regional and Acela track); the Hartford Line uses CT DOT's feed.
   Adding real-time later means swapping that provider's `fetchTrips`. These two have no public download, so they are
   the only bundled schedules outside the weekly refresh: rerun their `data:*` scripts with fresh zips when timetables change.
+  Agencies from the ingestion catalog are served by `src/providers/generated/` when `HOPLINE_STATES` and `HOPLINE_DATA_URL` are set (see `docs/NATIONWIDE.md`).
   Every other bundled schedule is regenerated weekly by `npm run data:refresh` (`scripts/refresh-data.ts`, run by the
   `refresh-schedules` workflow): one feed failing never stops the others (its old data is kept), and the sources that
   need a key are skipped when it is not set.

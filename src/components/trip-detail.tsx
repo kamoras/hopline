@@ -25,7 +25,7 @@ export function TripDetailBody({
   extra,
 }: {
   trip: Trip;
-  region: Region;
+  region: Pick<Region, "timeZone">;
   now: number;
   pinned: boolean;
   onTogglePin(): void;

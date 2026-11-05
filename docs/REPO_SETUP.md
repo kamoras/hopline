@@ -27,7 +27,8 @@ repo settings, so they can't live in code. Do them once:
 `publish-data.yml` packs every agency's schedule and publishes it to GitHub Pages. To use it: **Settings → Pages → Source:
 GitHub Actions**, run the workflow once, then set `HOPLINE_DATA_URL` in the hosting environment to the Pages address
 (for example `https://<owner>.github.io/<repo>`). Until it is set the server reads the copy bundled at build time, so nothing
-changes; if the host is unreachable it falls back to that copy too.
+changes; if the host is unreachable it falls back to that copy too. To serve the agencies the ingestion job found, also set
+`HOPLINE_STATES` (`all`, or state names separated by commas) once their data is published; see `docs/NATIONWIDE.md`.
 
 ## Merge policy
 | PR | Auto-merges when |

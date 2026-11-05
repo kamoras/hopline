@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { MODES } from "@/domain/modes";
-import { getRegion, NORTHEAST } from "@/domain/region";
+import { useZone } from "@/hooks/use-zone";
 import type { Trip } from "@/domain/trip";
 import { useArrivals } from "@/hooks/use-arrivals";
 import { groupArrivals, minutesUntil } from "@/lib/arrivals";
@@ -30,7 +30,7 @@ export function PlaceDrawer({
   const stationsFirst = mode.browse === "stations";
   const { arrivals, isLoading, error } = useArrivals(place.mode, place.regionId, stationsFirst ? place.id : undefined);
   const groups = groupArrivals(arrivals, now).slice(0, 8);
-  const region = getRegion(place.regionId) ?? NORTHEAST;
+  const region = useZone(place.regionId);
   // On a board that lists trains rather than stations, the trains calling here.
   const calling = useMemo(() => (stationsFirst ? [] : searchTrips(trips, { query: place.name, operator: "all", delayedOnly: false }).slice(0, 10)), [stationsFirst, trips, place.name]);
 
