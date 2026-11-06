@@ -315,7 +315,7 @@ no longer exist. The home page is all there is, with a plain list of the places 
   needs a key), Delaware's DART, Arlington's ART (feed unreachable from here) and Harrisburg's CAT (no vehicles
   reporting when checked).
 - **Aircraft.** Planes have no track, so each one shows where it has been, a fading trail kept in memory only
-  (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport
+  (`lib/trail.ts`: about a minute, each point fading with its age, so a trail dies away by itself and a vehicle that stops leaves none; never sent anywhere), and where it is headed, a dashed line to its airport (only from zoom 8 in: from far away, one to every airport is clutter)
   when known. The chosen plane's lines are brighter. ADS-B says where a plane is, not where it is going, so a
   flight's route is looked up by callsign in adsb.lol's public route files (`providers/adsb/routes.ts`: keyless,
   kept six hours, a callsign with no route remembered as such, up to 150 new lookups per refresh, so one refresh names nearly the whole
