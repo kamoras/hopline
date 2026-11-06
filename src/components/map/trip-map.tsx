@@ -43,6 +43,8 @@ const STACK_RADIUS_PX = 26;
 const GLYPH_MIN_ZOOM = 9;
 const LABEL_MIN_ZOOM = 11.5;
 /** Trains and buses (living model only) show a short wake from this zoom; a wake lasts about 30 s. */
+/** The zoom from which an aircraft shows its dotted line to the airport it is heading for. */
+const LEAD_MIN_ZOOM = 8;
 const WAKE_MIN_ZOOM = 9;
 const WAKE_MS = 30_000;
 
@@ -400,6 +402,8 @@ export default function TripMap({ region, trips, places, lines, fitLinesKey, fit
       id: "lead-lines",
       type: "line",
       source: "leads",
+      // Dotted lines to every airport are clutter from far away; they appear once the map is close enough to follow one.
+      minzoom: LEAD_MIN_ZOOM,
       layout: { "line-cap": "round" },
       paint: { "line-color": "#8ab4ff", "line-width": 1.6, "line-dasharray": [1, 2.2], "line-opacity": ["get", "a"] },
     });
