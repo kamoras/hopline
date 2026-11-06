@@ -1,6 +1,6 @@
 {
  "source": "https://files.mobilitydatabase.org/feeds_v2.csv",
- "generatedOn": "2026-11-03",
+ "generatedOn": "2026-11-06",
  "agencies": [
   {
    "id": "birmingham-jefferson-county-transit-auth-3434",
@@ -193,6 +193,20 @@
    ]
   },
   {
+   "id": "copper-mountain-transit-2860",
+   "name": "Copper Mountain Transit",
+   "state": "Arizona",
+   "municipality": "Globe",
+   "mdbId": "mdb-2860",
+   "staticUrl": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/11492/CMT_gtfs.zip",
+   "bbox": [
+    -110.87,
+    33.356,
+    -110.752,
+    33.421
+   ]
+  },
+  {
    "id": "cottonwood-area-transit-cat-158",
    "name": "Cottonwood Area Transit (CAT)",
    "state": "Arizona",
@@ -288,6 +302,20 @@
    }
   },
   {
+   "id": "yavapai-regional-transit-ntd-99419",
+   "name": "Yavapai Regional Transit",
+   "state": "Arizona",
+   "municipality": "Yavapai County",
+   "mdbId": "ntd-99419",
+   "staticUrl": "http://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/5156/yrt_gtfs.zip",
+   "bbox": [
+    -112.487,
+    34.542,
+    -112.318,
+    34.774
+   ]
+  },
+  {
    "id": "yuma-county-intergovernmental-public-tra-17",
    "name": "Yuma County Intergovernmental Public Transportation Authority (YCIPTA)",
    "state": "Arizona",
@@ -313,20 +341,6 @@
     35.292,
     -94.299,
     35.429
-   ]
-  },
-  {
-   "id": "eureka-springs-transit-ntd-60161",
-   "name": "Eureka Springs Transit",
-   "state": "Arkansas",
-   "municipality": "Eureka Springs",
-   "mdbId": "ntd-60161",
-   "staticUrl": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/11548/Transit_feed.zip",
-   "bbox": [
-    -93.772,
-    36.381,
-    -93.694,
-    36.435
    ]
   },
   {
@@ -908,25 +922,6 @@
    }
   },
   {
-   "id": "fresno-area-express-fax-90",
-   "name": "Fresno Area Express (FAX)",
-   "state": "California",
-   "municipality": "Fresno",
-   "mdbId": "mdb-90",
-   "staticUrl": "https://gis4u.fresno.gov/downloads/fax_gtfs.zip",
-   "bbox": [
-    -119.909,
-    36.678,
-    -119.682,
-    36.889
-   ],
-   "rt": {
-    "alerts": "https://gis4u.fresno.gov/TMGTFSRealTimeWebService/Alert/Alerts.pb",
-    "tripUpdates": "https://gis4u.fresno.gov/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
-    "vehicles": "https://gis4u.fresno.gov/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb"
-   }
-  },
-  {
    "id": "fresno-county-rural-transit-agency-fcrta-85",
    "name": "Fresno County Rural Transit Agency (FCRTA)",
    "state": "California",
@@ -966,20 +961,6 @@
     35.267,
     -118.914,
     35.447
-   ]
-  },
-  {
-   "id": "golden-gate-national-recreation-area-alc-3208",
-   "name": "Golden Gate National Recreation Area (Alcatraz Island) (Alcatraz Cruises Ferry)",
-   "state": "California",
-   "municipality": "San Francisco",
-   "mdbId": "mdb-3208",
-   "staticUrl": "https://www.nps.gov/external-resources/gtfs/alca/alcatraz-cruises-ferry.zip",
-   "bbox": [
-    -122.421,
-    37.807,
-    -122.404,
-    37.827
    ]
   },
   {
@@ -1489,25 +1470,6 @@
    ]
   },
   {
-   "id": "norwalk-transit-system-tld-881",
-   "name": "Norwalk Transit System",
-   "state": "California",
-   "municipality": "Artesia",
-   "mdbId": "tld-881",
-   "staticUrl": "https://nts.rideralerts.com/InfoPoint/gtfs-zip.ashx",
-   "bbox": [
-    -118.134,
-    33.865,
-    -117.959,
-    34.072
-   ],
-   "rt": {
-    "alerts": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
-    "tripUpdates": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   }
-  },
-  {
    "id": "omnitrans-97",
    "name": "OmniTrans",
    "state": "California",
@@ -1679,7 +1641,7 @@
    "mdbId": "mdb-58",
    "staticUrl": "http://data.trilliumtransit.com/gtfs/sanbenitocounty-ca-us/sanbenitocounty-ca-us.zip",
    "bbox": [
-    -121.567,
+    -121.571,
     36.828,
     -121.367,
     37.004
@@ -1918,20 +1880,6 @@
    ]
   },
   {
-   "id": "sonoma-county-transit-sct-70",
-   "name": "Sonoma County Transit (SCT)",
-   "state": "California",
-   "municipality": "Sonoma County",
-   "mdbId": "mdb-70",
-   "staticUrl": "http://data.trilliumtransit.com/gtfs/sonomacounty-ca-us/sonomacounty-ca-us.zip",
-   "bbox": [
-    -123.126,
-    38.106,
-    -122.458,
-    38.812
-   ]
-  },
-  {
    "id": "spirit-bus-2202",
    "name": "Spirit Bus",
    "state": "California",
@@ -2037,17 +1985,17 @@
    "mdbId": "mdb-3100",
    "staticUrl": "https://data.trilliumtransit.com/gtfs/thousandoaks-ca-us/thousandoaks-ca-us.zip",
    "bbox": [
-    -119.267,
-    34.021,
-    -118.816,
-    34.285
+    -118.956,
+    34.148,
+    -118.818,
+    34.226
    ]
   },
   {
    "id": "thousand-oaks-transit-kanan-shuttle-2315",
    "name": "Thousand Oaks Transit - Kanan Shuttle",
    "state": "California",
-   "municipality": "Agoura Hills",
+   "municipality": "Ventura County",
    "mdbId": "mdb-2315",
    "staticUrl": "https://data.trilliumtransit.com/gtfs/kananshuttle-ca-us/kananshuttle-ca-us.zip",
    "bbox": [
@@ -2948,14 +2896,14 @@
    "id": "connecticut-transit-2840",
    "name": "Connecticut Transit (Hartford Line - Rail)",
    "state": "Connecticut",
-   "municipality": "New Haven",
+   "municipality": "Hartford County",
    "mdbId": "mdb-2840",
    "staticUrl": "https://ctrides.com/hlgtfs.zip",
    "license": "https://www.cttransit.com/about/developers/terms-of-use",
    "bbox": [
     -72.926,
-    41.297,
-    -72.593,
+    41.275,
+    -72.093,
     42.106
    ]
   },
@@ -3115,6 +3063,46 @@
    ]
   },
   {
+   "id": "southeastern-pennsylvania-transportation-502",
+   "name": "Southeastern Pennsylvania Transportation Authority (SEPTA) (Bus)",
+   "state": "Delaware",
+   "municipality": "New Castle County",
+   "mdbId": "mdb-502",
+   "staticUrl": "https://www3.septa.org/developer/google_bus.zip",
+   "license": "https://www3.septa.org/developer/",
+   "bbox": [
+    -75.835,
+    39.804,
+    -74.754,
+    40.334
+   ],
+   "rt": {
+    "alerts": "https://www3.septa.org/gtfsrt/septa-pa-us/Service/rtServiceAlerts.pb",
+    "tripUpdates": "https://www3.septa.org/gtfsrt/septa-pa-us/Trip/rtTripUpdates.pb",
+    "vehicles": "https://www3.septa.org/gtfsrt/septa-pa-us/Vehicle/rtVehiclePosition.pb"
+   }
+  },
+  {
+   "id": "southeastern-pennsylvania-transportation-503",
+   "name": "Southeastern Pennsylvania Transportation Authority (SEPTA) (Rail)",
+   "state": "Delaware",
+   "municipality": "Claymont",
+   "mdbId": "mdb-503",
+   "staticUrl": "https://www3.septa.org/developer/google_rail.zip",
+   "license": "https://www3.septa.org/developer/",
+   "bbox": [
+    -75.764,
+    39.67,
+    -74.754,
+    40.306
+   ],
+   "rt": {
+    "alerts": "https://www3.septa.org/gtfsrt/septarail-pa-us/Service/rtServiceAlerts.pb",
+    "vehicles": "https://www3.septa.org/gtfsrt/septarail-pa-us/Vehicle/rtVehiclePosition.pb",
+    "tripUpdates": "https://www3.septa.org/gtfsrt/septarail-pa-us/Trip/rtTripUpdates.pb"
+   }
+  },
+  {
    "id": "maryland-transit-administration-467",
    "name": "Maryland Transit Administration (Commuter Bus)",
    "state": "District of Columbia",
@@ -3129,10 +3117,24 @@
    ]
   },
   {
+   "id": "bay-town-trolley-337",
+   "name": "Bay Town Trolley",
+   "state": "Florida",
+   "municipality": "Bay County",
+   "mdbId": "mdb-337",
+   "staticUrl": "http://data.trilliumtransit.com/gtfs/baytowntrolley-fl-us/baytowntrolley-fl-us.zip",
+   "bbox": [
+    -85.975,
+    30.131,
+    -85.591,
+    30.263
+   ]
+  },
+  {
    "id": "brightline-trains-llc-1126",
    "name": "Brightline Trains LLC",
    "state": "Florida",
-   "municipality": "Fort Lauderdale",
+   "municipality": "Miami-Dade County",
    "mdbId": "mdb-1126",
    "staticUrl": "http://feed.gobrightline.com/bl_gtfs.zip",
    "bbox": [
@@ -3263,20 +3265,6 @@
     29.715,
     -81.235,
     29.716
-   ]
-  },
-  {
-   "id": "gulf-islands-national-seashore-3209",
-   "name": "Gulf Islands National Seashore (Pensacola Bay City Ferry)",
-   "state": "Florida",
-   "municipality": "Escambia County",
-   "mdbId": "mdb-3209",
-   "staticUrl": "https://www.nps.gov/external-resources/gtfs/guis/guis-ferry-service-fl.zip",
-   "bbox": [
-    -87.289,
-    30.33,
-    -87.141,
-    30.405
    ]
   },
   {
@@ -3990,6 +3978,20 @@
    ]
   },
   {
+   "id": "pace-bus-2347",
+   "name": "Pace Bus",
+   "state": "Illinois",
+   "municipality": "Cook County",
+   "mdbId": "mdb-2347",
+   "staticUrl": "https://www.pacebus.com/gtfsdownload",
+   "bbox": [
+    -88.621,
+    41.404,
+    -87.523,
+    42.457
+   ]
+  },
+  {
    "id": "shawnee-mass-transit-district-2332",
    "name": "Shawnee Mass Transit District",
    "state": "Illinois",
@@ -4654,6 +4656,20 @@
    ]
   },
   {
+   "id": "lextran-2067",
+   "name": "Lextran",
+   "state": "Kentucky",
+   "municipality": "Fayette County",
+   "mdbId": "mdb-2067",
+   "staticUrl": "https://mystop.lextran.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -84.605,
+    37.971,
+    -84.406,
+    38.11
+   ]
+  },
+  {
    "id": "capital-area-transit-system-cats-2065",
    "name": "Capital Area Transit System (CATS)",
    "state": "Louisiana",
@@ -4876,20 +4892,6 @@
     "tripUpdates": "https://passio3.com/frederick/passioTransit/gtfs/realtime/tripUpdates",
     "vehicles": "https://passio3.com/frederick/passioTransit/gtfs/realtime/vehiclePositions"
    }
-  },
-  {
-   "id": "harbor-connector-618",
-   "name": "Harbor Connector",
-   "state": "Maryland",
-   "municipality": "Baltimore",
-   "mdbId": "mdb-618",
-   "staticUrl": "http://data.trilliumtransit.com/gtfs/harborconnector-md-us/harborconnector-md-us.zip",
-   "bbox": [
-    -76.612,
-    39.266,
-    -76.574,
-    39.286
-   ]
   },
   {
    "id": "maryland-transit-administration-469",
@@ -5666,25 +5668,6 @@
    ]
   },
   {
-   "id": "the-rapid-400",
-   "name": "The Rapid",
-   "state": "Michigan",
-   "municipality": "East Grand Rapids",
-   "mdbId": "mdb-400",
-   "staticUrl": "http://connect.ridetherapid.org/InfoPoint/gtfs-zip.ashx",
-   "bbox": [
-    -85.91,
-    42.838,
-    -85.48,
-    43.692
-   ],
-   "rt": {
-    "alerts": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?&Type=Alert",
-    "tripUpdates": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   }
-  },
-  {
    "id": "university-of-michigan-transit-services-2072",
    "name": "University of Michigan Transit Services",
    "state": "Michigan",
@@ -5937,20 +5920,6 @@
    ]
   },
   {
-   "id": "gulf-islands-national-seashore-3210",
-   "name": "Gulf Islands National Seashore (Ship Island Excursions)",
-   "state": "Mississippi",
-   "municipality": "Harrison County",
-   "mdbId": "mdb-3210",
-   "staticUrl": "https://www.nps.gov/external-resources/gtfs/guis/guis-ferry-service-ms.zip",
-   "bbox": [
-    -89.09,
-    30.215,
-    -88.971,
-    30.364
-   ]
-  },
-  {
    "id": "city-of-jefferson-ntd-70043",
    "name": "City of Jefferson",
    "state": "Missouri",
@@ -6084,20 +6053,6 @@
     41.141,
     -95.798,
     41.346
-   ]
-  },
-  {
-   "id": "open-plains-transit-tld-6708",
-   "name": "Open Plains Transit",
-   "state": "Nebraska",
-   "municipality": "Scotts Bluff County",
-   "mdbId": "tld-6708",
-   "staticUrl": "https://irp.cdn-website.com/442ea718/files/uploaded/opt_gtfs.zip",
-   "bbox": [
-    -103.678,
-    41.092,
-    -101.712,
-    44.082
    ]
   },
   {
@@ -6761,8 +6716,8 @@
    "staticUrl": "https://github.com/columbia-county-ny-transit/gtfs-generator/raw/refs/heads/main/columbia_county_gtfs.zip",
    "bbox": [
     -73.809,
-    42.246,
-    -73.596,
+    42.018,
+    -73.526,
     42.679
    ]
   },
@@ -6806,20 +6761,6 @@
     42.115,
     -76.971,
     42.182
-   ]
-  },
-  {
-   "id": "downtown-alliance-519",
-   "name": "Downtown Alliance",
-   "state": "New York",
-   "municipality": "New York County",
-   "mdbId": "mdb-519",
-   "staticUrl": "http://mjcaction.com/MJC_GTFS_Public/downtown_nyc_google_transit.zip",
-   "bbox": [
-    -74.018,
-    40.702,
-    -74.002,
-    40.717
    ]
   },
   {
@@ -7119,6 +7060,25 @@
     -73.755,
     40.903
    ]
+  },
+  {
+   "id": "metropolitan-transit-authority-mta-516",
+   "name": "Metropolitan Transit Authority (MTA) (NYC Subway)",
+   "state": "New York",
+   "municipality": "Bronx County",
+   "mdbId": "mdb-516",
+   "staticUrl": "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
+   "bbox": [
+    -74.252,
+    40.513,
+    -73.755,
+    40.903
+   ],
+   "rt": {
+    "alerts": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts",
+    "tripUpdates": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
+    "vehicles": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace"
+   }
   },
   {
    "id": "metropolitan-transit-authority-mta-520",
@@ -7584,20 +7544,6 @@
    }
   },
   {
-   "id": "transport-of-rockland-tld-3368",
-   "name": "Transport of Rockland",
-   "state": "New York",
-   "municipality": "Rockland County",
-   "mdbId": "tld-3368",
-   "staticUrl": "https://s3.amazonaws.com/datatools-511ny/public/TOR_Transport_of_Rockland.zip",
-   "bbox": [
-    -74.185,
-    41.019,
-    -73.92,
-    41.251
-   ]
-  },
-  {
    "id": "ulster-county-area-transit-526",
    "name": "Ulster County Area Transit",
    "state": "New York",
@@ -7821,8 +7767,8 @@
    "staticUrl": "https://godurham.rideralerts.com/InfoPoint/GTFS-Zip.ashx",
    "bbox": [
     -78.997,
-    35.794,
-    -78.708,
+    35.881,
+    -78.779,
     36.101
    ],
    "rt": {
@@ -7890,6 +7836,21 @@
     35.902,
     -79.052,
     36.096
+   ]
+  },
+  {
+   "id": "piedmont-authority-for-regional-transpor-373",
+   "name": "Piedmont Authority for Regional Transportation (PART)",
+   "state": "North Carolina",
+   "municipality": "Guilford County",
+   "mdbId": "mdb-373",
+   "staticUrl": "http://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/5137/gtfs.zip",
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "bbox": [
+    -80.246,
+    35.631,
+    -79.051,
+    36.118
    ]
   },
   {
@@ -8294,20 +8255,6 @@
    ]
   },
   {
-   "id": "astoria-riverfront-trolley-1254",
-   "name": "Astoria Riverfront Trolley",
-   "state": "Oregon",
-   "municipality": "Astoria",
-   "mdbId": "mdb-1254",
-   "staticUrl": "https://oregon-gtfs.trilliumtransit.com/gtfs_data/astoria-or-us/astoria-or-us.zip",
-   "bbox": [
-    -123.853,
-    46.188,
-    -123.799,
-    46.195
-   ]
-  },
-  {
    "id": "basin-transit-service-bts-125",
    "name": "Basin Transit Service (BTS)",
    "state": "Oregon",
@@ -8427,20 +8374,6 @@
     45.299,
     -122.693,
     45.301
-   ]
-  },
-  {
-   "id": "caravan-airport-transportation-127",
-   "name": "Caravan Airport Transportation",
-   "state": "Oregon",
-   "municipality": "Lincoln County",
-   "mdbId": "mdb-127",
-   "staticUrl": "https://oregon-gtfs.trilliumtransit.com/gtfs_data/caravan-or-us/caravan-or-us.zip",
-   "bbox": [
-    -124.081,
-    44.425,
-    -122.593,
-    45.589
    ]
   },
   {
@@ -9042,13 +8975,13 @@
    "id": "wallowa-community-connection-wcc-northea-289",
    "name": "Wallowa Community Connection (WCC), Northeast Oregon Public Transit",
    "state": "Oregon",
-   "municipality": "La Grande",
+   "municipality": "Union County",
    "mdbId": "mdb-289",
    "staticUrl": "https://oregon-gtfs.trilliumtransit.com/gtfs_data/northeast-or-us/northeast-or-us.zip",
    "bbox": [
-    -118.106,
-    44.762,
-    -117.19,
+    -118.201,
+    44.024,
+    -116.969,
     45.571
    ]
   },
@@ -9068,20 +9001,6 @@
    "rt": {
     "alerts": "http://gtfs-realtime.trilliumtransit.com/gtfs-realtime/feed/washingtonparkshuttle-or-us/service_alerts.proto"
    }
-  },
-  {
-   "id": "wheatland-ferry-833",
-   "name": "Wheatland Ferry",
-   "state": "Oregon",
-   "municipality": "Marion County",
-   "mdbId": "mdb-833",
-   "staticUrl": "https://oregon-gtfs.trilliumtransit.com/gtfs_data/wheatlandferry-or-us/wheatlandferry-or-us.zip",
-   "bbox": [
-    -123.046,
-    45.09,
-    -123.044,
-    45.091
-   ]
   },
   {
    "id": "woodburn-transit-service-wts-251",
@@ -9114,6 +9033,25 @@
     "alerts": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
     "vehicles": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
+   }
+  },
+  {
+   "id": "altoona-metro-transit-tld-4669",
+   "name": "Altoona Metro Transit",
+   "state": "Pennsylvania",
+   "municipality": "Altoona",
+   "mdbId": "tld-4669",
+   "staticUrl": "https://amtran.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -78.445,
+    40.428,
+    -78.237,
+    40.681
+   ],
+   "rt": {
+    "alerts": "https://amtran.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://amtran.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://amtran.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    }
   },
   {
@@ -9183,24 +9121,6 @@
    }
   },
   {
-   "id": "cambria-county-transit-authority-tld-4671",
-   "name": "Cambria County Transit Authority",
-   "state": "Pennsylvania",
-   "municipality": "Blair County",
-   "mdbId": "tld-4671",
-   "staticUrl": "https://live.camtranbus.com/InfoPoint/gtfs-zip.ashx",
-   "bbox": [
-    -78.979,
-    40.218,
-    -78.41,
-    40.67
-   ],
-   "rt": {
-    "tripUpdates": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   }
-  },
-  {
    "id": "capital-area-transit-tld-4298",
    "name": "Capital Area Transit",
    "state": "Pennsylvania",
@@ -9264,6 +9184,25 @@
     "alerts": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
     "tripUpdates": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
     "vehicles": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
+  },
+  {
+   "id": "crawford-area-transportation-authority-tld-4674",
+   "name": "Crawford Area Transportation Authority",
+   "state": "Pennsylvania",
+   "municipality": "Cranberry Township",
+   "mdbId": "tld-4674",
+   "staticUrl": "https://catabus.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -80.307,
+    41.349,
+    -79.667,
+    41.729
+   ],
+   "rt": {
+    "alerts": "https://catabus.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://catabus.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://catabus.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    }
   },
   {
@@ -11116,20 +11055,6 @@
    ]
   },
   {
-   "id": "grays-harbor-transit-263",
-   "name": "Grays Harbor Transit",
-   "state": "Washington",
-   "municipality": "Aberdeen",
-   "mdbId": "mdb-263",
-   "staticUrl": "http://mjcaction.com/MJC_GTFS_Public/graysharbor_google_transit.zip",
-   "bbox": [
-    -124.294,
-    46.717,
-    -122.901,
-    47.475
-   ]
-  },
-  {
    "id": "guemes-island-ferry-2310",
    "name": "Guemes Island Ferry",
    "state": "Washington",
@@ -11469,7 +11394,7 @@
    "id": "skagit-transit-tld-5895",
    "name": "Skagit Transit",
    "state": "Washington",
-   "municipality": "Burlington",
+   "municipality": "Anacortes",
    "mdbId": "tld-5895",
    "staticUrl": "https://strweb.skagittransit.org/GTFS/google_transit.zip",
    "bbox": [
