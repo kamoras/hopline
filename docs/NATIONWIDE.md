@@ -36,7 +36,7 @@ piece has a scalable replacement:
    regions, and writes `catalog/agencies.json`. A generic provider is created per entry at startup from the shared factories
    (`createLiveProvider`, `createTimetableProvider`) with the data host as its loader. The existing hand-tuned providers stay
    and win over a generated one for the same service. See *Serving ingested agencies* below.
-3. **Ingestion (the job is done; running it for every agency, and serving what passes, are next):** the weekly job processes agencies in batches (matrix jobs, each within its time limit), validates
+3. **Ingestion (done):** the weekly job (`ingest-agencies.yml`) processes agencies in 8 parallel batches, validates
    each (parses, has stops and trips in its horizon, live feed returns vehicles whose routes match the schedule), and
    publishes only what passes, with a report of what failed and why.
 4. **Switch on regions in waves** (largest metros first), watching the load test and the status page after each.
@@ -70,6 +70,16 @@ mostly because the live feed was unreachable from here (22) or its vehicles did 
 others, 9 pass (timetable-only trains and ferries such as Caltrain, BART, Cleveland's rail and Alaska ferries). Duplicates of
 hand-built agencies listed under another address are in `catalog/skip.json`. `ingested/` is not committed (it is published
 to Pages with the rest); `catalog/ingested.json`, the report, is.
+
+## The weekly ingest
+
+`.github/workflows/ingest-agencies.yml` (Tuesdays, after Monday's schedule refresh; also on demand): rebuilds the catalog, runs
+`npm run ingest -- --batch i/8 --part part-i.json` as eight parallel jobs (a failed batch stops the publish, so a bad night
+never shrinks what is served), joins the parts with `npm run ingest:merge`, packs `data/` and `ingested/` with
+`data:publish`, deploys them to Pages, and opens a PR with the report (`catalog/ingested.json`, `catalog/agencies.json`).
+`publish-data.yml` (a push that changes `data/`) carries the ingested files over from the live host with
+`--keep-from`, because a Pages deploy replaces the whole site. Run the workflow once by hand (Actions → Ingest agencies)
+before setting `HOPLINE_STATES`.
 
 ## Serving ingested agencies
 

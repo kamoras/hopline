@@ -11,11 +11,15 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { missingKeys } from "./lib/ingest.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 /** The hand-built agencies (committed) and the ones the ingestion job generated (not committed). */
 const SOURCES = [join(ROOT, "data"), join(ROOT, "ingested")];
-const OUT = join(ROOT, process.argv[2] ?? "dist-data");
+const flagValue = (name: string) => process.argv[process.argv.indexOf(name) + 1];
+const OUT = join(ROOT, process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : "dist-data");
+/** Where agencies already published live, for those this run did not rebuild (see `--keep-from`). */
+const KEEP_FROM = process.argv.includes("--keep-from") ? flagValue("--keep-from")?.replace(/\/$/, "") : undefined;
 const FILES = ["stops", "routes", "trips", "services", "shapes"] as const;
 
 const read = (src: string, agency: string, name: string): unknown => JSON.parse(readFileSync(join(src, agency, `${name}.json`), "utf8"));
@@ -31,6 +35,26 @@ for (const [src, agency] of SOURCES.filter(existsSync).flatMap((src) => readdirS
   writeFileSync(join(OUT, `${agency}.json`), text);
   const meta = existsSync(join(src, agency, "meta.json")) ? (read(src, agency, "meta") as { generatedOn?: string; horizon?: { from: string; to: string } }) : {};
   index.push({ id: agency, bytes: text.length, generatedOn: meta.generatedOn, horizon: meta.horizon });
+}
+// A push that only changes bundled schedules does not rebuild the ingested ones; they are carried over from the live host
+// (a Pages deploy replaces the whole site), so publishing one never drops the other.
+if (KEEP_FROM) {
+  const report = JSON.parse(readFileSync(join(ROOT, "catalog", "ingested.json"), "utf8")) as { served: { key: string }[] };
+  const have = new Set(index.map((a) => a.id));
+  let kept = 0;
+  for (const key of missingKeys(report.served, have)) {
+    try {
+      const res = await fetch(`${KEEP_FROM}/${encodeURIComponent(key)}.json`, { signal: AbortSignal.timeout(60_000) });
+      if (!res.ok) throw new Error(`answered ${res.status}`);
+      const text = await res.text();
+      writeFileSync(join(OUT, `${key}.json`), text);
+      index.push({ id: key, bytes: text.length });
+      kept++;
+    } catch (err) {
+      console.warn(`Could not carry over ${key}: ${err instanceof Error ? err.message : err}`);
+    }
+  }
+  console.log(`Carried over ${kept} ingested agencies from ${KEEP_FROM}`);
 }
 writeFileSync(join(OUT, "index.json"), JSON.stringify({ generatedAt: new Date().toISOString(), agencies: index }, null, 1));
 const total = index.reduce((n, a) => n + a.bytes, 0);
