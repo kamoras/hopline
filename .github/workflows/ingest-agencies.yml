@@ -2,7 +2,7 @@ name: Ingest agencies
 
 # Finds every US transit agency with a keyless feed (Mobility Database), downloads and proves each one (npm run ingest, split
 # into parallel batches), publishes what passes to GitHub Pages next to the bundled schedules, and opens a PR with the
-# report (catalog/ingested.json) that says what the app will serve. Nothing is served until HOPLINE_STATES is set where the
+# report (catalog/ingested.json) that says what the app will serve (needs "Allow GitHub Actions to create pull requests"; the publish does not). Nothing is served until HOPLINE_STATES is set where the
 # app runs (docs/NATIONWIDE.md). Runs weekly after the schedule refresh, and on demand.
 on:
   schedule:
@@ -89,6 +89,24 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist-data
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: |
+            catalog/agencies.json
+            catalog/ingested.json
+
+  # Opening the report PR is separate from publishing: if the repository does not let Actions open pull requests
+  # (Settings → Actions → General) this job fails, but the schedules still reach Pages.
+  report:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: report
+          path: catalog
       - id: pr
         uses: peter-evans/create-pull-request@v8
         with:
