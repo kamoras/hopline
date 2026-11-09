@@ -51,3 +51,27 @@ describe("generated agencies", () => {
     expect(getRegion(p.regionIds[0])?.timeZone).toMatch(/^America\//);
   });
 });
+
+describe("agency names", () => {
+  it("says what riders say", async () => {
+    const { cleanName, displayNames } = await import("@/providers/generated/plan");
+    expect(cleanName("Central Puget Sound Regional Transit Authority, Central Puget Sound Regional Transit Authority")).toBe("Central Puget Sound Regional Transit Authority");
+    expect(cleanName("ClackCo Connects (Clackamas County) (Static feed for realtime)")).toBe("ClackCo Connects (Clackamas County)");
+    expect(cleanName("Utah Transit Authority (UTA)")).toBe("UTA");
+    expect(cleanName("Southeastern Pennsylvania Transportation Authority (SEPTA) (Bus)")).toBe("SEPTA (Bus)");
+    expect(cleanName("Regional Transportation District (Flex v2 included)")).toBe("Regional Transportation District");
+    expect(cleanName("Community Transit (CT)")).toBe("Community Transit (CT)");
+    expect(cleanName("TriMet, Portland Streetcar")).toBe("TriMet, Portland Streetcar");
+    expect(cleanName("Cincinnati Metro")).toBe("Cincinnati Metro");
+  });
+
+  it("tells apart agencies that share a name by their state", async () => {
+    const { displayNames } = await import("@/providers/generated/plan");
+    const names = displayNames([
+      { id: "a", name: "Dallas Area Rapid Transit (DART)", state: "Texas" },
+      { id: "b", name: "Des Moines Area Regional Transit Authority (DART)", state: "Iowa" },
+      { id: "c", name: "Cincinnati Metro", state: "Ohio" },
+    ]);
+    expect([names.get("a"), names.get("b"), names.get("c")]).toEqual(["DART (Texas)", "DART (Iowa)", "Cincinnati Metro"]);
+  });
+});
