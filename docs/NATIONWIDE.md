@@ -90,7 +90,7 @@ run after each. Each agency gets its own region: its service area padded 10 %, a
 state (split states such as Texas, Florida and Idaho are decided by position). A hand-built provider of the same mode whose
 area holds the agency's centre wins, and a live agency missing either feed is left out. Boards, search and the trip and
 station drawers need nothing special: `BoardLink` carries the zone, and the drawers read it from the boards the page has.
-`npm run data:publish` packs `ingested/` along with `data/`.
+`npm run data:publish` packs `ingested/` along with `data/`. Names are tidied for display (`cleanName`): catalog notes in brackets dropped, repeats said once, "Utah Transit Authority (UTA)" shown as UTA, and two agencies with the same name told apart by their state.
 
 Checked locally with Oregon and Washington on and the published files served from a static server: King County Metro's
 board listed, its live buses and stops answered, and the other agencies' boards answered empty only outside their areas.

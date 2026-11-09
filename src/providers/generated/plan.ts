@@ -176,3 +176,32 @@ export function covered(
       mode === MODE_OF[a.mode] && lon >= w && lon <= e && lat >= s && lat <= n,
   );
 }
+
+/**
+ * What riders call an agency, from its catalog name: catalog notes in brackets ("(Static feed for realtime)") are dropped, a
+ * repeated phrase is said once, and a long legal name with a familiar short form in brackets becomes the short form
+ * ("Utah Transit Authority (UTA)" is UTA; "… (SEPTA) (Bus)" is "SEPTA (Bus)").
+ */
+export function cleanName(raw: string): string {
+  const note = /feed|real-?time|supplemented|flex|fixed route|included/i;
+  let name = raw.replace(/\s+/g, " ").trim();
+  name = name.replace(/\s*\(([^)]*)\)/g, (all, inner: string) => (note.test(inner) ? "" : all));
+  const parts = name.split(/,\s*/);
+  const seen = new Set<string>();
+  name = parts.filter((p) => !seen.has(p.toLowerCase()) && seen.add(p.toLowerCase())).join(", ");
+  const short = /^(.+?)\s*\(([^()]{3,20})\)(\s*\([^()]+\))?$/.exec(name);
+  if (short && short[1]!.length > short[2]!.length) name = `${short[2]}${short[3] ?? ""}`;
+  return name || raw.trim();
+}
+
+/** Display names for a set of agencies; two agencies that end up with the same name are told apart by their state. */
+export function displayNames(all: readonly Pick<IngestedAgency, "id" | "name" | "state">[]): Map<string, string> {
+  const clean = new Map<string, string>();
+  const owners = new Map<string, Set<string>>();
+  for (const a of all) {
+    const name = cleanName(a.name);
+    clean.set(a.id, name);
+    owners.set(name, (owners.get(name) ?? new Set()).add(a.id));
+  }
+  return new Map(all.map((a) => [a.id, owners.get(clean.get(a.id)!)!.size > 1 ? `${clean.get(a.id)} (${a.state})` : clean.get(a.id)!]));
+}

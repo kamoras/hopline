@@ -6,6 +6,7 @@ import { createTimetableProvider } from "../gtfs/timetable-provider";
 import type { TransitProvider } from "../types";
 import {
   covered,
+  displayNames,
   enabled,
   MODE_OF,
   regionOf,
@@ -33,19 +34,21 @@ export function generatedProviders(
     }),
   );
   const out: TransitProvider[] = [];
-  for (const a of enabled(ingested.served as unknown as IngestedAgency[], states, host)) {
-    if (!servable(a) || covered(a, taken)) continue;
-    const region = regionOf(a);
+  const wanted = enabled(ingested.served as unknown as IngestedAgency[], states, host).filter((a) => servable(a) && !covered(a, taken));
+  const names = displayNames(wanted);
+  for (const a of wanted) {
+    const name = names.get(a.id) ?? a.name;
+    const region = regionOf({ ...a, name });
     addRegion(region);
     const mode = MODE_OF[a.mode];
     const attribution = {
-      label: a.name,
+      label: name,
       url: "https://mobilitydatabase.org",
-      notice: `${a.name} schedule${a.kind === "live" ? " and real-time" : ""} data are published by the agency and catalogued by the Mobility Database. Hopline is not affiliated with ${a.name}.`,
+      notice: `${name} schedule${a.kind === "live" ? " and real-time" : ""} data are published by the agency and catalogued by the Mobility Database. Hopline is not affiliated with ${name}.`,
     };
     const base = {
       id: a.key,
-      name: a.name,
+      name,
       mode,
       regionIds: [region.id],
       attribution,
