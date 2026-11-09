@@ -33,7 +33,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run catalog
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: catalog
           path: catalog/agencies.json
@@ -53,12 +53,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: catalog
           path: catalog
       - run: npm run ingest -- --batch ${{ matrix.batch }}/${{ env.BATCHES }} --part part-${{ matrix.batch }}.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ingest-${{ matrix.batch }}
           path: |
@@ -75,21 +75,21 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: catalog
           path: catalog
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: ingest-*
           merge-multiple: true
           path: .
       - run: npm run ingest:merge -- part-*.json
       - run: npm run data:publish
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist-data
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: report
           path: |
@@ -103,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: report
           path: catalog
@@ -133,4 +133,4 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
