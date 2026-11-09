@@ -106,6 +106,8 @@ export interface AgencyBundle {
  */
 export async function fetchAgencyBundle(id: string, host = dataHost()): Promise<AgencyBundle | undefined> {
   if (!host) return undefined;
+  // A local folder (`file:///path/to/dist-data`) stands in for the host, for scripts that run offline.
+  if (host.startsWith("file://")) return JSON.parse(await (await import("node:fs/promises")).readFile(`${decodeURIComponent(new URL(host).pathname)}/${id}.json`, "utf8")) as AgencyBundle;
   const res = await fetch(`${host}/${encodeURIComponent(id)}.json`, { cache: "no-store", signal: AbortSignal.timeout(20_000) });
   if (!res.ok) throw new Error(`${id}: data host answered ${res.status}`);
   const body = (await res.json()) as Partial<AgencyBundle>;

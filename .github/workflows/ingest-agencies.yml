@@ -86,6 +86,11 @@ jobs:
           path: .
       - run: npm run ingest:merge -- part-*.json
       - run: npm run data:publish
+      # The station search index reads every board's stations, the generated agencies from the folder just packed.
+      - run: npm run data:places
+        env:
+          HOPLINE_DATA_URL: file://${{ github.workspace }}/dist-data
+          HOPLINE_STATES: all
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist-data
