@@ -54,6 +54,13 @@ if (KEEP_FROM) {
       console.warn(`Could not carry over ${key}: ${err instanceof Error ? err.message : err}`);
     }
   }
+  // The station search index is rebuilt with the ingested agencies; until then the live one stays.
+  try {
+    const res = await fetch(`${KEEP_FROM}/places.json`, { signal: AbortSignal.timeout(60_000) });
+    if (res.ok) writeFileSync(join(OUT, "places.json"), await res.text());
+  } catch {
+    console.warn("Could not carry over places.json");
+  }
   console.log(`Carried over ${kept} ingested agencies from ${KEEP_FROM}`);
 }
 writeFileSync(join(OUT, "index.json"), JSON.stringify({ generatedAt: new Date().toISOString(), agencies: index }, null, 1));
