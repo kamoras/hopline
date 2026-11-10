@@ -1,6 +1,6 @@
 {
  "source": "https://files.mobilitydatabase.org/feeds_v2.csv",
- "generatedOn": "2026-11-06",
+ "generatedOn": "2026-11-10",
  "agencies": [
   {
    "id": "birmingham-jefferson-county-transit-auth-3434",
@@ -870,6 +870,21 @@
    ]
   },
   {
+   "id": "elk-grove-transit-3620",
+   "name": "Elk Grove Transit",
+   "state": "California",
+   "municipality": "Sacramento",
+   "mdbId": "mdb-3620",
+   "staticUrl": "https://apps.sacrt.com/gtfs/eg/google_transit.zip",
+   "license": "https://www.sacrt.com/transit-data-portal/",
+   "bbox": [
+    -121.505,
+    38.379,
+    -121.322,
+    38.581
+   ]
+  },
+  {
    "id": "emery-go-round-2224",
    "name": "Emery Go-Round",
    "state": "California",
@@ -1470,6 +1485,25 @@
    ]
   },
   {
+   "id": "norwalk-transit-system-tld-881",
+   "name": "Norwalk Transit System",
+   "state": "California",
+   "municipality": "Artesia",
+   "mdbId": "tld-881",
+   "staticUrl": "https://nts.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -118.134,
+    33.865,
+    -117.959,
+    34.072
+   ],
+   "rt": {
+    "alerts": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
+  },
+  {
    "id": "omnitrans-97",
    "name": "OmniTrans",
    "state": "California",
@@ -1631,6 +1665,21 @@
     38.573,
     -121.214,
     38.808
+   ]
+  },
+  {
+   "id": "sacramento-regional-transit-sacrt-3621",
+   "name": "Sacramento Regional Transit (SacRT)",
+   "state": "California",
+   "municipality": "Sacramento",
+   "mdbId": "mdb-3621",
+   "staticUrl": "https://apps.sacrt.com/gtfs/srtd/google_transit.zip",
+   "license": "https://www.sacrt.com/transit-data-portal/",
+   "bbox": [
+    -121.764,
+    38.393,
+    -121.092,
+    38.723
    ]
   },
   {
@@ -1877,6 +1926,21 @@
     37.796,
     -121.842,
     38.456
+   ]
+  },
+  {
+   "id": "south-county-transit-link-3622",
+   "name": "South County Transit Link",
+   "state": "California",
+   "municipality": "Sacramento",
+   "mdbId": "mdb-3622",
+   "staticUrl": "https://apps.sacrt.com/gtfs/SCTLink/google_transit.zip",
+   "license": "https://www.sacrt.com/transit-data-portal/",
+   "bbox": [
+    -121.613,
+    38.133,
+    -121.272,
+    38.582
    ]
   },
   {
@@ -2958,14 +3022,14 @@
    "id": "middletown-area-transit-mat-551",
    "name": "Middletown Area Transit (MAT)",
    "state": "Connecticut",
-   "municipality": "Clinton",
+   "municipality": "Berlin",
    "mdbId": "mdb-551",
    "staticUrl": "http://data.trilliumtransit.com/gtfs/ninetown-connecticut-us/ninetown-connecticut-us.zip",
    "bbox": [
     -72.8,
     41.261,
     -72.093,
-    41.609
+    41.608
    ],
    "rt": {
     "tripUpdates": "https://passio3.com/9town/passioTransit/gtfs/realtime",
@@ -3978,6 +4042,25 @@
    ]
   },
   {
+   "id": "metro-st-louis-190",
+   "name": "Metro St. Louis",
+   "state": "Illinois",
+   "municipality": "Belleville",
+   "mdbId": "mdb-190",
+   "staticUrl": "http://metrostlouis.org/Transit/google_transit.zip",
+   "bbox": [
+    -90.662,
+    38.47,
+    -89.875,
+    38.809
+   ],
+   "rt": {
+    "vehicles": "https://www.metrostlouis.org/RealTimeData/StlRealTimeVehicles.pb",
+    "alerts": "https://www.metrostlouis.org/RealTimeData/StlRealTimeAlerts.pb",
+    "tripUpdates": "http://www.metrostlouis.org/RealTimeData/StlRealTimeTrips.pb"
+   }
+  },
+  {
    "id": "pace-bus-2347",
    "name": "Pace Bus",
    "state": "Illinois",
@@ -4862,6 +4945,20 @@
    ]
   },
   {
+   "id": "annapolis-transit-2285",
+   "name": "Annapolis Transit",
+   "state": "Maryland",
+   "municipality": "Anne Arundel County",
+   "mdbId": "mdb-2285",
+   "staticUrl": "https://www.arcgis.com/sharing/rest/content/items/c307923d57ab4871aff79491b4a1bfd3/data",
+   "bbox": [
+    -76.557,
+    38.948,
+    -76.484,
+    38.995
+   ]
+  },
+  {
    "id": "cecil-transit-3178",
    "name": "Cecil Transit",
    "state": "Maryland",
@@ -5666,6 +5763,25 @@
     -82.754,
     42.708
    ]
+  },
+  {
+   "id": "the-rapid-400",
+   "name": "The Rapid",
+   "state": "Michigan",
+   "municipality": "East Grand Rapids",
+   "mdbId": "mdb-400",
+   "staticUrl": "http://connect.ridetherapid.org/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -85.91,
+    42.838,
+    -85.48,
+    43.692
+   ],
+   "rt": {
+    "alerts": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?&Type=Alert",
+    "tripUpdates": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
   },
   {
    "id": "university-of-michigan-transit-services-2072",
@@ -8817,25 +8933,6 @@
    ]
   },
   {
-   "id": "rogue-valley-transportation-district-rvt-3219",
-   "name": "Rogue Valley Transportation District (RVTD)",
-   "state": "Oregon",
-   "municipality": "Ashland",
-   "mdbId": "mdb-3219",
-   "staticUrl": "https://gtfs.rvtd.cadavl.com/RVTD/GTFS/GTFS_RVTD.zip",
-   "bbox": [
-    -122.92,
-    42.176,
-    -122.672,
-    42.444
-   ],
-   "rt": {
-    "alerts": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/Alert.pb",
-    "tripUpdates": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/TripUpdate.pb",
-    "vehicles": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/VehiclePosition.pb"
-   }
-  },
-  {
    "id": "sandy-area-metro-sam-261",
    "name": "Sandy Area Metro (SAM)",
    "state": "Oregon",
@@ -9118,6 +9215,24 @@
     "alerts": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
     "tripUpdates": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
     "vehicles": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
+  },
+  {
+   "id": "cambria-county-transit-authority-tld-4671",
+   "name": "Cambria County Transit Authority",
+   "state": "Pennsylvania",
+   "municipality": "Blair County",
+   "mdbId": "tld-4671",
+   "staticUrl": "https://live.camtranbus.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -78.979,
+    40.218,
+    -78.41,
+    40.67
+   ],
+   "rt": {
+    "tripUpdates": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    }
   },
   {
@@ -11815,8 +11930,8 @@
    "mdbId": "tld-7929",
    "staticUrl": "http://www.fonddulac.ridesystems.net/Secure/Admin/Reports/GTFSDownload.aspx",
    "bbox": [
-    -88.485,
-    43.744,
+    -88.486,
+    43.739,
     -88.385,
     43.797
    ]
