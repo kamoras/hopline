@@ -1,5 +1,5 @@
 {
- "checkedOn": "2026-11-06",
+ "checkedOn": "2026-11-17",
  "served": [
   {
    "id": "altoona-metro-transit-tld-4669",
@@ -43,7 +43,7 @@
    ],
    "stops": 18,
    "routes": 1,
-   "bytes": 7136
+   "bytes": 7037
   },
   {
    "id": "amtrak-vermonter-2297",
@@ -60,7 +60,7 @@
    ],
    "stops": 44,
    "routes": 2,
-   "bytes": 177445
+   "bytes": 178462
   },
   {
    "id": "area-transit-authority-tld-4551",
@@ -104,15 +104,15 @@
    ],
    "stops": 570,
    "routes": 14,
-   "bytes": 635324,
+   "bytes": 635333,
    "feeds": {
     "tripUpdates": "https://realtime.arlingtontransit.com/gtfsrt/trips",
     "vehicles": "https://realtime.arlingtontransit.com/gtfsrt/vehicles"
    },
    "live": {
-    "vehicles": 55,
-    "matched": 39,
-    "withRoute": 39
+    "vehicles": 38,
+    "matched": 23,
+    "withRoute": 23
    }
   },
   {
@@ -157,7 +157,7 @@
    ],
    "stops": 103,
    "routes": 12,
-   "bytes": 931773,
+   "bytes": 789616,
    "feeds": {
     "alerts": "http://api.bart.gov/gtfsrt/alerts.aspx",
     "tripUpdates": "http://api.bart.gov/gtfsrt/tripupdate.aspx"
@@ -178,7 +178,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 2255
+   "bytes": 2089
   },
   {
    "id": "ben-franklin-transit-2122",
@@ -202,9 +202,9 @@
     "vehicles": "https://myride.bft.org/Realtime/GTFS_VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 51,
-    "matched": 51,
-    "withRoute": 51
+    "vehicles": 54,
+    "matched": 54,
+    "withRoute": 54
    }
   },
   {
@@ -220,18 +220,18 @@
     -108.445,
     45.841
    ],
-   "stops": 447,
+   "stops": 449,
    "routes": 13,
-   "bytes": 48606,
+   "bytes": 49450,
    "feeds": {
     "alerts": "https://passio3.com/billings/passioTransit/gtfs/realtime/serviceAlerts",
     "tripUpdates": "https://passio3.com/billings/passioTransit/gtfs/realtime/tripUpdates",
     "vehicles": "https://passio3.com/billings/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 14,
-    "matched": 14,
-    "withRoute": 14
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 13
    }
   },
   {
@@ -276,7 +276,7 @@
    ],
    "stops": 2,
    "routes": 3,
-   "bytes": 14223
+   "bytes": 14124
   },
   {
    "id": "bloomington-transit-2066",
@@ -293,7 +293,7 @@
    ],
    "stops": 532,
    "routes": 15,
-   "bytes": 492098,
+   "bytes": 492097,
    "feeds": {
     "alerts": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/alerts.pb",
     "tripUpdates": "https://s3.amazonaws.com/etatransit.gtfs/bloomingtontransit.etaspot.net/trip_updates.pb",
@@ -320,7 +320,7 @@
    ],
    "stops": 6,
    "routes": 1,
-   "bytes": 69132
+   "bytes": 67281
   },
   {
    "id": "broward-county-transit-3534",
@@ -344,9 +344,9 @@
     "tripUpdates": "https://myride2.broward.org/gtfsrealtime/api/trips"
    },
    "live": {
-    "vehicles": 173,
-    "matched": 173,
-    "withRoute": 173
+    "vehicles": 138,
+    "matched": 138,
+    "withRoute": 138
    }
   },
   {
@@ -388,9 +388,9 @@
     "vehicles": "https://butlerivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 8,
-    "matched": 8,
-    "withRoute": 8
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
    }
   },
   {
@@ -415,9 +415,9 @@
     "alerts": "https://planmyride.blinetransit.com/gtfsrealtime/GTFS_ServiceAlerts.pb"
    },
    "live": {
-    "vehicles": 12,
-    "matched": 12,
-    "withRoute": 12
+    "vehicles": 20,
+    "matched": 20,
+    "withRoute": 20
    }
   },
   {
@@ -435,7 +435,33 @@
    ],
    "stops": 60,
    "routes": 5,
-   "bytes": 103349
+   "bytes": 103348
+  },
+  {
+   "id": "cambria-county-transit-authority-tld-4671",
+   "key": "cambria-county-transit-authority-tld-4671",
+   "name": "Cambria County Transit Authority",
+   "state": "Pennsylvania",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -78.979,
+    40.218,
+    -78.41,
+    40.67
+   ],
+   "stops": 583,
+   "routes": 22,
+   "bytes": 300162,
+   "feeds": {
+    "tripUpdates": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://live.camtranbus.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 23,
+    "matched": 23,
+    "withRoute": 23
+   }
   },
   {
    "id": "canby-ferry-605",
@@ -452,7 +478,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 5571
+   "bytes": 5472
   },
   {
    "id": "cape-lookout-national-seashore-3205",
@@ -493,9 +519,9 @@
     "vehicles": "https://www.goraleighlive.org/gtfsrt/vehicles"
    },
    "live": {
-    "vehicles": 83,
-    "matched": 82,
-    "withRoute": 82
+    "vehicles": 81,
+    "matched": 81,
+    "withRoute": 81
    }
   },
   {
@@ -520,9 +546,9 @@
     "vehicles": "https://cats.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 33,
-    "matched": 33,
-    "withRoute": 33
+    "vehicles": 29,
+    "matched": 29,
+    "withRoute": 29
    }
   },
   {
@@ -547,9 +573,9 @@
     "vehicles": "https://cat.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 33,
-    "matched": 33,
-    "withRoute": 33
+    "vehicles": 21,
+    "matched": 21,
+    "withRoute": 21
    }
   },
   {
@@ -574,9 +600,9 @@
     "tripUpdates": "http://developers.cata.org/gtfsrt/tripupdate/tripupdates.pb"
    },
    "live": {
-    "vehicles": 59,
-    "matched": 59,
-    "withRoute": 59
+    "vehicles": 52,
+    "matched": 52,
+    "withRoute": 52
    }
   },
   {
@@ -592,18 +618,18 @@
     -97.372,
     30.588
    ],
-   "stops": 2328,
+   "stops": 2329,
    "routes": 69,
-   "bytes": 8682050,
+   "bytes": 4897512,
    "feeds": {
     "vehicles": "https://data.texas.gov/download/eiei-9rpf/application%2Foctet-stream",
     "alerts": "https://data.texas.gov/download/9zu9-jwr2/text%2Fplain",
     "tripUpdates": "https://data.texas.gov/download/rmk2-acnw/application%2Foctet-stream"
    },
    "live": {
-    "vehicles": 378,
-    "matched": 256,
-    "withRoute": 256
+    "vehicles": 367,
+    "matched": 246,
+    "withRoute": 246
    }
   },
   {
@@ -621,16 +647,16 @@
    ],
    "stops": 10,
    "routes": 1,
-   "bytes": 48174,
+   "bytes": 48120,
    "feeds": {
     "vehicles": "https://data.texas.gov/download/eiei-9rpf/application%2Foctet-stream",
     "alerts": "https://data.texas.gov/download/9zu9-jwr2/text%2Fplain",
     "tripUpdates": "https://data.texas.gov/download/rmk2-acnw/application%2Foctet-stream"
    },
    "live": {
-    "vehicles": 378,
-    "matched": 256,
-    "withRoute": 256
+    "vehicles": 367,
+    "matched": 246,
+    "withRoute": 246
    }
   },
   {
@@ -655,9 +681,9 @@
     "vehicles": "https://passio3.com/cet/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 19,
-    "matched": 19,
-    "withRoute": 19
+    "vehicles": 18,
+    "matched": 18,
+    "withRoute": 18
    }
   },
   {
@@ -692,7 +718,7 @@
    ],
    "stops": 20,
    "routes": 2,
-   "bytes": 42021
+   "bytes": 41174
   },
   {
    "id": "central-puget-sound-regional-transit-aut-ntd-40-3",
@@ -709,7 +735,7 @@
    ],
    "stops": 100,
    "routes": 3,
-   "bytes": 3079908
+   "bytes": 2926590
   },
   {
    "id": "central-puget-sound-regional-transit-aut-ntd-40-4",
@@ -758,18 +784,18 @@
     -88.16,
     40.153
    ],
-   "stops": 1915,
+   "stops": 1911,
    "routes": 90,
-   "bytes": 541391,
+   "bytes": 545317,
    "feeds": {
     "alerts": "https://gtfs-rt.mtd.org/service-alerts",
     "tripUpdates": "https://gtfs-rt.mtd.org/trip-updates",
     "vehicles": "https://gtfs-rt.mtd.org/vehicle-positions"
    },
    "live": {
-    "vehicles": 89,
-    "matched": 87,
-    "withRoute": 87
+    "vehicles": 72,
+    "matched": 69,
+    "withRoute": 69
    }
   },
   {
@@ -794,8 +820,8 @@
     "vehicles": "http://mychtransit.org/gtfs-rt/vehiclepositions"
    },
    "live": {
-    "vehicles": 47,
-    "matched": 47,
+    "vehicles": 34,
+    "matched": 34,
     "withRoute": 0
    }
   },
@@ -812,18 +838,18 @@
     -80.639,
     35.503
    ],
-   "stops": 2850,
+   "stops": 2851,
    "routes": 62,
-   "bytes": 371724,
+   "bytes": 371848,
    "feeds": {
     "alerts": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Alerts/Alerts.pb",
     "tripUpdates": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/TripUpdate/Tripupdates.pb",
     "vehicles": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Vehicle/VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 165,
-    "matched": 165,
-    "withRoute": 165
+    "vehicles": 124,
+    "matched": 124,
+    "withRoute": 124
    }
   },
   {
@@ -848,9 +874,9 @@
     "vehicles": "https://gtfsrealtime.ridetransit.org/GTFSRealTime/Vehicle/VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 165,
-    "matched": 165,
-    "withRoute": 165
+    "vehicles": 124,
+    "matched": 124,
+    "withRoute": 124
    }
   },
   {
@@ -868,7 +894,7 @@
    ],
    "stops": 3,
    "routes": 1,
-   "bytes": 14252
+   "bytes": 14207
   },
   {
    "id": "cincinnati-metro-307",
@@ -892,9 +918,9 @@
     "alerts": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/alert/alerts.pb"
    },
    "live": {
-    "vehicles": 214,
-    "matched": 214,
-    "withRoute": 214
+    "vehicles": 142,
+    "matched": 142,
+    "withRoute": 142
    }
   },
   {
@@ -919,9 +945,9 @@
     "alerts": "https://tmgtfsprd.sorttrpcloud.com/TMGTFSRealTimeWebService/alert/alerts.pb"
    },
    "live": {
-    "vehicles": 214,
-    "matched": 214,
-    "withRoute": 214
+    "vehicles": 142,
+    "matched": 142,
+    "withRoute": 142
    }
   },
   {
@@ -973,9 +999,9 @@
     "vehicles": "https://passio3.com/jacksonville/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 6,
-    "matched": 6,
-    "withRoute": 6
+    "vehicles": 5,
+    "matched": 5,
+    "withRoute": 5
    }
   },
   {
@@ -999,9 +1025,9 @@
     "vehicles": "https://drive.google.com/uc?export=download&id=12OWJm28dWakSVM3TnmajNWmUrmcytZPq"
    },
    "live": {
-    "vehicles": 4,
-    "matched": 4,
-    "withRoute": 4
+    "vehicles": 3,
+    "matched": 3,
+    "withRoute": 3
    }
   },
   {
@@ -1019,7 +1045,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 3120
+   "bytes": 3057
   },
   {
    "id": "city-of-mobile-tld-6773",
@@ -1063,15 +1089,15 @@
    ],
    "stops": 734,
    "routes": 38,
-   "bytes": 667065,
+   "bytes": 667109,
    "feeds": {
     "alerts": "http://apps.santaclaritatransit.com/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "http://apps.santaclaritatransit.com/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
     "vehicles": "http://apps.santaclaritatransit.com/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 16,
-    "matched": 15,
+    "vehicles": 28,
+    "matched": 23,
     "withRoute": 0
    }
   },
@@ -1090,7 +1116,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 53992
+   "bytes": 51105
   },
   {
    "id": "citybus-of-greater-lafayette-indiana-cit-391",
@@ -1105,17 +1131,17 @@
     -86.805,
     40.481
    ],
-   "stops": 624,
+   "stops": 629,
    "routes": 18,
-   "bytes": 84421,
+   "bytes": 85153,
    "feeds": {
     "tripUpdates": "https://bus.gocitybus.com/GTFSRT/GTFS_TripUpdates.pb",
     "vehicles": "https://bus.gocitybus.com/GTFSRT/GTFS_VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 28,
-    "matched": 28,
-    "withRoute": 28
+    "vehicles": 26,
+    "matched": 26,
+    "withRoute": 26
    }
   },
   {
@@ -1140,9 +1166,9 @@
     "vehicles": "https://passio3.com/clackamas/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 4,
-    "matched": 4,
-    "withRoute": 4
+    "vehicles": 5,
+    "matched": 5,
+    "withRoute": 5
    }
   },
   {
@@ -1167,9 +1193,9 @@
     "vehicles": "https://passio3.com/clovis/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 16,
-    "matched": 16,
-    "withRoute": 16
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
    }
   },
   {
@@ -1204,15 +1230,15 @@
    ],
    "stops": 225,
    "routes": 7,
-   "bytes": 88730,
+   "bytes": 88703,
    "feeds": {
     "vehicles": "https://citycommbus.com/gtfs-rt/vehiclepositions",
     "tripUpdates": "https://citycommbus.com/gtfs-rt/tripupdates",
     "alerts": "https://citycommbus.com/gtfs-rt/alerts"
    },
    "live": {
-    "vehicles": 11,
-    "matched": 11,
+    "vehicles": 10,
+    "matched": 10,
     "withRoute": 0
    }
   },
@@ -1229,36 +1255,36 @@
     -121.601,
     48.279
    ],
-   "stops": 1712,
-   "routes": 39,
-   "bytes": 263397,
+   "stops": 1713,
+   "routes": 40,
+   "bytes": 270451,
    "feeds": {
     "vehicles": "https://s3.amazonaws.com/commtrans-realtime-prod/vehiclepositions.pb",
     "alerts": "https://s3.amazonaws.com/commtrans-realtime-prod/alerts.pb",
     "tripUpdates": "https://s3.amazonaws.com/commtrans-realtime-prod/tripupdates.pb"
    },
    "live": {
-    "vehicles": 119,
-    "matched": 119,
-    "withRoute": 119
+    "vehicles": 130,
+    "matched": 130,
+    "withRoute": 130
    }
   },
   {
    "id": "connecticut-transit-2840",
-   "key": "connecticut-transit-2840-rail",
+   "key": "connecticut-transit-2840",
    "name": "Connecticut Transit (Hartford Line - Rail)",
    "state": "Connecticut",
    "mode": "rail",
    "kind": "timetable",
    "bbox": [
     -72.926,
-    41.275,
-    -72.093,
+    41.298,
+    -72.594,
     42.106
    ],
    "stops": 9,
    "routes": 1,
-   "bytes": 16847
+   "bytes": 22730
   },
   {
    "id": "county-of-lackawanna-transit-system-tld-4553",
@@ -1282,7 +1308,7 @@
     "vehicles": "https://coltsivl.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 22,
+    "vehicles": 21,
     "matched": 21,
     "withRoute": 21
    }
@@ -1346,7 +1372,7 @@
    ],
    "stops": 22,
    "routes": 2,
-   "bytes": 69946
+   "bytes": 51027
   },
   {
    "id": "dallas-area-rapid-transit-dart-152",
@@ -1363,7 +1389,7 @@
    ],
    "stops": 67,
    "routes": 4,
-   "bytes": 668002
+   "bytes": 514736
   },
   {
    "id": "des-moines-area-regional-transit-authori-193",
@@ -1387,9 +1413,9 @@
     "vehicles": "https://www.ridedart.com/gtfs/real-time/vehicle-positions"
    },
    "live": {
-    "vehicles": 18,
-    "matched": 18,
-    "withRoute": 18
+    "vehicles": 35,
+    "matched": 35,
+    "withRoute": 35
    }
   },
   {
@@ -1407,7 +1433,7 @@
    ],
    "stops": 13,
    "routes": 1,
-   "bytes": 140889
+   "bytes": 139395
   },
   {
    "id": "dry-tortugas-national-park-3207",
@@ -1441,7 +1467,7 @@
    ],
    "stops": 5,
    "routes": 2,
-   "bytes": 5613
+   "bytes": 5586
   },
   {
    "id": "embark-2062",
@@ -1475,15 +1501,15 @@
    ],
    "stops": 41,
    "routes": 5,
-   "bytes": 162351,
+   "bytes": 162198,
    "feeds": {
     "alerts": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=Alert",
     "tripUpdates": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=TripUpdate",
     "vehicles": "https://emerygoround.tripshot.com/v1/gtfs/realtime/feed/egr?types=VehiclePosition"
    },
    "live": {
-    "vehicles": 11,
-    "matched": 11,
+    "vehicles": 13,
+    "matched": 13,
     "withRoute": 0
    }
   },
@@ -1515,6 +1541,33 @@
    }
   },
   {
+   "id": "everett-transit-3038",
+   "key": "everett-transit-3038",
+   "name": "Everett Transit",
+   "state": "Washington",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -122.306,
+    47.88,
+    -122.184,
+    48.01
+   ],
+   "stops": 496,
+   "routes": 10,
+   "bytes": 444735,
+   "feeds": {
+    "alerts": "https://everett.mapstrat.com/current/gtfrealtime_ServiceAlerts.bin",
+    "tripUpdates": "https://everett.mapstrat.com/current/gtfrealtime_TripUpdates.bin",
+    "vehicles": "https://everett.mapstrat.com/current/gtfrealtime_VehiclePositions.bin"
+   },
+   "live": {
+    "vehicles": 33,
+    "matched": 21,
+    "withRoute": 0
+   }
+  },
+  {
    "id": "fayette-area-coordinated-transportation-tld-7027",
    "key": "fayette-area-coordinated-transportation-tld-7027",
    "name": "Fayette Area Coordinated Transportation",
@@ -1536,9 +1589,9 @@
     "vehicles": "https://fact.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 3,
-    "matched": 3,
-    "withRoute": 3
+    "vehicles": 2,
+    "matched": 2,
+    "withRoute": 2
    }
   },
   {
@@ -1556,7 +1609,7 @@
    ],
    "stops": 17,
    "routes": 1,
-   "bytes": 14135
+   "bytes": 14063
   },
   {
    "id": "fort-matanzas-national-monument-tld-6905",
@@ -1573,7 +1626,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 1810
+   "bytes": 1738
   },
   {
    "id": "fort-sumter-and-fort-moultrie-national-h-tld-6906",
@@ -1590,7 +1643,7 @@
    ],
    "stops": 3,
    "routes": 2,
-   "bytes": 3169
+   "bytes": 2971
   },
   {
    "id": "fort-worth-transit-authority-885",
@@ -1630,9 +1683,9 @@
     "vehicles": "https://passio3.com/frederick/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 14,
-    "matched": 14,
-    "withRoute": 14
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 13
    }
   },
   {
@@ -1657,9 +1710,9 @@
     "vehicles": "https://freedom.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 7,
-    "matched": 7,
-    "withRoute": 7
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
    }
   },
   {
@@ -1677,7 +1730,7 @@
    ],
    "stops": 7,
    "routes": 1,
-   "bytes": 11971
+   "bytes": 11998
   },
   {
    "id": "gocary-2277",
@@ -1728,9 +1781,9 @@
     "vehicles": "https://godurham.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 47,
-    "matched": 47,
-    "withRoute": 47
+    "vehicles": 48,
+    "matched": 48,
+    "withRoute": 48
    }
   },
   {
@@ -1748,7 +1801,7 @@
    ],
    "stops": 6,
    "routes": 5,
-   "bytes": 20557
+   "bytes": 20458
   },
   {
    "id": "greater-cleveland-regional-transit-autho-406",
@@ -1765,16 +1818,16 @@
    ],
    "stops": 5398,
    "routes": 43,
-   "bytes": 8702824,
+   "bytes": 8702626,
    "feeds": {
     "vehicles": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
     "tripUpdates": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
     "alerts": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
    },
    "live": {
-    "vehicles": 313,
-    "matched": 229,
-    "withRoute": 229
+    "vehicles": 298,
+    "matched": 201,
+    "withRoute": 201
    }
   },
   {
@@ -1792,16 +1845,16 @@
    ],
    "stops": 104,
    "routes": 4,
-   "bytes": 441023,
+   "bytes": 440924,
    "feeds": {
     "vehicles": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb",
     "tripUpdates": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb",
     "alerts": "https://gtfs-rt.gcrta.vontascloud.com/TMGTFSRealTimeWebService/Alert/Alerts.pb"
    },
    "live": {
-    "vehicles": 313,
-    "matched": 229,
-    "withRoute": 229
+    "vehicles": 298,
+    "matched": 201,
+    "withRoute": 201
    }
   },
   {
@@ -1826,9 +1879,9 @@
     "vehicles": "https://clk.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 30,
-    "matched": 30,
-    "withRoute": 30
+    "vehicles": 24,
+    "matched": 24,
+    "withRoute": 24
    }
   },
   {
@@ -1852,9 +1905,9 @@
     "vehicles": "https://gtfsrt.greenlink.cadavl.com/ProfilGtfsRt2_0RSProducer-GTA/VehiclePosition.pb"
    },
    "live": {
-    "vehicles": 17,
-    "matched": 16,
-    "withRoute": 16
+    "vehicles": 14,
+    "matched": 13,
+    "withRoute": 13
    }
   },
   {
@@ -1896,9 +1949,9 @@
     "vehicles": "https://realtimegwinnett.availtec.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 32,
-    "matched": 32,
-    "withRoute": 32
+    "vehicles": 30,
+    "matched": 30,
+    "withRoute": 30
    }
   },
   {
@@ -1923,9 +1976,9 @@
     "vehicles": "https://realtimehpts.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 6,
-    "matched": 5,
-    "withRoute": 6
+    "vehicles": 8,
+    "matched": 7,
+    "withRoute": 8
    }
   },
   {
@@ -1943,7 +1996,7 @@
    ],
    "stops": 14,
    "routes": 2,
-   "bytes": 234513,
+   "bytes": 234315,
    "feeds": {
     "tripUpdates": "http://api.tampa.onebusaway.org:8088/trip-updates",
     "vehicles": "http://api.tampa.onebusaway.org:8088/vehicle-positions"
@@ -1988,9 +2041,9 @@
     "vehicles": "https://indigobus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 9,
-    "matched": 9,
-    "withRoute": 9
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
    }
   },
   {
@@ -2032,9 +2085,9 @@
     "tripUpdates": "https://its.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate"
    },
    "live": {
-    "vehicles": 64,
-    "matched": 64,
-    "withRoute": 64
+    "vehicles": 62,
+    "matched": 62,
+    "withRoute": 62
    }
   },
   {
@@ -2052,14 +2105,14 @@
    ],
    "stops": 701,
    "routes": 21,
-   "bytes": 86607,
+   "bytes": 87799,
    "feeds": {
     "alerts": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
     "tripUpdates": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
     "vehicles": "https://trackmybus.kmetro.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 28,
+    "vehicles": 27,
     "matched": 27,
     "withRoute": 27
    }
@@ -2079,7 +2132,7 @@
    ],
    "stops": 34,
    "routes": 1,
-   "bytes": 355643
+   "bytes": 355544
   },
   {
    "id": "ketchikan-gateway-borough-244",
@@ -2111,18 +2164,18 @@
     -121.786,
     47.866
    ],
-   "stops": 6241,
+   "stops": 6247,
    "routes": 138,
-   "bytes": 844671,
+   "bytes": 844252,
    "feeds": {
     "tripUpdates": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
     "alerts": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/alerts.pb",
     "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 519,
-    "matched": 519,
-    "withRoute": 519
+    "vehicles": 576,
+    "matched": 576,
+    "withRoute": 576
    }
   },
   {
@@ -2147,9 +2200,9 @@
     "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 519,
-    "matched": 519,
-    "withRoute": 519
+    "vehicles": 576,
+    "matched": 576,
+    "withRoute": 576
    }
   },
   {
@@ -2174,9 +2227,9 @@
     "vehicles": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 519,
-    "matched": 519,
-    "withRoute": 519
+    "vehicles": 576,
+    "matched": 576,
+    "withRoute": 576
    }
   },
   {
@@ -2194,15 +2247,15 @@
    ],
    "stops": 238,
    "routes": 18,
-   "bytes": 150048,
+   "bytes": 145607,
    "feeds": {
     "alerts": "http://kart.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "http://kart.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
     "vehicles": "http://kart.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 15,
-    "matched": 13,
+    "vehicles": 14,
+    "matched": 14,
     "withRoute": 0
    }
   },
@@ -2228,8 +2281,8 @@
     "alerts": "https://knoxville.syncromatics.com/gtfs-rt/alerts"
    },
    "live": {
-    "vehicles": 30,
-    "matched": 30,
+    "vehicles": 35,
+    "matched": 35,
     "withRoute": 0
    }
   },
@@ -2265,7 +2318,7 @@
    ],
    "stops": 4,
    "routes": 2,
-   "bytes": 33654
+   "bytes": 34437
   },
   {
    "id": "laudergo-water-trolley-ntd-44929",
@@ -2306,35 +2359,9 @@
     "vehicles": "https://realtime.lebanontransit.org/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 9,
-    "matched": 9,
-    "withRoute": 9
-   }
-  },
-  {
-   "id": "link-transit-275",
-   "key": "link-transit-275",
-   "name": "Link Transit",
-   "state": "Washington",
-   "mode": "bus",
-   "kind": "live",
-   "bbox": [
-    -120.674,
-    47.363,
-    -119.98,
-    47.885
-   ],
-   "stops": 627,
-   "routes": 21,
-   "bytes": 121925,
-   "feeds": {
-    "tripUpdates": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   },
-   "live": {
-    "vehicles": 30,
-    "matched": 30,
-    "withRoute": 30
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
    }
   },
   {
@@ -2352,7 +2379,7 @@
    ],
    "stops": 114,
    "routes": 6,
-   "bytes": 2206050
+   "bytes": 1844116
   },
   {
    "id": "lummi-island-ferry-2319",
@@ -2369,7 +2396,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 20077
+   "bytes": 26063
   },
   {
    "id": "luzerne-county-transportation-authority-tld-4555",
@@ -2392,9 +2419,9 @@
     "vehicles": "https://realtimelctabus.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 25,
-    "matched": 25,
-    "withRoute": 25
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 22
    }
   },
   {
@@ -2419,9 +2446,9 @@
     "vehicles": "https://realtimemcat.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 25,
-    "matched": 25,
-    "withRoute": 25
+    "vehicles": 23,
+    "matched": 23,
+    "withRoute": 23
    }
   },
   {
@@ -2439,7 +2466,7 @@
    ],
    "stops": 67,
    "routes": 1,
-   "bytes": 214071
+   "bytes": 213972
   },
   {
    "id": "maryland-transit-administration-metro-su-470",
@@ -2456,7 +2483,7 @@
    ],
    "stops": 26,
    "routes": 1,
-   "bytes": 84624
+   "bytes": 84525
   },
   {
    "id": "mckinney-avenue-transit-authority-ntd-60133",
@@ -2476,25 +2503,21 @@
    "bytes": 106764
   },
   {
-   "id": "metro-north-railroad-524",
-   "key": "metro-north-railroad-524",
-   "name": "Metro-North Railroad",
-   "state": "Connecticut",
-   "mode": "rail",
+   "id": "metro-houston-2060",
+   "key": "metro-houston-2060-subway",
+   "name": "METRO Houston",
+   "state": "Texas",
+   "mode": "subway",
    "kind": "timetable",
    "bbox": [
-    -73.985,
-    40.753,
-    -72.922,
-    41.815
+    -95.776,
+    29.529,
+    -94.98,
+    30.054
    ],
-   "stops": 114,
-   "routes": 6,
-   "bytes": 4008323,
-   "feeds": {
-    "alerts": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fmnr-alerts",
-    "tripUpdates": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/mnr%2Fgtfs-mnr"
-   }
+   "stops": 80,
+   "routes": 3,
+   "bytes": 379001
   },
   {
    "id": "metro-transit-205",
@@ -2504,23 +2527,23 @@
    "mode": "bus",
    "kind": "live",
    "bbox": [
-    -93.73,
+    -93.732,
     44.707,
     -92.806,
-    45.33
+    45.333
    ],
-   "stops": 8179,
+   "stops": 8211,
    "routes": 123,
-   "bytes": 1137483,
+   "bytes": 1154376,
    "feeds": {
     "tripUpdates": "https://svc.metrotransit.org/mtgtfs/tripupdates.pb",
     "alerts": "https://svc.metrotransit.org/mtgtfs/alerts.pb",
     "vehicles": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 940,
-    "matched": 940,
-    "withRoute": 940
+    "vehicles": 738,
+    "matched": 738,
+    "withRoute": 738
    }
   },
   {
@@ -2531,10 +2554,10 @@
    "mode": "subway",
    "kind": "live",
    "bbox": [
-    -93.73,
+    -93.732,
     44.707,
     -92.806,
-    45.33
+    45.333
    ],
    "stops": 75,
    "routes": 3,
@@ -2545,9 +2568,9 @@
     "vehicles": "https://svc.metrotransit.org/mtgtfs/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 940,
-    "matched": 940,
-    "withRoute": 940
+    "vehicles": 738,
+    "matched": 738,
+    "withRoute": 738
    }
   },
   {
@@ -2572,9 +2595,9 @@
     "vehicles": "https://metromap.cityofmadison.com/gtfsrt/vehicles"
    },
    "live": {
-    "vehicles": 90,
-    "matched": 86,
-    "withRoute": 86
+    "vehicles": 95,
+    "matched": 88,
+    "withRoute": 88
    }
   },
   {
@@ -2595,94 +2618,6 @@
    "bytes": 49893,
    "feeds": {
     "alerts": "https://cdn.simplifytransit.com/metrolink/alerts/service-alerts.pb"
-   }
-  },
-  {
-   "id": "metropolitan-transit-authority-mta-511",
-   "key": "metropolitan-transit-authority-mta-511-rail",
-   "name": "Metropolitan Transit Authority (MTA) (NYC Subway Supplemented)",
-   "state": "New York",
-   "mode": "rail",
-   "kind": "timetable",
-   "bbox": [
-    -74.252,
-    40.513,
-    -73.755,
-    40.903
-   ],
-   "stops": 42,
-   "routes": 1,
-   "bytes": 202809
-  },
-  {
-   "id": "metropolitan-transit-authority-mta-511",
-   "key": "metropolitan-transit-authority-mta-511-subway",
-   "name": "Metropolitan Transit Authority (MTA) (NYC Subway Supplemented)",
-   "state": "New York",
-   "mode": "subway",
-   "kind": "timetable",
-   "bbox": [
-    -74.252,
-    40.513,
-    -73.755,
-    40.903
-   ],
-   "stops": 949,
-   "routes": 28,
-   "bytes": 30069205
-  },
-  {
-   "id": "metropolitan-transit-authority-mta-516",
-   "key": "metropolitan-transit-authority-mta-516-rail",
-   "name": "Metropolitan Transit Authority (MTA) (NYC Subway)",
-   "state": "New York",
-   "mode": "rail",
-   "kind": "timetable",
-   "bbox": [
-    -74.252,
-    40.513,
-    -73.755,
-    40.903
-   ],
-   "stops": 42,
-   "routes": 1,
-   "bytes": 94863,
-   "feeds": {
-    "alerts": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts",
-    "tripUpdates": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
-    "vehicles": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace"
-   },
-   "live": {
-    "vehicles": 0,
-    "matched": 0,
-    "withRoute": 0
-   }
-  },
-  {
-   "id": "metropolitan-transit-authority-mta-516",
-   "key": "metropolitan-transit-authority-mta-516-subway",
-   "name": "Metropolitan Transit Authority (MTA) (NYC Subway)",
-   "state": "New York",
-   "mode": "subway",
-   "kind": "timetable",
-   "bbox": [
-    -74.252,
-    40.513,
-    -73.755,
-    40.903
-   ],
-   "stops": 947,
-   "routes": 28,
-   "bytes": 7149555,
-   "feeds": {
-    "alerts": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts",
-    "tripUpdates": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
-    "vehicles": "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace"
-   },
-   "live": {
-    "vehicles": 0,
-    "matched": 0,
-    "withRoute": 0
    }
   },
   {
@@ -2727,7 +2662,7 @@
    ],
    "stops": 46,
    "routes": 1,
-   "bytes": 170631
+   "bytes": 170532
   },
   {
    "id": "miami-dade-transit-331",
@@ -2744,7 +2679,7 @@
    ],
    "stops": 45,
    "routes": 3,
-   "bytes": 700500
+   "bytes": 700401
   },
   {
    "id": "mid-mon-valley-transit-authority-tld-5503",
@@ -2768,9 +2703,9 @@
     "vehicles": "https://mmvta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 15,
-    "matched": 15,
-    "withRoute": 15
+    "vehicles": 9,
+    "matched": 9,
+    "withRoute": 9
    }
   },
   {
@@ -2784,19 +2719,19 @@
     -72.8,
     41.261,
     -72.093,
-    41.609
+    41.608
    ],
-   "stops": 801,
+   "stops": 859,
    "routes": 17,
-   "bytes": 135714,
+   "bytes": 140738,
    "feeds": {
     "tripUpdates": "https://passio3.com/9town/passioTransit/gtfs/realtime",
     "vehicles": "https://passio3.com/9town/passioTransit/gtfs/realtime"
    },
    "live": {
-    "vehicles": 12,
-    "matched": 12,
-    "withRoute": 12
+    "vehicles": 11,
+    "matched": 11,
+    "withRoute": 11
    }
   },
   {
@@ -2821,9 +2756,9 @@
     "alerts": "https://ponytracker.availtec.com/InfoPoint/gtfs-realtime.ashx?type=alert"
    },
    "live": {
-    "vehicles": 6,
-    "matched": 6,
-    "withRoute": 6
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
    }
   },
   {
@@ -2848,9 +2783,9 @@
     "tripUpdates": "https://mbl.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate"
    },
    "live": {
-    "vehicles": 33,
-    "matched": 33,
-    "withRoute": 33
+    "vehicles": 34,
+    "matched": 34,
+    "withRoute": 34
    }
   },
   {
@@ -2868,14 +2803,14 @@
    ],
    "stops": 334,
    "routes": 13,
-   "bytes": 278630,
+   "bytes": 47068,
    "feeds": {
     "alerts": "https://bt.mountainline.com/gtfsrt/alerts",
     "tripUpdates": "https://bt.mountainline.com/gtfsrt/trips",
     "vehicles": "https://bt.mountainline.com/gtfsrt/vehicles"
    },
    "live": {
-    "vehicles": 24,
+    "vehicles": 20,
     "matched": 17,
     "withRoute": 17
    }
@@ -2893,17 +2828,17 @@
     -111.573,
     35.239
    ],
-   "stops": 180,
+   "stops": 178,
    "routes": 9,
-   "bytes": 433606,
+   "bytes": 430262,
    "feeds": {
     "vehicles": "https://mountainline.syncromatics.com/gtfs-rt/vehiclepositions",
     "tripUpdates": "https://mountainline.syncromatics.com/gtfs-rt/tripupdates",
     "alerts": "https://mountainline.syncromatics.com/gtfs-rt/alerts"
    },
    "live": {
-    "vehicles": 20,
-    "matched": 20,
+    "vehicles": 22,
+    "matched": 22,
     "withRoute": 0
    }
   },
@@ -2920,9 +2855,9 @@
     -86.172,
     43.248
    ],
-   "stops": 312,
+   "stops": 311,
    "routes": 7,
-   "bytes": 65346,
+   "bytes": 65220,
    "feeds": {
     "alerts": "https://muskegon.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "https://muskegon.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
@@ -2947,18 +2882,18 @@
     -86.297,
     36.525
    ],
-   "stops": 1603,
+   "stops": 1605,
    "routes": 36,
-   "bytes": 3568629,
+   "bytes": 3572897,
    "feeds": {
     "tripUpdates": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
     "alerts": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/alert/alerts.pb",
     "vehicles": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 195,
-    "matched": 153,
-    "withRoute": 154
+    "vehicles": 190,
+    "matched": 120,
+    "withRoute": 121
    }
   },
   {
@@ -2976,16 +2911,16 @@
    ],
    "stops": 7,
    "routes": 1,
-   "bytes": 10018,
+   "bytes": 9946,
    "feeds": {
     "tripUpdates": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/tripupdate/tripupdates.pb",
     "alerts": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/alert/alerts.pb",
     "vehicles": "http://transitdata.nashvillemta.org/TMGTFSRealTimeWebService/vehicle/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 195,
-    "matched": 153,
-    "withRoute": 154
+    "vehicles": 190,
+    "matched": 120,
+    "withRoute": 121
    }
   },
   {
@@ -3010,9 +2945,9 @@
     "vehicles": "https://ncata.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 16,
-    "matched": 16,
-    "withRoute": 16
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 13
    }
   },
   {
@@ -3030,7 +2965,7 @@
    ],
    "stops": 164,
    "routes": 14,
-   "bytes": 1427598
+   "bytes": 911884
   },
   {
    "id": "new-jersey-transit-nj-transit-509",
@@ -3084,6 +3019,33 @@
    "bytes": 803602
   },
   {
+   "id": "new-river-transit-authority-tld-6713",
+   "key": "new-river-transit-authority-tld-6713",
+   "name": "New River Transit Authority",
+   "state": "West Virginia",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -81.54,
+    37.57,
+    -81.104,
+    38.057
+   ],
+   "stops": 55,
+   "routes": 6,
+   "bytes": 48763,
+   "feeds": {
+    "alerts": "https://passio3.com/beckley/passioTransit/gtfs/realtime/serviceAlerts",
+    "tripUpdates": "https://passio3.com/beckley/passioTransit/gtfs/realtime/tripUpdates",
+    "vehicles": "https://passio3.com/beckley/passioTransit/gtfs/realtime/vehiclePositions"
+   },
+   "live": {
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
+   }
+  },
+  {
    "id": "niagara-frontier-transportation-authorit-tld-6748",
    "key": "niagara-frontier-transportation-authorit-tld-6748",
    "name": "Niagara Frontier Transportation Authority",
@@ -3098,7 +3060,7 @@
    ],
    "stops": 28,
    "routes": 1,
-   "bytes": 56843
+   "bytes": 56744
   },
   {
    "id": "north-carolina-state-university-ncsu-2245",
@@ -3113,18 +3075,18 @@
     -78.664,
     35.802
    ],
-   "stops": 108,
+   "stops": 106,
    "routes": 15,
-   "bytes": 22285,
+   "bytes": 18688,
    "feeds": {
     "alerts": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/serviceAlerts",
     "tripUpdates": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/tripUpdates",
     "vehicles": "https://passio3.com/ncstateuni/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 22,
-    "matched": 22,
-    "withRoute": 22
+    "vehicles": 25,
+    "matched": 25,
+    "withRoute": 25
    }
   },
   {
@@ -3140,18 +3102,45 @@
     -105.21,
     36.979
    ],
-   "stops": 391,
+   "stops": 390,
    "routes": 23,
-   "bytes": 321598,
+   "bytes": 264402,
    "feeds": {
     "alerts": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
     "tripUpdates": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
     "vehicles": "https://bluebustracker.availtec.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 8,
-    "matched": 8,
-    "withRoute": 8
+    "vehicles": 16,
+    "matched": 16,
+    "withRoute": 16
+   }
+  },
+  {
+   "id": "norwalk-transit-system-tld-881",
+   "key": "norwalk-transit-system-tld-881",
+   "name": "Norwalk Transit System",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -118.134,
+    33.865,
+    -117.959,
+    34.072
+   ],
+   "stops": 442,
+   "routes": 6,
+   "bytes": 51004,
+   "feeds": {
+    "alerts": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://nts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 23,
+    "matched": 23,
+    "withRoute": 23
    }
   },
   {
@@ -3167,9 +3156,9 @@
     -118.069,
     34.198
    ],
-   "stops": 459,
+   "stops": 443,
    "routes": 12,
-   "bytes": 659186,
+   "bytes": 745645,
    "feeds": {
     "alerts": "http://rt.pasadenatransit.net/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "http://rt.pasadenatransit.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
@@ -3196,7 +3185,7 @@
    ],
    "stops": 14,
    "routes": 1,
-   "bytes": 59192
+   "bytes": 59093
   },
   {
    "id": "patriots-party-boats-424",
@@ -3257,7 +3246,7 @@
    ],
    "stops": 3,
    "routes": 2,
-   "bytes": 9837
+   "bytes": 9488
   },
   {
    "id": "pottstown-area-rapid-transit-tld-7025",
@@ -3281,10 +3270,44 @@
     "vehicles": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 5,
-    "matched": 5,
-    "withRoute": 5
+    "vehicles": 4,
+    "matched": 4,
+    "withRoute": 4
    }
+  },
+  {
+   "id": "prita-autoridad-de-transporte-integrado-3626",
+   "key": "prita-autoridad-de-transporte-integrado-3626-ferry",
+   "name": "PRITA (Autoridad de Transporte Integrado)",
+   "state": "Puerto Rico",
+   "mode": "ferry",
+   "kind": "timetable",
+   "bbox": [
+    -66.247,
+    18.143,
+    -65.303,
+    18.465
+   ],
+   "stops": 6,
+   "routes": 4,
+   "bytes": 37945
+  },
+  {
+   "id": "prita-autoridad-de-transporte-integrado-3626",
+   "key": "prita-autoridad-de-transporte-integrado-3626-subway",
+   "name": "PRITA (Autoridad de Transporte Integrado)",
+   "state": "Puerto Rico",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -66.247,
+    18.143,
+    -65.303,
+    18.465
+   ],
+   "stops": 16,
+   "routes": 1,
+   "bytes": 221305
   },
   {
    "id": "regional-transportation-district-2054",
@@ -3301,7 +3324,7 @@
    ],
    "stops": 45,
    "routes": 4,
-   "bytes": 203845
+   "bytes": 203746
   },
   {
    "id": "regional-transportation-district-2054",
@@ -3316,9 +3339,9 @@
     -104.67,
     40.207
    ],
-   "stops": 95,
+   "stops": 96,
    "routes": 6,
-   "bytes": 596532
+   "bytes": 599049
   },
   {
    "id": "regional-transportation-district-rtd-178",
@@ -3333,18 +3356,18 @@
     -104.67,
     40.59
    ],
-   "stops": 7339,
+   "stops": 7328,
    "routes": 120,
-   "bytes": 1021209,
+   "bytes": 1020526,
    "feeds": {
     "tripUpdates": "https://www.rtd-denver.com/files/gtfs-rt/TripUpdate.pb",
     "alerts": "https://www.rtd-denver.com/files/gtfs-rt/Alerts.pb",
     "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
    },
    "live": {
-    "vehicles": 560,
-    "matched": 471,
-    "withRoute": 471
+    "vehicles": 520,
+    "matched": 452,
+    "withRoute": 452
    }
   },
   {
@@ -3369,9 +3392,9 @@
     "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
    },
    "live": {
-    "vehicles": 560,
-    "matched": 471,
-    "withRoute": 471
+    "vehicles": 520,
+    "matched": 452,
+    "withRoute": 452
    }
   },
   {
@@ -3396,9 +3419,9 @@
     "vehicles": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb"
    },
    "live": {
-    "vehicles": 560,
-    "matched": 471,
-    "withRoute": 471
+    "vehicles": 520,
+    "matched": 452,
+    "withRoute": 452
    }
   },
   {
@@ -3422,9 +3445,9 @@
     "vehicles": "https://www.rtd-denver.com/files/bustang/gtfs-rt/Bustang_VehiclePosition.pb"
    },
    "live": {
-    "vehicles": 15,
-    "matched": 15,
-    "withRoute": 15
+    "vehicles": 13,
+    "matched": 13,
+    "withRoute": 13
    }
   },
   {
@@ -3449,9 +3472,9 @@
     "vehicles": "http://realtime.ripta.com:81/api/vehiclepositions?format=gtfs.proto"
    },
    "live": {
-    "vehicles": 130,
-    "matched": 130,
-    "withRoute": 130
+    "vehicles": 112,
+    "matched": 112,
+    "withRoute": 112
    }
   },
   {
@@ -3476,9 +3499,36 @@
     "vehicles": "https://my.ridervt.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 15,
-    "matched": 15,
-    "withRoute": 15
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
+   }
+  },
+  {
+   "id": "riverside-transit-agency-98",
+   "key": "riverside-transit-agency-98",
+   "name": "Riverside Transit Agency",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -117.916,
+    33.452,
+    -116.876,
+    34.1
+   ],
+   "stops": 2157,
+   "routes": 39,
+   "bytes": 4845069,
+   "feeds": {
+    "tripUpdates": "https://rtabus.com/gtfsrt/trips",
+    "alerts": "https://rtabus.com/gtfsrt/alerts",
+    "vehicles": "https://rtabus.com/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 150,
+    "matched": 108,
+    "withRoute": 108
    }
   },
   {
@@ -3501,36 +3551,9 @@
     "vehicles": "https://api.rgrta.com/rtgvehicles?key=00e2dbf6b15742febb37d0a1d7d3acd5"
    },
    "live": {
-    "vehicles": 88,
-    "matched": 84,
-    "withRoute": 77
-   }
-  },
-  {
-   "id": "rogue-valley-transportation-district-rvt-3219",
-   "key": "rogue-valley-transportation-district-rvt-3219",
-   "name": "Rogue Valley Transportation District (RVTD)",
-   "state": "Oregon",
-   "mode": "bus",
-   "kind": "live",
-   "bbox": [
-    -122.92,
-    42.176,
-    -122.672,
-    42.444
-   ],
-   "stops": 292,
-   "routes": 6,
-   "bytes": 138658,
-   "feeds": {
-    "alerts": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/Alert.pb",
-    "tripUpdates": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/TripUpdate.pb",
-    "vehicles": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/VehiclePosition.pb"
-   },
-   "live": {
-    "vehicles": 13,
-    "matched": 12,
-    "withRoute": 0
+    "vehicles": 76,
+    "matched": 72,
+    "withRoute": 72
    }
   },
   {
@@ -3555,10 +3578,27 @@
     "vehicles": "https://racine.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 22,
-    "matched": 20,
+    "vehicles": 14,
+    "matched": 13,
     "withRoute": 0
    }
+  },
+  {
+   "id": "sacramento-regional-transit-sacrt-3621",
+   "key": "sacramento-regional-transit-sacrt-3621-subway",
+   "name": "Sacramento Regional Transit (SacRT)",
+   "state": "California",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -121.764,
+    38.393,
+    -121.092,
+    38.723
+   ],
+   "stops": 108,
+   "routes": 3,
+   "bytes": 241513
   },
   {
    "id": "san-diego-international-airport-metropol-13",
@@ -3575,7 +3615,7 @@
    ],
    "stops": 3,
    "routes": 1,
-   "bytes": 18301
+   "bytes": 18310
   },
   {
    "id": "san-diego-international-airport-metropol-13",
@@ -3592,7 +3632,7 @@
    ],
    "stops": 124,
    "routes": 5,
-   "bytes": 592687
+   "bytes": 592696
   },
   {
    "id": "san-francisco-bay-ferry-3143",
@@ -3609,7 +3649,24 @@
    ],
    "stops": 13,
    "routes": 7,
-   "bytes": 48686
+   "bytes": 47871
+  },
+  {
+   "id": "san-francisco-municipal-transportation-a-2886",
+   "key": "san-francisco-municipal-transportation-a-2886-subway",
+   "name": "San Francisco Municipal Transportation Agency (SFMTA - Muni)",
+   "state": "California",
+   "mode": "subway",
+   "kind": "timetable",
+   "bbox": [
+    -122.511,
+    37.706,
+    -122.367,
+    37.83
+   ],
+   "stops": 292,
+   "routes": 7,
+   "bytes": 1418046
   },
   {
    "id": "san-luis-obispo-regional-transit-authori-43",
@@ -3633,8 +3690,8 @@
     "vehicles": "http://slo.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 21,
-    "matched": 16,
+    "vehicles": 17,
+    "matched": 15,
     "withRoute": 0
    }
   },
@@ -3660,9 +3717,36 @@
     "vehicles": "https://passio3.com/sandyor/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 9,
-    "matched": 9,
-    "withRoute": 9
+    "vehicles": 5,
+    "matched": 5,
+    "withRoute": 5
+   }
+  },
+  {
+   "id": "santa-barbara-metropolitan-transit-distr-1246",
+   "key": "santa-barbara-metropolitan-transit-distr-1246",
+   "name": "Santa Barbara Metropolitan Transit District (MTD)",
+   "state": "California",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -119.906,
+    34.383,
+    -119.481,
+    34.455
+   ],
+   "stops": 608,
+   "routes": 38,
+   "bytes": 3448930,
+   "feeds": {
+    "alerts": "https://bustracker.sbmtd.gov/gtfsrt/alerts",
+    "tripUpdates": "https://bustracker.sbmtd.gov/gtfsrt/trips",
+    "vehicles": "https://bustracker.sbmtd.gov/gtfsrt/vehicles"
+   },
+   "live": {
+    "vehicles": 60,
+    "matched": 47,
+    "withRoute": 47
    }
   },
   {
@@ -3680,7 +3764,7 @@
    ],
    "stops": 122,
    "routes": 7,
-   "bytes": 318195
+   "bytes": 318132
   },
   {
    "id": "santa-cruz-metro-scmtd-2425",
@@ -3697,16 +3781,16 @@
    ],
    "stops": 755,
    "routes": 28,
-   "bytes": 1965738,
+   "bytes": 280079,
    "feeds": {
     "vehicles": "https://rt.scmetro.org/gtfsrt/vehicles",
     "tripUpdates": "https://rt.scmetro.org/gtfsrt/trips",
     "alerts": "https://rt.scmetro.org/gtfsrt/alerts"
    },
    "live": {
-    "vehicles": 72,
-    "matched": 53,
-    "withRoute": 53
+    "vehicles": 55,
+    "matched": 45,
+    "withRoute": 45
    }
   },
   {
@@ -3731,9 +3815,9 @@
     "vehicles": "https://sts.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 5,
-    "matched": 5,
-    "withRoute": 5
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
    }
   },
   {
@@ -3751,7 +3835,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 53992
+   "bytes": 51105
   },
   {
    "id": "shenango-valley-shuttle-service-tld-4663",
@@ -3802,9 +3886,9 @@
     "alerts": "https://myride.shoretransit.org/gtfs/GTFS_ServiceAlerts.pb"
    },
    "live": {
-    "vehicles": 6,
-    "matched": 6,
-    "withRoute": 6
+    "vehicles": 7,
+    "matched": 7,
+    "withRoute": 7
    }
   },
   {
@@ -3820,18 +3904,18 @@
     -121.739,
     48.751
    ],
-   "stops": 479,
+   "stops": 477,
    "routes": 19,
-   "bytes": 136431,
+   "bytes": 135245,
    "feeds": {
     "alerts": "https://strweb.skagittransit.org/GTFS/GTFS_ServiceAlerts.pb",
     "tripUpdates": "https://strweb.skagittransit.org/GTFS/GTFS_TripUpdates.pb",
     "vehicles": "https://strweb.skagittransit.org/GTFS/GTFS_VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 21,
-    "matched": 21,
-    "withRoute": 21
+    "vehicles": 20,
+    "matched": 20,
+    "withRoute": 20
    }
   },
   {
@@ -3849,7 +3933,7 @@
    ],
    "stops": 20,
    "routes": 2,
-   "bytes": 42021
+   "bytes": 41174
   },
   {
    "id": "sound-transit-268",
@@ -3866,7 +3950,7 @@
    ],
    "stops": 100,
    "routes": 3,
-   "bytes": 3079908
+   "bytes": 2926590
   },
   {
    "id": "sound-transit-metro-transit-city-of-seat-267",
@@ -3941,8 +4025,8 @@
     "alerts": "https://mysmartbus.com/gtfs-rt/alerts"
    },
    "live": {
-    "vehicles": 9,
-    "matched": 9,
+    "vehicles": 15,
+    "matched": 15,
     "withRoute": 0
    }
   },
@@ -3968,9 +4052,9 @@
     "vehicles": "https://passio3.com/transpo/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 24,
+    "vehicles": 22,
     "matched": 0,
-    "withRoute": 24
+    "withRoute": 22
    }
   },
   {
@@ -3986,18 +4070,18 @@
     -74.754,
     40.334
    ],
-   "stops": 12866,
+   "stops": 12863,
    "routes": 155,
-   "bytes": 29600510,
+   "bytes": 29591948,
    "feeds": {
     "alerts": "https://www3.septa.org/gtfsrt/septa-pa-us/Service/rtServiceAlerts.pb",
     "tripUpdates": "https://www3.septa.org/gtfsrt/septa-pa-us/Trip/rtTripUpdates.pb",
     "vehicles": "https://www3.septa.org/gtfsrt/septa-pa-us/Vehicle/rtVehiclePosition.pb"
    },
    "live": {
-    "vehicles": 1156,
-    "matched": 855,
-    "withRoute": 855
+    "vehicles": 1034,
+    "matched": 631,
+    "withRoute": 631
    }
   },
   {
@@ -4015,16 +4099,16 @@
    ],
    "stops": 714,
    "routes": 13,
-   "bytes": 2473588,
+   "bytes": 2471837,
    "feeds": {
     "alerts": "https://www3.septa.org/gtfsrt/septa-pa-us/Service/rtServiceAlerts.pb",
     "tripUpdates": "https://www3.septa.org/gtfsrt/septa-pa-us/Trip/rtTripUpdates.pb",
     "vehicles": "https://www3.septa.org/gtfsrt/septa-pa-us/Vehicle/rtVehiclePosition.pb"
    },
    "live": {
-    "vehicles": 1156,
-    "matched": 855,
-    "withRoute": 855
+    "vehicles": 1034,
+    "matched": 631,
+    "withRoute": 631
    }
   },
   {
@@ -4049,9 +4133,9 @@
     "tripUpdates": "https://www3.septa.org/gtfsrt/septarail-pa-us/Trip/rtTripUpdates.pb"
    },
    "live": {
-    "vehicles": 71,
-    "matched": 71,
-    "withRoute": 71
+    "vehicles": 42,
+    "matched": 42,
+    "withRoute": 42
    }
   },
   {
@@ -4103,9 +4187,9 @@
     "vehicles": "https://gtfsbridge.spokanetransit.com/realtime/vehicle/VehiclePositions.pb"
    },
    "live": {
-    "vehicles": 107,
-    "matched": 107,
-    "withRoute": 107
+    "vehicles": 104,
+    "matched": 104,
+    "withRoute": 104
    }
   },
   {
@@ -4123,15 +4207,15 @@
    ],
    "stops": 901,
    "routes": 27,
-   "bytes": 114485,
+   "bytes": 114643,
    "feeds": {
     "tripUpdates": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
     "vehicles": "https://stanrta.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 60,
-    "matched": 60,
-    "withRoute": 60
+    "vehicles": 57,
+    "matched": 57,
+    "withRoute": 57
    }
   },
   {
@@ -4156,9 +4240,36 @@
     "vehicles": "https://startran.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 36,
-    "matched": 34,
+    "vehicles": 21,
+    "matched": 19,
     "withRoute": 0
+   }
+  },
+  {
+   "id": "the-rapid-400",
+   "key": "the-rapid-400",
+   "name": "The Rapid",
+   "state": "Michigan",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -85.91,
+    42.838,
+    -85.48,
+    43.692
+   ],
+   "stops": 1518,
+   "routes": 30,
+   "bytes": 182854,
+   "feeds": {
+    "alerts": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?&Type=Alert",
+    "tripUpdates": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://connect.ridetherapid.org/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   },
+   "live": {
+    "vehicles": 82,
+    "matched": 82,
+    "withRoute": 82
    }
   },
   {
@@ -4176,7 +4287,7 @@
    ],
    "stops": 13,
    "routes": 1,
-   "bytes": 190484
+   "bytes": 146067
   },
   {
    "id": "tompkins-consolidated-area-transit-inc-535",
@@ -4200,9 +4311,9 @@
     "vehicles": "https://realtimetcatbus.availtec.com/InfoPoint/GTFS-Realtime.ashx?&Type=VehiclePosition&serverid=0"
    },
    "live": {
-    "vehicles": 27,
-    "matched": 27,
-    "withRoute": 27
+    "vehicles": 22,
+    "matched": 22,
+    "withRoute": 22
    }
   },
   {
@@ -4220,7 +4331,7 @@
    ],
    "stops": 3,
    "routes": 1,
-   "bytes": 658
+   "bytes": 586
   },
   {
    "id": "towson-loop-1784",
@@ -4244,9 +4355,9 @@
     "vehicles": "https://passio3.com/towson/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 7,
-    "matched": 7,
-    "withRoute": 7
+    "vehicles": 6,
+    "matched": 6,
+    "withRoute": 6
    }
   },
   {
@@ -4349,9 +4460,9 @@
     "alerts": "https://passio3.com/uga/passioTransit/gtfs/realtime/"
    },
    "live": {
-    "vehicles": 24,
-    "matched": 24,
-    "withRoute": 24
+    "vehicles": 29,
+    "matched": 29,
+    "withRoute": 29
    }
   },
   {
@@ -4369,7 +4480,7 @@
    ],
    "stops": 17,
    "routes": 1,
-   "bytes": 41587
+   "bytes": 41335
   },
   {
    "id": "utah-transit-authority-uta-170",
@@ -4386,7 +4497,34 @@
    ],
    "stops": 113,
    "routes": 4,
-   "bytes": 400263
+   "bytes": 400164
+  },
+  {
+   "id": "valley-metro-vm-147",
+   "key": "valley-metro-vm-147-bus",
+   "name": "Valley Metro (VM)",
+   "state": "Arizona",
+   "mode": "bus",
+   "kind": "live",
+   "bbox": [
+    -112.872,
+    32.372,
+    -111.661,
+    33.714
+   ],
+   "stops": 7894,
+   "routes": 108,
+   "bytes": 9983445,
+   "feeds": {
+    "tripUpdates": "https://app.mecatran.com/utw/ws/gtfsfeed/realtime/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "alerts": "https://app.mecatran.com/utw/ws/gtfsfeed/alerts/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
+    "vehicles": "https://app.mecatran.com/utw/ws/gtfsfeed/vehicles/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f"
+   },
+   "live": {
+    "vehicles": 648,
+    "matched": 511,
+    "withRoute": 511
+   }
   },
   {
    "id": "valley-metro-vm-147",
@@ -4394,7 +4532,7 @@
    "name": "Valley Metro (VM)",
    "state": "Arizona",
    "mode": "subway",
-   "kind": "timetable",
+   "kind": "live",
    "bbox": [
     -112.872,
     32.372,
@@ -4408,6 +4546,11 @@
     "tripUpdates": "https://app.mecatran.com/utw/ws/gtfsfeed/realtime/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
     "alerts": "https://app.mecatran.com/utw/ws/gtfsfeed/alerts/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f",
     "vehicles": "https://app.mecatran.com/utw/ws/gtfsfeed/vehicles/valleymetro?apiKey=4f22263f69671d7f49726c3011333e527368211f"
+   },
+   "live": {
+    "vehicles": 648,
+    "matched": 511,
+    "withRoute": 511
    }
   },
   {
@@ -4425,15 +4568,15 @@
    ],
    "stops": 574,
    "routes": 19,
-   "bytes": 938933,
+   "bytes": 779859,
    "feeds": {
     "alerts": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/alerts.pb",
     "tripUpdates": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/trip_updates.pb",
     "vehicles": "https://s3.amazonaws.com/etatransit.gtfs/valleyregionaltransit.etaspot.net/position_updates.pb"
    },
    "live": {
-    "vehicles": 20,
-    "matched": 18,
+    "vehicles": 22,
+    "matched": 20,
     "withRoute": 0
    }
   },
@@ -4452,7 +4595,7 @@
    ],
    "stops": 173,
    "routes": 12,
-   "bytes": 71361,
+   "bytes": 71356,
    "feeds": {
     "alerts": "https://itransitnw.com/rtt/public/utility/gtfsrealtime.aspx/alert",
     "tripUpdates": "https://itransitnw.com/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
@@ -4477,18 +4620,18 @@
     -98.307,
     29.65
    ],
-   "stops": 6004,
+   "stops": 5990,
    "routes": 88,
-   "bytes": 673468,
+   "bytes": 8706471,
    "feeds": {
     "alerts": "http://gtfs.viainfo.net/alert/alerts.pb",
     "tripUpdates": "http://gtfs.viainfo.net/tripupdate/tripupdates.pb",
     "vehicles": "http://gtfs.viainfo.net/vehicle/vehiclepositions.pb"
    },
    "live": {
-    "vehicles": 425,
-    "matched": 349,
-    "withRoute": 349
+    "vehicles": 430,
+    "matched": 327,
+    "withRoute": 327
    }
   },
   {
@@ -4513,9 +4656,9 @@
     "vehicles": "https://passio3.com/viaboulder/passioTransit/gtfs/realtime/vehiclePositions"
    },
    "live": {
-    "vehicles": 9,
-    "matched": 9,
-    "withRoute": 9
+    "vehicles": 8,
+    "matched": 8,
+    "withRoute": 8
    }
   },
   {
@@ -4533,7 +4676,7 @@
    ],
    "stops": 2,
    "routes": 1,
-   "bytes": 5166
+   "bytes": 5067
   },
   {
    "id": "washington-state-ferries-1331",
@@ -4550,7 +4693,7 @@
    ],
    "stops": 19,
    "routes": 38,
-   "bytes": 955974
+   "bytes": 1568963
   },
   {
    "id": "washington-state-ferries-283",
@@ -4567,34 +4710,7 @@
    ],
    "stops": 19,
    "routes": 38,
-   "bytes": 1813172
-  },
-  {
-   "id": "western-reserve-transit-authority-tld-1717",
-   "key": "western-reserve-transit-authority-tld-1717",
-   "name": "Western Reserve Transit Authority",
-   "state": "Ohio",
-   "mode": "bus",
-   "kind": "live",
-   "bbox": [
-    -80.893,
-    40.977,
-    -80.576,
-    41.238
-   ],
-   "stops": 1019,
-   "routes": 24,
-   "bytes": 113506,
-   "feeds": {
-    "alerts": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=Alert",
-    "tripUpdates": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   },
-   "live": {
-    "vehicles": 26,
-    "matched": 26,
-    "withRoute": 26
-   }
+   "bytes": 1570638
   },
   {
    "id": "westmoreland-county-transit-authority-tld-6785",
@@ -4618,9 +4734,9 @@
     "vehicles": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
    },
    "live": {
-    "vehicles": 17,
-    "matched": 16,
-    "withRoute": 16
+    "vehicles": 14,
+    "matched": 14,
+    "withRoute": 14
    }
   },
   {
@@ -4638,16 +4754,16 @@
    ],
    "stops": 878,
    "routes": 34,
-   "bytes": 187296,
+   "bytes": 999915,
    "feeds": {
     "alerts": "https://bustracker.ridewta.com/gtfsrt/alerts",
     "tripUpdates": "https://bustracker.ridewta.com/gtfsrt/trips",
     "vehicles": "https://bustracker.ridewta.com/gtfsrt/vehicles"
    },
    "live": {
-    "vehicles": 48,
-    "matched": 39,
-    "withRoute": 39
+    "vehicles": 55,
+    "matched": 40,
+    "withRoute": 40
    }
   },
   {
@@ -4672,9 +4788,9 @@
     "vehicles": "https://bus.wichitatransit.org/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
    },
    "live": {
-    "vehicles": 26,
-    "matched": 26,
-    "withRoute": 26
+    "vehicles": 24,
+    "matched": 24,
+    "withRoute": 24
    }
   },
   {
@@ -4699,7 +4815,7 @@
     "vehicles": "https://ycta.connexionz.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    },
    "live": {
-    "vehicles": 5,
+    "vehicles": 6,
     "matched": 4,
     "withRoute": 0
    }
@@ -4747,14 +4863,14 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
-   "id": "advance-transit-631",
-   "name": "Advance Transit",
+   "id": "adirondack-trailways-tld-5781",
+   "name": "Adirondack Trailways",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
-   "id": "akron-metro-regional-transit-authority-m-2071",
-   "name": "Akron Metro Regional Transit Authority (METRO)",
-   "reason": "bus: no live feed that matches the schedule (0 of 74 vehicles matched)"
+   "id": "advance-transit-631",
+   "name": "Advance Transit",
+   "reason": "bus: no live feed that matches the schedule"
   },
   {
    "id": "all-points-transit-2039",
@@ -4789,6 +4905,11 @@
   {
    "id": "ann-arbor-area-transportation-authority--415",
    "name": "Ann Arbor Area Transportation Authority (TheRide)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "annapolis-transit-2285",
+   "name": "Annapolis Transit",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
@@ -4854,6 +4975,11 @@
   {
    "id": "bay-transit-2439",
    "name": "Bay Transit (Flex)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "bayamon-3627",
+   "name": "Bayamón",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
@@ -5099,7 +5225,7 @@
   {
    "id": "central-florida-regional-transit-authori-347",
    "name": "Central Florida Regional Transit Authority (LYNX)",
-   "reason": "bus: no live feed that matches the schedule (0 of 202 vehicles matched)"
+   "reason": "bus: no live feed that matches the schedule (0 of 186 vehicles matched)"
   },
   {
    "id": "central-indiana-regional-transportation--ntd-50209",
@@ -5242,6 +5368,11 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "city-of-douglas-2864",
+   "name": "City of Douglas",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "city-of-ellensburg-public-transit-centra-2456",
    "name": "City of Ellensburg Public Transit (Central Transit)",
    "reason": "bus: no live feed that matches the schedule"
@@ -5362,6 +5493,11 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "city-of-show-low-2863",
+   "name": "City of Show Low",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "city-of-sierra-vista-tld-679",
    "name": "City of Sierra Vista",
    "reason": "bus: no live feed that matches the schedule"
@@ -5379,7 +5515,7 @@
   {
    "id": "citylink-north-kootenai-county-tld-4791",
    "name": "Citylink North (Kootenai County)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "could not download (UND_ERR_SOCKET)"
   },
   {
    "id": "citylink-south-kootenai-county-tld-4792",
@@ -5624,7 +5760,7 @@
   {
    "id": "detroit-department-of-transportation-ddo-464",
    "name": "Detroit Department of Transportation (DDOT)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download answered 403"
   },
   {
    "id": "developmental-services-of-nw-kansas-acce-ntd-70060",
@@ -5707,9 +5843,14 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "elk-grove-transit-3620",
+   "name": "Elk Grove Transit",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "elwha-transit-2307",
    "name": "Elwha Transit",
-   "reason": "could not download (UND_ERR_SOCKET)"
+   "reason": "bus: no live feed that matches the schedule"
   },
   {
    "id": "envida-2044",
@@ -5730,11 +5871,6 @@
    "id": "etrans-65",
    "name": "eTrans",
    "reason": "bus: no live feed that matches the schedule"
-  },
-  {
-   "id": "everett-transit-3038",
-   "name": "Everett Transit",
-   "reason": "bus: no live feed that matches the schedule (18 of 32 vehicles matched)"
   },
   {
    "id": "ez-rider-2634",
@@ -5782,6 +5918,11 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "franklin-county-public-transportation-545",
+   "name": "Franklin County Public Transportation",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "franklin-regional-transit-authority-frta-429",
    "name": "Franklin Regional Transit Authority (FRTA)",
    "reason": "bus: no live feed that matches the schedule"
@@ -5825,6 +5966,11 @@
    "id": "get-around-columbia-gocomo-ntd-70016",
    "name": "Get Around Columbia (GoCOMO)",
    "reason": "download answered 404"
+  },
+  {
+   "id": "glendora-transportation-division-3097",
+   "name": "Glendora Transportation Division",
+   "reason": "bus: no live feed that matches the schedule"
   },
   {
    "id": "glenn-transit-service-3094",
@@ -5949,7 +6095,7 @@
   {
    "id": "hendry-county-transit-system-tld-7914",
    "name": "Hendry County Transit System",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
   },
   {
    "id": "hiawathaland-transit-2859",
@@ -6129,7 +6275,7 @@
   {
    "id": "lakeland-area-mass-transit-district-tld-5899",
    "name": "Lakeland Area Mass Transit District",
-   "reason": "bus: no live feed that matches the schedule (0 of 27 vehicles matched)"
+   "reason": "bus: no live feed that matches the schedule (0 of 26 vehicles matched)"
   },
   {
    "id": "lakes-region-explorer-452",
@@ -6234,11 +6380,6 @@
   {
    "id": "los-angeles-department-of-transportation-1210",
    "name": "Los Angeles Department of Transportation (LADOT - DASH - Commuter Express) (Bus)",
-   "reason": "bus: no live feed that matches the schedule"
-  },
-  {
-   "id": "lowell-regional-transit-authority-lrta-444",
-   "name": "Lowell Regional Transit Authority (LRTA)",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
@@ -6397,19 +6538,24 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
-   "id": "metro-houston-2060",
-   "name": "METRO Houston",
-   "reason": "could not download (ETIMEDOUT)"
-  },
-  {
    "id": "metro-mcallen-ntd-60099",
    "name": "Metro McAllen",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "metro-north-railroad-524",
+   "name": "Metro-North Railroad",
+   "reason": "download is not a zip file"
+  },
+  {
    "id": "metro-ride-830",
    "name": "Metro Ride",
    "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "metro-st-louis-190",
+   "name": "Metro St. Louis",
+   "reason": "bus: the build had no stops; rail: the build had no stops"
   },
   {
    "id": "metro-transit-3529",
@@ -6419,32 +6565,42 @@
   {
    "id": "metropolitan-transit-authority-mta-510",
    "name": "Metropolitan Transit Authority (MTA) (NYC Bus Company)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
+  },
+  {
+   "id": "metropolitan-transit-authority-mta-511",
+   "name": "Metropolitan Transit Authority (MTA) (NYC Subway Supplemented)",
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-mta-512",
    "name": "Metropolitan Transit Authority (MTA) (Brooklyn Bus)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-mta-513",
    "name": "Metropolitan Transit Authority (MTA) (Manhattan Bus)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-mta-514",
    "name": "Metropolitan Transit Authority (MTA) (Staten Island Bus)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
+  },
+  {
+   "id": "metropolitan-transit-authority-mta-516",
+   "name": "Metropolitan Transit Authority (MTA) (NYC Subway)",
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-mta-520",
    "name": "Metropolitan Transit Authority (MTA) (Queens Bus)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-mta-528",
    "name": "Metropolitan Transit Authority (MTA) (Bronx Bus)",
-   "reason": "bus: no live feed that matches the schedule"
+   "reason": "download is not a zip file"
   },
   {
    "id": "metropolitan-transit-authority-of-black--2414",
@@ -6612,11 +6768,6 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
-   "id": "nassau-inter-county-express-nice-bus-521",
-   "name": "Nassau Inter-County Express (NICE Bus)",
-   "reason": "bus: no live feed that matches the schedule"
-  },
-  {
    "id": "navajo-transit-system-2346",
    "name": "Navajo Transit System",
    "reason": "bus: no live feed that matches the schedule"
@@ -6630,11 +6781,6 @@
    "id": "new-jersey-transit-nj-transit-508",
    "name": "New Jersey Transit (NJ Transit) (Bus)",
    "reason": "bus: no live feed that matches the schedule"
-  },
-  {
-   "id": "new-river-transit-authority-tld-6713",
-   "name": "New River Transit Authority",
-   "reason": "could not download (UND_ERR_SOCKET)"
   },
   {
    "id": "niagara-frontier-transportation-authorit-tld-401",
@@ -6864,7 +7010,7 @@
   {
    "id": "propark-mobility-columbia-county-public--tld-6745",
    "name": "Propark Mobility, Columbia County Public Transportation",
-   "reason": "could not download (UND_ERR_SOCKET)"
+   "reason": "bus: no live feed that matches the schedule"
   },
   {
    "id": "pueblo-transit-1232",
@@ -6965,11 +7111,6 @@
    "id": "rivercities-transit-rct-259",
    "name": "RiverCities Transit (RCT)",
    "reason": "bus: no live feed that matches the schedule"
-  },
-  {
-   "id": "riverside-transit-agency-98",
-   "name": "Riverside Transit Agency",
-   "reason": "download answered 403"
   },
   {
    "id": "roadrunner-transit-2075",
@@ -7122,11 +7263,6 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
-   "id": "santa-barbara-metropolitan-transit-distr-1246",
-   "name": "Santa Barbara Metropolitan Transit District (MTD)",
-   "reason": "bus: no live feed that matches the schedule (0 of 4 vehicles matched)"
-  },
-  {
    "id": "santa-maria-area-transit-2272",
    "name": "Santa Maria Area Transit",
    "reason": "bus: no live feed that matches the schedule"
@@ -7139,7 +7275,7 @@
   {
    "id": "santa-ynez-valley-transit-tld-1301",
    "name": "Santa Ynez Valley Transit",
-   "reason": "could not download (ETIMEDOUT)"
+   "reason": "bus: no live feed that matches the schedule (live feed unreachable)"
   },
   {
    "id": "sarasota-county-area-transit-scat-348",
@@ -7149,7 +7285,7 @@
   {
    "id": "schoharie-county-transit-tld-5877",
    "name": "Schoharie County Transit",
-   "reason": "could not download (UND_ERR_SOCKET)"
+   "reason": "bus: no live feed that matches the schedule"
   },
   {
    "id": "seneca-transit-system-ntd-22929",
@@ -7239,6 +7375,11 @@
   {
    "id": "south-clackamas-transportation-district-883",
    "name": "South Clackamas Transportation District",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "south-county-transit-link-3622",
+   "name": "South County Transit Link",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
@@ -7497,6 +7638,11 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "transit-authority-of-northern-kentucky-t-2068",
+   "name": "Transit Authority of Northern Kentucky (TANK)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "transit-authority-of-warren-county-ntd-30124",
    "name": "Transit Authority of Warren County",
    "reason": "bus: no live feed that matches the schedule"
@@ -7627,6 +7773,11 @@
    "reason": "bus: no live feed that matches the schedule"
   },
   {
+   "id": "vega-baja-3628",
+   "name": "Vega Baja",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
    "id": "ventura-county-transportation-commission-3096",
    "name": "Ventura County Transportation Commission",
    "reason": "bus: no live feed that matches the schedule"
@@ -7644,6 +7795,11 @@
   {
    "id": "virgin-island-transit-vitran-ntd-40188",
    "name": "Virgin Island Transit (VITran)",
+   "reason": "bus: no live feed that matches the schedule"
+  },
+  {
+   "id": "virginia-breeze-3506",
+   "name": "Virginia Breeze",
    "reason": "bus: no live feed that matches the schedule"
   },
   {
