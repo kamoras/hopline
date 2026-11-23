@@ -149,6 +149,21 @@ either run. Memory climbed to about 970 MB in this worst case (every board touch
 collected): the next lever is the per-request JSON string (stream or cache the serialized body) and, in production, the edge
 cache, which answers repeat requests without reaching the server at all.
 
+### With every state switched on
+
+`npm run loadtest -- --nationwide` gives each viewer three random boards from the whole country (200 boards: 24 November 2026,
+`HOPLINE_STATES=all`, agency data fetched from the Pages host on first use, one local server, no CDN):
+
+| Run | Requests | Errors | Slowest p95 | Memory |
+| --- | --- | --- | --- | --- |
+| 40 viewers, 60 s | 678 | 0 | 1,282 ms (metro) | 136 to 727 MB |
+| 120 viewers, 90 s | 3,126 | 0 | 603 ms (buses) | 308 to **1,128 MB** peak, **465 MB** a minute after the load stopped |
+
+Typical answers are 25 to 270 ms (p50). The few multi-second maxima (about 8 s, the provider timeout) are the first request
+to a board whose agency has to be fetched and parsed; later ones are fast. The peak is garbage not yet collected: it fell back
+to 465 MB on its own, so a server needs about 1.2 GB of headroom at 120 concurrent viewers on different boards (in production
+the edge cache absorbs repeats, and each function instance sees only some of them).
+
 ## Where the national plan stands
 
 `docs/NATIONWIDE.md` has the plan. Done so far: lean polling, memory fixes, and **schedule data off git** (agency bundles

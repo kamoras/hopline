@@ -4,6 +4,9 @@
  *   npm run build && npm start &                     # a production server
  *   npm run loadtest -- --url http://localhost:3000 --viewers 50 --seconds 30
  *
+ * With `--nationwide` each viewer instead looks at three random boards from everywhere the server serves (it asks
+ * /api/boards for the whole country), which is what coverage of every state looks like.
+ *
  * Reports, per endpoint, how many requests, errors and the 50th/95th/max latency, plus the server's memory if `--pid` is
  * given. Run it before switching on a large batch of agencies, and compare the numbers with the last run in
  * docs/SCALING_REVIEW.md. It only ever reads public endpoints, and it is polite: viewers wait between rounds like a browser.
@@ -18,6 +21,7 @@ const BASE = arg("url", "http://localhost:3000").replace(/\/$/, "");
 const VIEWERS = Number(arg("viewers", "20"));
 const SECONDS = Number(arg("seconds", "30"));
 const PID = Number(arg("pid", "0"));
+const NATIONWIDE = process.argv.includes("--nationwide");
 const ROUND_MS = Number(arg("round-ms", "10000")); // a browser polls every 10 s
 
 /** The views people actually have: a few metros with their modes, as the browser asks for them. */
@@ -28,6 +32,27 @@ const VIEWS = [
   ["/api/trips?mode=bus&region=pittsburgh&lean=1&bbox=-80.05,40.4,-79.9,40.5", "/api/trips?mode=subway&region=pittsburgh&lean=1", "/api/boards?bbox=-81,40,-79,41"],
 ] as const;
 const EXTRA = ["/api/lines?mode=subway&region=nyc", "/api/places?mode=subway&region=nyc", "/api/line-status?mode=subway&region=nyc"];
+
+/** What the map asks for one board: whole-area boards by region, a bus network by the rectangle around its centre. */
+interface NationalBoard { mode: string; regionId: string; center: [number, number] }
+const requestFor = ({ mode, regionId, center: [lon, lat] }: NationalBoard) =>
+  mode === "bus" ? `/api/trips?mode=bus&region=${regionId}&lean=1&bbox=${lon - 0.06},${lat - 0.05},${lon + 0.06},${lat + 0.05}` : `/api/trips?mode=${mode}&region=${regionId}&lean=1`;
+
+async function nationalViews(count: number): Promise<string[][]> {
+  // The server answers for areas up to 40 degrees wide and at most 300 boards, so the country is asked for in tiles.
+  const tiles: string[] = [];
+  for (let lon = -125; lon < -66; lon += 10) for (let lat = 24; lat < 50; lat += 13) tiles.push(`${lon},${lat},${lon + 10},${lat + 13}`);
+  const found = new Map<string, NationalBoard>();
+  for (const tile of tiles) {
+    const res = await fetch(`${BASE}/api/boards?bbox=${tile}`, { signal: AbortSignal.timeout(30_000) });
+    const list = res.ok ? ((await res.json()) as (NationalBoard & { href: string })[]) : [];
+    for (const b of list) found.set(b.href, b);
+  }
+  const boards = [...found.values()].filter((b) => b.mode !== "flights");
+  if (boards.length === 0) throw new Error("the server lists no boards");
+  console.log(`${boards.length} boards across the country`);
+  return Array.from({ length: count }, () => Array.from({ length: 3 }, () => requestFor(boards[Math.floor(Math.random() * boards.length)]!)));
+}
 
 const stats = new Map<string, { n: number; errors: number; ms: number[]; bytes: number }>();
 const key = (url: string) => url.split("?")[0] + (url.includes("mode=") ? ` ${new URL(url, BASE).searchParams.get("mode")}` : "");
@@ -51,12 +76,12 @@ async function hit(url: string) {
   stats.set(key(url), s);
 }
 
-async function viewer(i: number, until: number) {
-  const view = VIEWS[i % VIEWS.length]!;
+async function viewer(i: number, until: number, views: readonly (readonly string[])[]) {
+  const view = views[i % views.length]!;
   await new Promise((r) => setTimeout(r, Math.random() * ROUND_MS)); // viewers do not arrive in step
   for (let round = 0; Date.now() < until; round++) {
     await Promise.all(view.map(hit));
-    if (round === 0) await Promise.all(EXTRA.map(hit)); // the first load also fetches the static layers
+    if (round === 0 && !NATIONWIDE) await Promise.all(EXTRA.map(hit)); // the first load also fetches the static layers
     await new Promise((r) => setTimeout(r, ROUND_MS));
   }
 }
@@ -75,7 +100,8 @@ const pct = (xs: number[], p: number) => [...xs].sort((a, b) => a - b)[Math.min(
 const before = await rss();
 const until = Date.now() + SECONDS * 1000;
 console.log(`${VIEWERS} viewers for ${SECONDS}s against ${BASE}`);
-await Promise.all(Array.from({ length: VIEWERS }, (_, i) => viewer(i, until)));
+const views = NATIONWIDE ? await nationalViews(VIEWERS) : VIEWS;
+await Promise.all(Array.from({ length: VIEWERS }, (_, i) => viewer(i, until, views)));
 const after = await rss();
 
 let total = 0;
