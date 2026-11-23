@@ -106,6 +106,10 @@ jobs:
   report:
     needs: publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
@@ -115,7 +119,6 @@ jobs:
       - id: pr
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
           branch: chore/ingest-agencies
           delete-branch: true
           add-paths: |
@@ -124,11 +127,14 @@ jobs:
           commit-message: "chore: update the ingested agency report"
           title: "chore: update the ingested agency report"
           body: "Automated weekly ingest (`npm run ingest`): which agencies passed and why the rest did not. The schedules themselves are published to GitHub Pages by the same run."
-      - name: Enable auto-merge
+      # A pull request opened by a workflow gets no CI run of its own, so start it on the branch; auto-merge then waits for it.
+      - name: Run CI on the branch and enable auto-merge
         if: steps.pr.outputs.pull-request-number
-        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        run: |
+          gh workflow run ci.yml --ref chore/ingest-agencies
+          gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
         env:
-          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: publish
