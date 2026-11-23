@@ -54,7 +54,7 @@ describe("generated agencies", () => {
 
 describe("agency names", () => {
   it("says what riders say", async () => {
-    const { cleanName, displayNames } = await import("@/providers/generated/plan");
+    const { cleanName } = await import("@/providers/generated/plan");
     expect(cleanName("Central Puget Sound Regional Transit Authority, Central Puget Sound Regional Transit Authority")).toBe("Central Puget Sound Regional Transit Authority");
     expect(cleanName("ClackCo Connects (Clackamas County) (Static feed for realtime)")).toBe("ClackCo Connects (Clackamas County)");
     expect(cleanName("Utah Transit Authority (UTA)")).toBe("UTA");

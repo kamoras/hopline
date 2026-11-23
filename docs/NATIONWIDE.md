@@ -28,7 +28,7 @@ piece has a scalable replacement:
       most `HOPLINE_MAX_RESIDENT` agencies stay in memory (least recently used dropped).
    2. *Lean polling (done, #60)* and the *positions-only feed* (next stage of the scaling review).
    3. *Boards by viewport (done):* `/api/boards?bbox=` and a page that carries only the boards where the map opens, so the HTML
-      does not grow with coverage. (Station search still walks every board: it needs the server-side place index below.)
+      does not grow with coverage. (Station search reads a published index: see *Station search* below.)
    4. *Load test (done):* `npm run loadtest` drives the API with simulated viewers and reports latency, errors and memory;
       its first run found, and this stage fixed, flights timing out under load. Run it before switching on a batch of agencies.
 2. **Catalog and generic providers (done):** `scripts/build-catalog.ts` reads the Mobility Database catalog, keeps agencies with a
@@ -80,6 +80,15 @@ never shrinks what is served), joins the parts with `npm run ingest:merge`, pack
 `publish-data.yml` (a push that changes `data/`) carries the ingested files over from the live host with
 `--keep-from`, because a Pages deploy replaces the whole site. Run the workflow once by hand (Actions → Ingest agencies)
 before setting `HOPLINE_STATES`.
+
+## Station search
+
+`/api/search` used to open every board's places, which would have meant loading each agency's schedule for a single search.
+`npm run data:places` (`scripts/build-place-index.ts`) writes `places.json`, every station of every whole-area board (buses
+are searched by route instead), and the weekly ingest publishes it next to the schedules. With a data host the server reads
+that file (kept six hours) and answers in a few milliseconds; without one, or before it exists, search walks the boards as
+before. Measured on the published data: 3,638 stations on 97 boards, 300 KB, built in 12 seconds. `publish-data.yml` carries
+the live `places.json` over, like the ingested files. `HOPLINE_DATA_URL` may be a `file://` folder for offline builds.
 
 ## Serving ingested agencies
 

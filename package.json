@@ -23,6 +23,7 @@
     "catalog": "tsx scripts/build-catalog.ts",
     "ingest": "tsx scripts/ingest.ts",
     "ingest:merge": "tsx scripts/merge-ingest.ts",
+    "data:places": "NODE_OPTIONS=\"--import ./scripts/lib/rt-shim.mjs\" tsx scripts/build-place-index.ts",
     "data:mnr": "tsx scripts/build-rail-gtfs.ts mnr",
     "data:lirr": "tsx scripts/build-rail-gtfs.ts lirr",
     "data:shoreline-east": "tsx scripts/build-rail-gtfs.ts shoreline-east",

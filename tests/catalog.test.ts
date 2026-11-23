@@ -68,3 +68,19 @@ describe("the committed catalog", () => {
     for (const known of ["cdn.mbta.com/mbta_gtfs.zip", "rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip", "content.amtrak.com/content/gtfs/gtfs.zip"]) expect(urls.has(known)).toBe(false);
   });
 });
+
+describe("station search index", () => {
+  it("finds stations by name on boards that exist, best matches first", async () => {
+    const { searchIndex } = await import("../src/server/search-index");
+    const places = [
+      ["rail", "northeast", "stamford", "Stamford", 41.05, -73.54],
+      ["rail", "northeast", "old-stamford", "Old Stamford Road", 41, -73.5],
+      ["subway", "gone", "stamford-x", "Stamford X", 41, -73],
+      ["ferry", "nyc", "wall", "Wall St", 40.7, -74],
+    ] as const;
+    const boards = new Set(["rail/northeast", "ferry/nyc"]);
+    expect(searchIndex(places, "stamford", boards).map((h) => h.place[2])).toEqual(["stamford", "old-stamford"]);
+    expect(searchIndex(places, "  ", boards)).toEqual([]);
+    expect(searchIndex(places, "wall", boards)).toHaveLength(1);
+  });
+});
