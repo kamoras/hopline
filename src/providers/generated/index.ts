@@ -1,6 +1,7 @@
 import ingested from "../../../catalog/ingested.json";
 import { addRegion, getRegion } from "@/domain/region";
 import { dataHost } from "../gtfs/dataset";
+import { generatedIds } from "./published";
 import { createLiveProvider } from "../gtfs/live-provider";
 import { createTimetableProvider } from "../gtfs/timetable-provider";
 import type { TransitProvider } from "../types";
@@ -55,6 +56,7 @@ export function generatedProviders(
       files: noBundledFiles(a.key),
       placeIds: mode === "bus" ? ("stop" as const) : ("name" as const),
     };
+    generatedIds.add(a.key);
     out.push(
       a.kind === "live"
         ? createLiveProvider({

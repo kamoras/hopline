@@ -81,6 +81,15 @@ never shrinks what is served), joins the parts with `npm run ingest:merge`, pack
 `--keep-from`, because a Pages deploy replaces the whole site. Run the workflow once by hand (Actions → Ingest agencies)
 before setting `HOPLINE_STATES`.
 
+### Keeping the report and the host in step
+
+The report in the repository (`catalog/ingested.json`) is merged by pull request, so it can run behind the host: a weekly ingest
+drops an agency whose feed broke, and until that report is merged the app would still list it (an empty board). Checked on
+23 November 2026: the report was from 6 November and listed 205 agencies, the host had 193, and 49 boards answered "no bundled
+data". The server now reads the host's `index.json` (in the background, every ten minutes) and leaves out generated agencies the
+host does not have (`src/providers/generated/published.ts`): 200 boards became 151, all of which answer. Merge the report pull
+requests when they open; the filter is a safety net, not a substitute.
+
 ## Station search
 
 `/api/search` used to open every board's places, which would have meant loading each agency's schedule for a single search.
