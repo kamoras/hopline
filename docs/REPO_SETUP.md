@@ -14,10 +14,10 @@ repo settings, so they can't live in code. Do them once:
    Raise `required_approving_review_count` in the file if you add collaborators.
 3. **Settings → Advanced Security:** enable **Dependabot alerts** and **Dependabot security
    updates** (security PRs are raised by Dependabot and covered by the auto-merge workflow).
-4. **Secret `AUTOMERGE_TOKEN`** (Settings → Secrets → Actions): a fine-grained personal access
-   token for this repo with *Contents* and *Pull requests* read/write. Needed because PRs opened
-   by the default `GITHUB_TOKEN` (the weekly Metro-North schedule refresh) don't trigger CI,
-   so the required check would never run and the PR would sit unmerged. Dependabot PRs don't need it.
+4. **No token is needed for the automated pull requests** (the weekly schedule refresh and the ingest report). GitHub does not
+   start CI for a pull request a workflow opened, so those workflows start `ci.yml` by hand on their branch
+   (`workflow_dispatch`) and turn on auto-merge; the dispatched `verify` and `lighthouse` checks count for the pull request like
+   any others, so keep those two names as the required checks. Needs step 6 and **Settings → General → Allow auto-merge**.
 5. **Optional secret `WMATA_API_KEY`:** lets the weekly schedule refresh include Washington Metrorail and Metrobus (their downloads need the key). Without it those two are skipped and keep their old data.
 6. **Settings → Actions → General:** allow GitHub Actions to create pull requests.
 7. **Settings → General → Pull Requests:** enable **Automatically delete head branches**. The

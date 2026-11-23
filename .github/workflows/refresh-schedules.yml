@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   refresh:
@@ -30,17 +31,16 @@ jobs:
       - id: pr
         uses: peter-evans/create-pull-request@v8
         with:
-          # PRs opened with the default GITHUB_TOKEN don't trigger CI, so required
-          # checks would never report and auto-merge would stall. Set AUTOMERGE_TOKEN
-          # (a fine-grained PAT with contents + pull-requests write) to fix that.
-          token: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
           branch: chore/refresh-schedules
           delete-branch: true
           commit-message: "chore: refresh bundled schedules"
           title: "chore: refresh bundled schedules"
           body: "Automated regeneration of the bundled timetables in `data/*` from the operators' GTFS feeds (`npm run data:refresh`). See the workflow run for any feed that could not be refreshed."
-      - name: Enable auto-merge
+      # A pull request opened by a workflow gets no CI run of its own, so start it on the branch; auto-merge then waits for it.
+      - name: Run CI on the branch and enable auto-merge
         if: steps.pr.outputs.pull-request-number
-        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        run: |
+          gh workflow run ci.yml --ref chore/refresh-schedules
+          gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
         env:
-          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

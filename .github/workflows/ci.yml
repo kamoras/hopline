@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Pull requests opened by a workflow do not start `pull_request` runs (GitHub stops workflows triggering workflows), so
+  # the automated ones start this by hand on their branch: its checks count for the pull request like any others.
+  workflow_dispatch:
 
 permissions:
   contents: read
