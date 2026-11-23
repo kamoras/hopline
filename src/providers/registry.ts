@@ -44,6 +44,7 @@ import { vreProvider } from "./vre";
 import { wmataProvider } from "./wmata";
 import { wmataBusProvider } from "./wmata-bus";
 import { generatedProviders } from "./generated";
+import { isServed } from "./generated/published";
 
 const HAND_BUILT: readonly TransitProvider[] = [mnrProvider, lirrProvider, mbtaCommuterRailProvider, marcProvider, vreProvider, septaRailProvider, amtrakProvider, shorelineEastProvider, hartfordLineProvider, nyctProvider, mbtaSubwayProvider, wmataProvider, septaMetroProvider, mbtaBusProvider, septaBusProvider, wmataBusProvider, mtaBusProvider, cttransitProvider, norwalkProvider, hartProvider, portlandMeProvider, prtBusProvider, prtRailProvider, fairfaxConnectorProvider, dashProvider, lantaProvider, bartaProvider, redRoseProvider, rabbittransitProvider, nycFerryProvider, nyWaterwayProvider, seastreakProvider, statueFerriesProvider, siFerryProvider, mbtaFerryProvider, rooseveltTramProvider, adsbProvider];
 
@@ -72,7 +73,8 @@ export function deriveBoards(all: readonly TransitProvider[]): Board[] {
   return [...boards.values()].sort((a, b) => modeOrder(a.mode) - modeOrder(b.mode) || a.region.name.localeCompare(b.region.name));
 }
 
-export const listBoards = () => deriveBoards(PROVIDERS);
+/** Boards worth offering now: a generated agency whose data the host does not have (its feed broke at the last ingest) is left out. */
+export const listBoards = () => deriveBoards(PROVIDERS.filter((p) => isServed(p.id)));
 
 /** Resolve URL segments to a board, or undefined if nothing serves it. */
 export function findBoard(modeSlug: string, regionId: string): Board | undefined {
