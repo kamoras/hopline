@@ -1,6 +1,6 @@
 {
  "source": "https://files.mobilitydatabase.org/feeds_v2.csv",
- "generatedOn": "2026-11-23",
+ "generatedOn": "2026-11-24",
  "agencies": [
   {
    "id": "birmingham-jefferson-county-transit-auth-3434",
@@ -1304,7 +1304,7 @@
    "id": "marin-transit-2937",
    "name": "Marin Transit",
    "state": "California",
-   "municipality": "Belvedere",
+   "municipality": "Novato",
    "mdbId": "mdb-2937",
    "staticUrl": "https://marintransit.gov/data/google_transit.zip",
    "bbox": [
@@ -1640,6 +1640,20 @@
     "tripUpdates": "http://rt.pasadenatransit.net/rtt/public/utility/gtfsrealtime.aspx/tripupdate",
     "vehicles": "http://rt.pasadenatransit.net/rtt/public/utility/gtfsrealtime.aspx/vehicleposition"
    }
+  },
+  {
+   "id": "placer-county-transit-3663",
+   "name": "Placer County Transit",
+   "state": "California",
+   "municipality": "Rocklin",
+   "mdbId": "mdb-3663",
+   "staticUrl": "https://feed.actionfigure.ai/placer-county-transit.zip",
+   "bbox": [
+    -121.503,
+    38.573,
+    -120.811,
+    39.207
+   ]
   },
   {
    "id": "plumas-transit-119",
@@ -2409,6 +2423,21 @@
    ]
   },
   {
+   "id": "blue-sky-limo-llc-2616",
+   "name": "Blue Sky Limo LLC",
+   "state": "Colorado",
+   "municipality": "Denver",
+   "mdbId": "mdb-2616",
+   "staticUrl": "https://blueskylimovail.com/blueskylimo_gtfs.zip",
+   "license": "https://creativecommons.org/licenses/by/4.0/",
+   "bbox": [
+    -107.812,
+    37.939,
+    -104.674,
+    40.485
+   ]
+  },
+  {
    "id": "bustang-outrider-2330",
    "name": "Bustang Outrider",
    "state": "Colorado",
@@ -2780,6 +2809,20 @@
     37.101,
     -107.587,
     37.273
+   ]
+  },
+  {
+   "id": "roaring-fork-transportation-authority-2278",
+   "name": "Roaring Fork Transportation Authority",
+   "state": "Colorado",
+   "municipality": "Aspen",
+   "mdbId": "mdb-2278",
+   "staticUrl": "https://www.rfta.com/RFTAGTFSExport.zip",
+   "bbox": [
+    -107.784,
+    39.181,
+    -106.801,
+    39.572
    ]
   },
   {
@@ -3183,6 +3226,26 @@
    ]
   },
   {
+   "id": "southeastern-pennsylvania-transportation-503",
+   "name": "Southeastern Pennsylvania Transportation Authority (SEPTA) (Rail)",
+   "state": "Delaware",
+   "municipality": "Claymont",
+   "mdbId": "mdb-503",
+   "staticUrl": "https://www3.septa.org/developer/google_rail.zip",
+   "license": "https://www3.septa.org/developer/",
+   "bbox": [
+    -75.764,
+    39.67,
+    -74.754,
+    40.306
+   ],
+   "rt": {
+    "alerts": "https://www3.septa.org/gtfsrt/septarail-pa-us/Service/rtServiceAlerts.pb",
+    "vehicles": "https://www3.septa.org/gtfsrt/septarail-pa-us/Vehicle/rtVehiclePosition.pb",
+    "tripUpdates": "https://www3.septa.org/gtfsrt/septarail-pa-us/Trip/rtTripUpdates.pb"
+   }
+  },
+  {
    "id": "maryland-transit-administration-467",
    "name": "Maryland Transit Administration (Commuter Bus)",
    "state": "District of Columbia",
@@ -3514,6 +3577,20 @@
     26.785,
     -80.059,
     27.266
+   ]
+  },
+  {
+   "id": "miami-dade-transit-331",
+   "name": "Miami-Dade Transit",
+   "state": "Florida",
+   "municipality": "Miami-Dade County",
+   "mdbId": "mdb-331",
+   "staticUrl": "http://www.miamidade.gov/transit/googletransit/current/google_transit.zip",
+   "bbox": [
+    -81.076,
+    24.716,
+    -80.119,
+    25.985
    ]
   },
   {
@@ -5006,7 +5083,7 @@
    "id": "maryland-transit-administration-466",
    "name": "Maryland Transit Administration (Local Bus)",
    "state": "Maryland",
-   "municipality": "Anne Arundel County",
+   "municipality": "Baltimore",
    "mdbId": "mdb-466",
    "staticUrl": "https://mdotmta-gtfs.s3.amazonaws.com/mdotmta_gtfs_localbus.zip",
    "bbox": [
@@ -5752,7 +5829,7 @@
    "id": "the-rapid-400",
    "name": "The Rapid",
    "state": "Michigan",
-   "municipality": "East Grand Rapids",
+   "municipality": "Kent County",
    "mdbId": "mdb-400",
    "staticUrl": "http://connect.ridetherapid.org/InfoPoint/gtfs-zip.ashx",
    "bbox": [
@@ -5888,7 +5965,7 @@
    "id": "metro-transit-205",
    "name": "Metro Transit",
    "state": "Minnesota",
-   "municipality": "Anoka",
+   "municipality": "Hennepin County",
    "mdbId": "mdb-205",
    "staticUrl": "https://svc.metrotransit.org/mtgtfs/gtfs.zip",
    "bbox": [
@@ -7433,7 +7510,7 @@
    "id": "propark-mobility-columbia-county-public--tld-6745",
    "name": "Propark Mobility, Columbia County Public Transportation",
    "state": "New York",
-   "municipality": "Hudson",
+   "municipality": "Columbia County",
    "mdbId": "tld-6745",
    "staticUrl": "https://s3.amazonaws.com/datatools-511ny/public/Columbia_County_Public_Transit.zip",
    "bbox": [
@@ -8090,6 +8167,25 @@
    ]
   },
   {
+   "id": "akron-metro-regional-transit-authority-m-2071",
+   "name": "Akron Metro Regional Transit Authority (METRO)",
+   "state": "Ohio",
+   "municipality": "Akron",
+   "mdbId": "mdb-2071",
+   "staticUrl": "https://www.yourmetrobus.org/Data/Sites/2/gtfs-data/metro_rta_gtfs.zip",
+   "bbox": [
+    -81.697,
+    40.911,
+    -81.383,
+    41.514
+   ],
+   "rt": {
+    "alerts": "https://realtimemetro.availtec.com/infopoint/GTFS-Realtime.ashx?&Type=Alert",
+    "tripUpdates": "https://realtimemetro.availtec.com/infopoint/GTFS-Realtime.ashx?&Type=TripUpdate",
+    "vehicles": "https://realtimemetro.availtec.com/infopoint/GTFS-Realtime.ashx?&Type=VehiclePosition&serverid=0"
+   }
+  },
+  {
    "id": "allen-county-regional-transit-authority-210",
    "name": "Allen County Regional Transit Authority",
    "state": "Ohio",
@@ -8146,7 +8242,7 @@
    "id": "greater-cleveland-regional-transit-autho-406",
    "name": "Greater Cleveland Regional Transit Authority",
    "state": "Ohio",
-   "municipality": "Brook Park",
+   "municipality": "Cuyahoga County",
    "mdbId": "mdb-406",
    "staticUrl": "https://www.riderta.com/sites/default/files/gtfs/latest/google_transit.zip",
    "license": "http://www.riderta.com/developers",
@@ -8273,6 +8369,25 @@
     -83.46,
     41.729
    ]
+  },
+  {
+   "id": "western-reserve-transit-authority-tld-1717",
+   "name": "Western Reserve Transit Authority",
+   "state": "Ohio",
+   "municipality": "Mahoning County",
+   "mdbId": "tld-1717",
+   "staticUrl": "https://myvalleystops.wrtaonline.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -80.893,
+    40.977,
+    -80.576,
+    41.238
+   ],
+   "rt": {
+    "alerts": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=Alert",
+    "tripUpdates": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://myvalleystops.wrtaonline.com/infopoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
   },
   {
    "id": "campus-area-rapid-transit-cart-182",
@@ -8940,25 +9055,6 @@
    ]
   },
   {
-   "id": "rogue-valley-transportation-district-rvt-3219",
-   "name": "Rogue Valley Transportation District (RVTD)",
-   "state": "Oregon",
-   "municipality": "Ashland",
-   "mdbId": "mdb-3219",
-   "staticUrl": "https://gtfs.rvtd.cadavl.com/RVTD/GTFS/GTFS_RVTD.zip",
-   "bbox": [
-    -122.92,
-    42.176,
-    -122.672,
-    42.444
-   ],
-   "rt": {
-    "alerts": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/Alert.pb",
-    "tripUpdates": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/TripUpdate.pb",
-    "vehicles": "https://gtfsrt.rvtd.cadavl.com/ProfilGtfsRt2_0RSProducer-RVTD/VehiclePosition.pb"
-   }
-  },
-  {
    "id": "sandy-area-metro-sam-261",
    "name": "Sandy Area Metro (SAM)",
    "state": "Oregon",
@@ -9545,25 +9641,6 @@
    ]
   },
   {
-   "id": "pottstown-area-rapid-transit-tld-7025",
-   "name": "Pottstown Area Rapid Transit",
-   "state": "Pennsylvania",
-   "municipality": "Douglass Township",
-   "mdbId": "tld-7025",
-   "staticUrl": "https://part.rideralerts.com/InfoPoint/gtfs-zip.ashx",
-   "bbox": [
-    -75.688,
-    40.228,
-    -75.571,
-    40.334
-   ],
-   "rt": {
-    "alerts": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=Alert",
-    "tripUpdates": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
-    "vehicles": "https://part.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
-   }
-  },
-  {
    "id": "river-valley-transit-tld-4548",
    "name": "River Valley Transit",
    "state": "Pennsylvania",
@@ -9621,6 +9698,26 @@
    }
   },
   {
+   "id": "southeastern-pennsylvania-transportation-502",
+   "name": "Southeastern Pennsylvania Transportation Authority (SEPTA) (Bus)",
+   "state": "Pennsylvania",
+   "municipality": "Philadelphia County",
+   "mdbId": "mdb-502",
+   "staticUrl": "https://www3.septa.org/developer/google_bus.zip",
+   "license": "https://www3.septa.org/developer/",
+   "bbox": [
+    -75.835,
+    39.804,
+    -74.754,
+    40.334
+   ],
+   "rt": {
+    "alerts": "https://www3.septa.org/gtfsrt/septa-pa-us/Service/rtServiceAlerts.pb",
+    "tripUpdates": "https://www3.septa.org/gtfsrt/septa-pa-us/Trip/rtTripUpdates.pb",
+    "vehicles": "https://www3.septa.org/gtfsrt/septa-pa-us/Vehicle/rtVehiclePosition.pb"
+   }
+  },
+  {
    "id": "trans-bridge-lines-ntd-20169",
    "name": "Trans-Bridge Lines",
    "state": "Pennsylvania",
@@ -9675,25 +9772,6 @@
     -75.358,
     40.111
    ]
-  },
-  {
-   "id": "westmoreland-county-transit-authority-tld-6785",
-   "name": "Westmoreland County Transit Authority",
-   "state": "Pennsylvania",
-   "municipality": "Adamsburg",
-   "mdbId": "tld-6785",
-   "staticUrl": "https://wcta.rideralerts.com/InfoPoint/gtfs-zip.ashx",
-   "bbox": [
-    -80.005,
-    40.093,
-    -78.917,
-    40.617
-   ],
-   "rt": {
-    "alerts": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=alert",
-    "tripUpdates": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=tripupdate",
-    "vehicles": "https://wcta.rideralerts.com/InfoPoint/gtfs-realtime.ashx?type=vehicleposition"
-   }
   },
   {
    "id": "bayamon-3627",
@@ -9800,7 +9878,7 @@
    "id": "greenlink-tld-490",
    "name": "Greenlink",
    "state": "South Carolina",
-   "municipality": "Berea",
+   "municipality": "Greenville County",
    "mdbId": "tld-490",
    "staticUrl": "https://gtfs.greenlink.cadavl.com/GTA/GTFS/GTFS_GTA.zip",
    "bbox": [
@@ -10275,7 +10353,7 @@
    "id": "via-metropolitan-transit-tld-217",
    "name": "VIA Metropolitan Transit",
    "state": "Texas",
-   "municipality": "Balcones Heights",
+   "municipality": "Bexar County",
    "mdbId": "tld-217",
    "staticUrl": "http://www.viainfo.net/BusService/google_transit.zip",
    "bbox": [
@@ -11145,20 +11223,6 @@
    ]
   },
   {
-   "id": "city-of-pullman-ntd-294",
-   "name": "City of Pullman",
-   "state": "Washington",
-   "municipality": "Whitman County",
-   "mdbId": "ntd-294",
-   "staticUrl": "https://pullmanbusbeacon.com/gtfs",
-   "bbox": [
-    -117.209,
-    46.712,
-    -117.145,
-    46.758
-   ]
-  },
-  {
    "id": "city-of-seattle-ntd-23",
    "name": "City of Seattle",
    "state": "Washington",
@@ -11359,6 +11423,24 @@
     -120.038,
     48.309
    ]
+  },
+  {
+   "id": "link-transit-275",
+   "name": "Link Transit",
+   "state": "Washington",
+   "municipality": "Chelan County",
+   "mdbId": "mdb-275",
+   "staticUrl": "https://link.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+   "bbox": [
+    -120.674,
+    47.292,
+    -119.98,
+    47.885
+   ],
+   "rt": {
+    "tripUpdates": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=TripUpdate",
+    "vehicles": "https://link.rideralerts.com/InfoPoint/GTFS-Realtime.ashx?Type=VehiclePosition"
+   }
   },
   {
    "id": "lower-columbia-cap-community-action-prog-568",
